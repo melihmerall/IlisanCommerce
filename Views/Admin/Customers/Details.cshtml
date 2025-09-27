@@ -1,0 +1,245 @@
+@model CustomerDetailViewModel
+
+@{
+    ViewData["Title"] = "Müşteri Detayı";
+    Layout = "_AdminLayout";
+}
+
+<div class="container-fluid">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Admin")">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="@Url.Action("Index")">Müşteriler</a></li>
+            <li class="breadcrumb-item active">@Model.Customer.FirstName @Model.Customer.LastName</li>
+        </ol>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2 class="h3 mb-0">@Model.Customer.FirstName @Model.Customer.LastName</h2>
+            <p class="text-muted">Müşteri detayları ve sipariş geçmişi</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <button type="button" class="btn btn-@(Model.Customer.IsActive ? "success" : "warning") btn-sm" onclick="toggleCustomerStatus(@Model.Customer.Id)">
+                <i class="fas fa-@(Model.Customer.IsActive ? "check-circle" : "pause-circle")"></i>
+                @(Model.Customer.IsActive ? "Aktif" : "Pasif")
+            </button>
+            <a href="@Url.Action("Index")" class="btn btn-secondary btn-sm ms-2">
+                <i class="fas fa-arrow-left"></i> Geri
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Customer Info Card -->
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-user"></i> Müşteri Bilgileri
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-sm-5"><strong>Ad Soyad:</strong></div>
+                        <div class="col-sm-7">@Model.Customer.FirstName @Model.Customer.LastName</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-5"><strong>E-posta:</strong></div>
+                        <div class="col-sm-7">@Model.Customer.Email</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-5"><strong>Telefon:</strong></div>
+                        <div class="col-sm-7">@(Model.Customer.Phone ?? "Belirtilmemiş")</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-5"><strong>Kayıt Tarihi:</strong></div>
+                        <div class="col-sm-7">@Model.Customer.CreatedDate.ToString("dd.MM.yyyy")</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-5"><strong>Durum:</strong></div>
+                        <div class="col-sm-7">
+                            <span class="badge bg-@(Model.Customer.IsActive ? "success" : "warning")">
+                                @(Model.Customer.IsActive ? "Aktif" : "Pasif")
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics Card -->
+            <div class="card mt-3">
+                <div class="card-header bg-info text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-bar"></i> İstatistikler
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-sm-6"><strong>Toplam Sipariş:</strong></div>
+                        <div class="col-sm-6">@Model.TotalOrders</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-6"><strong>Toplam Harcama:</strong></div>
+                        <div class="col-sm-6">@Model.TotalSpent.ToString("C", new System.Globalization.CultureInfo("tr-TR"))</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-6"><strong>Ortalama Sipariş:</strong></div>
+                        <div class="col-sm-6">@Model.AverageOrderValue.ToString("C", new System.Globalization.CultureInfo("tr-TR"))</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Orders -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-shopping-cart"></i> Son Siparişler
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.RecentOrders.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Sipariş No</th>
+                                        <th>Tarih</th>
+                                        <th>Durum</th>
+                                        <th>Tutar</th>
+                                        <th>İşlemler</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var order in Model.RecentOrders)
+                                    {
+                                        <tr>
+                                            <td>#@order.Id</td>
+                                            <td>@order.OrderDate.ToString("dd.MM.yyyy")</td>
+                                            <td>
+                                                @switch (order.Status)
+                                                {
+                                                    case OrderStatus.Pending:
+                                                        <span class="badge bg-warning">Beklemede</span>
+                                                        break;
+                                                    case OrderStatus.Processing:
+                                                        <span class="badge bg-info">İşleniyor</span>
+                                                        break;
+                                                    case OrderStatus.Shipped:
+                                                        <span class="badge bg-primary">Kargoda</span>
+                                                        break;
+                                                    case OrderStatus.Delivered:
+                                                        <span class="badge bg-success">Teslim Edildi</span>
+                                                        break;
+                                                    case OrderStatus.Cancelled:
+                                                        <span class="badge bg-danger">İptal Edildi</span>
+                                                        break;
+                                                }
+                                            </td>
+                                            <td>@order.TotalAmount.ToString("C", new System.Globalization.CultureInfo("tr-TR"))</td>
+                                            <td>
+                                                <a href="@Url.Action("Details", "Orders", new { id = order.Id })" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+                            <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">Bu müşterinin henüz siparişi bulunmuyor.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Addresses -->
+            @if (Model.Addresses.Any())
+            {
+                <div class="card mt-3">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-map-marker-alt"></i> Adresler
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            @foreach (var address in Model.Addresses)
+                            {
+                                <div class="col-md-6 mb-3">
+                                    <div class="card @(address.IsDefault ? "border-primary" : "")">
+                                        <div class="card-body">
+                                        <h6 class="card-title">
+                                            @address.AddressTitle
+                                            @if (address.IsDefault)
+                                            {
+                                                <span class="badge bg-primary ms-2">Varsayılan</span>
+                                            }
+                                        </h6>
+                                        <p class="card-text mb-1">
+                                            <strong>@address.FullName</strong><br>
+                                            @address.AddressLine1<br>
+                                            @if (!string.IsNullOrEmpty(address.AddressLine2))
+                                            {
+                                                @address.AddressLine2<br>
+                                            }
+                                            @address.City / @address.District
+                                            @if (!string.IsNullOrEmpty(address.PostalCode))
+                                            {
+                                                @: @address.PostalCode
+                                            }
+                                            <br>
+                                            Türkiye
+                                        </p>
+                                            @if (!string.IsNullOrEmpty(address.Phone))
+                                            {
+                                                <p class="card-text"><i class="fas fa-phone"></i> @address.Phone</p>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    function toggleCustomerStatus(customerId) {
+        if (confirm('Bu müşterinin durumunu değiştirmek istediğinizden emin misiniz?')) {
+            $.ajax({
+                url: '@Url.Action("ToggleStatus")',
+                type: 'POST',
+                data: { id: customerId },
+                headers: {
+                    'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                },
+                success: function(response) {
+                    if (response.success) {
+                        location.reload();
+                    } else {
+                        alert('Hata: ' + response.message);
+                    }
+                },
+                error: function() {
+                    alert('İşlem sırasında bir hata oluştu.');
+                }
+            });
+        }
+    }
+</script>
+}

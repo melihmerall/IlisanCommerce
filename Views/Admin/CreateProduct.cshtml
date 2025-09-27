@@ -1,0 +1,567 @@
+@model IlisanCommerce.Models.Product
+@{
+    ViewData["Title"] = "Yeni Ürün Oluştur";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0">Yeni Ürün Oluştur</h1>
+                <a href="@Url.Action("Products", "Admin")" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Geri Dön
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <form asp-action="CreateProduct" method="post" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+        
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card shadow mb-4 admin-card">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Temel Bilgiler</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Name" class="form-label">Ürün Adı *</label>
+                                    <input asp-for="Name" class="form-control" placeholder="Ürün adını girin" />
+                                    <span asp-validation-for="Name" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="ProductCode" class="form-label">Ürün Kodu *</label>
+                                    <input asp-for="ProductCode" class="form-control" placeholder="Ürün kodunu girin" />
+                                    <span asp-validation-for="ProductCode" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ShortDescription" class="form-label">Kısa Açıklama *</label>
+                            <textarea asp-for="ShortDescription" class="form-control" rows="3" placeholder="Ürünün kısa açıklaması"></textarea>
+                            <span asp-validation-for="ShortDescription" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="LongDescription" class="form-label">Detaylı Açıklama</label>
+                            <textarea asp-for="LongDescription" class="form-control" rows="5" placeholder="Ürünün detaylı açıklaması"></textarea>
+                            <span asp-validation-for="LongDescription" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow mb-4 admin-card">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Fiyat ve Stok Bilgileri</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label asp-for="Price" class="form-label">Satış Fiyatı *</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">₺</span>
+                                        <input asp-for="Price" class="form-control" type="number" step="0.01" placeholder="0.00" />
+                                    </div>
+                                    <span asp-validation-for="Price" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label asp-for="ComparePrice" class="form-label">Liste Fiyatı</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">₺</span>
+                                        <input asp-for="ComparePrice" class="form-control" type="number" step="0.01" placeholder="0.00" />
+                                    </div>
+                                    <span asp-validation-for="ComparePrice" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label asp-for="CategoryId" class="form-label">Kategori *</label>
+                                    <select id="CategoryId" name="CategoryId" class="form-select">
+                                        <option value="">Kategori Seçin</option>
+@{
+    var allCategories = ViewBag.Categories as IEnumerable<IlisanCommerce.Models.Category>;
+    if (allCategories != null)
+    {
+        Func<int?, IEnumerable<IlisanCommerce.Models.Category>> getChildren = null;
+        getChildren = parentId => allCategories.Where(c => c.ParentCategoryId == parentId).OrderBy(c => c.Name);
+
+        Action<IEnumerable<IlisanCommerce.Models.Category>, int> renderOptions = null;
+        renderOptions = (cats, level) =>
+        {
+            foreach (var cat in cats)
+            {
+                var indent = new string('—', level);
+                var selected = Model != null && Model.CategoryId == cat.Id ? "selected" : string.Empty;
+                @:<option value="@cat.Id" @selected>@(indent) @cat.Name</option>
+                var children = getChildren(cat.Id);
+                if (children.Any())
+                {
+                    renderOptions(children, level + 1);
+                }
+            }
+        };
+
+        var roots = getChildren(null);
+        renderOptions(roots, 0);
+    }
+}
+                                    </select>
+                                    <span asp-validation-for="CategoryId" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label asp-for="StockQuantity" class="form-label">Stok Miktarı</label>
+                                    <input asp-for="StockQuantity" class="form-control" type="number" value="0" />
+                                    <span asp-validation-for="StockQuantity" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label asp-for="MinStockLevel" class="form-label">Minimum Stok Seviyesi</label>
+                                    <input asp-for="MinStockLevel" class="form-control" type="number" value="10" />
+                                    <span asp-validation-for="MinStockLevel" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label asp-for="Desi" class="form-label">Desi</label>
+                                    <input asp-for="Desi" class="form-control" type="number" step="0.1" value="1.0" />
+                                    <span asp-validation-for="Desi" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow mb-4 admin-card">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Ürün Özellikleri</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Brand" class="form-label">Marka</label>
+                                    <input asp-for="Brand" class="form-control" value="ILISAN" />
+                                    <span asp-validation-for="Brand" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Weight" class="form-label">Ağırlık</label>
+                                    <input asp-for="Weight" class="form-control" placeholder="Örn: 500g" />
+                                    <span asp-validation-for="Weight" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label asp-for="Color" class="form-label">Renk</label>
+                                    <input asp-for="Color" class="form-control" placeholder="Örn: Siyah" />
+                                    <span asp-validation-for="Color" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label asp-for="Size" class="form-label">Boyut</label>
+                                    <input asp-for="Size" class="form-control" placeholder="Örn: L" />
+                                    <span asp-validation-for="Size" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label asp-for="Material" class="form-label">Malzeme</label>
+                                    <input asp-for="Material" class="form-control" placeholder="Örn: Polyester" />
+                                    <span asp-validation-for="Material" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Dimensions" class="form-label">Boyutlar</label>
+                                    <input asp-for="Dimensions" class="form-control" placeholder="Örn: 30x20x10 cm" />
+                                    <span asp-validation-for="Dimensions" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="CertificateType" class="form-label">Sertifika Tipi</label>
+                                    <select asp-for="CertificateType" class="form-select">
+                                        <option value="">Sertifika Seçin</option>
+                                        @foreach (var certType in ViewBag.CertificateTypes as List<string> ?? new List<string>())
+                                        {
+                                            <option value="@certType">@certType</option>
+                                        }
+                                    </select>
+                                    <span asp-validation-for="CertificateType" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card shadow mb-4 admin-card">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Ürün Resimleri</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="productImages" class="form-label">Ürün Resimleri *</label>
+                            <input type="file" name="productImages" id="productImages" class="form-control" accept="image/*" multiple required />
+                            <small class="form-text text-muted">
+                                <i class="fas fa-info-circle"></i> 
+                                Birden fazla resim seçebilirsiniz. İlk seçilen resim ana resim olacaktır. 
+                                Maksimum dosya boyutu: 5MB. Desteklenen formatlar: JPG, PNG, GIF, WebP
+                            </small>
+                        </div>
+
+                        <div id="imagePreviewContainer" class="mt-3" style="display: none;">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-muted">Önizleme</span>
+                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="clearAllImages()">
+                                    <i class="fas fa-trash"></i> Tümünü Temizle
+                                </button>
+                            </div>
+                            <div id="imagePreviewGrid" class="row g-2"></div>
+                            
+                            <div class="mt-3">
+                                <label for="mainImageIndex" class="form-label">Ana Resim Seçimi</label>
+                                <select name="mainImageIndex" id="mainImageIndex" class="form-select">
+                                    <option value="0">1. Resim (Varsayılan)</option>
+                                </select>
+                                <small class="form-text text-muted">Ana resim ürün listelerinde gösterilecek.</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow mb-4 admin-card">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">SEO Ayarları</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label asp-for="Slug" class="form-label">URL Slug</label>
+                            <input asp-for="Slug" class="form-control" placeholder="urun-adi-seo-dostu" id="slugInput" />
+                            <small class="form-text text-muted">
+                                <i class="fas fa-info-circle"></i> 
+                                SEO dostu URL oluşturmak için kullanılır. Türkçe karakterler otomatik dönüştürülür.
+                                Boş bırakılırsa ürün adından otomatik oluşturulur.
+                            </small>
+                            <span asp-validation-for="Slug" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="MetaTitle" class="form-label">Meta Başlık</label>
+                            <input asp-for="MetaTitle" class="form-control" placeholder="SEO için başlık" />
+                            <span asp-validation-for="MetaTitle" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="MetaDescription" class="form-label">Meta Açıklama</label>
+                            <textarea asp-for="MetaDescription" class="form-control" rows="3" placeholder="SEO için açıklama"></textarea>
+                            <span asp-validation-for="MetaDescription" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow mb-4 admin-card">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Durum Ayarları</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-check mb-3">
+                            <input asp-for="IsActive" class="form-check-input" type="checkbox" checked />
+                            <label asp-for="IsActive" class="form-check-label">
+                                Aktif
+                            </label>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input asp-for="IsFeatured" class="form-check-input" type="checkbox" />
+                            <label asp-for="IsFeatured" class="form-check-label">
+                                Öne Çıkan Ürün
+                            </label>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input asp-for="IsSpecialProduct" class="form-check-input" type="checkbox" />
+                            <label asp-for="IsSpecialProduct" class="form-check-label">
+                                Özel Ürün (NATO vb.)
+                            </label>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ProtectionLevel" class="form-label">Koruma Seviyesi</label>
+                            <select asp-for="ProtectionLevel" class="form-control">
+                                <option value="">Seviye Seçin</option>
+                                <option value="1">I</option>
+                                <option value="2">II</option>
+                                <option value="3">IIIA</option>
+                                <option value="4">III</option>
+                                <option value="5">IV</option>
+                            </select>
+                            <span asp-validation-for="ProtectionLevel" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg btn-admin-primary">
+                        <i class="fas fa-save"></i> Ürün Oluştur
+                    </button>
+                    <a href="@Url.Action("Products", "Admin")" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> İptal
+                    </a>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        let selectedImages = [];
+        let mainImageIndex = 0;
+
+        // Professional multi-image upload handler
+        document.getElementById('productImages').addEventListener('change', function(e) {
+            const files = Array.from(e.target.files);
+            selectedImages = [];
+            
+            if (files.length === 0) {
+                document.getElementById('imagePreviewContainer').style.display = 'none';
+                return;
+            }
+
+            const maxSize = 5 * 1024 * 1024; // 5MB
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+            
+            // Validate and process files
+            files.forEach((file, index) => {
+                if (!allowedTypes.includes(file.type.toLowerCase())) {
+                    showNotification(`"${file.name}" dosyası desteklenmeyen formatta.`, 'warning');
+                    return;
+                }
+                
+                if (file.size > maxSize) {
+                    showNotification(`"${file.name}" dosyası çok büyük (maksimum 5MB).`, 'warning');
+                    return;
+                }
+                
+                selectedImages.push({ file, index, url: null });
+            });
+
+            if (selectedImages.length === 0) {
+                document.getElementById('imagePreviewContainer').style.display = 'none';
+                showNotification('Hiç geçerli resim bulunamadı.', 'error');
+                return;
+            }
+
+            // Generate previews
+            generateImagePreviews();
+            updateMainImageOptions();
+            document.getElementById('imagePreviewContainer').style.display = 'block';
+            
+            showNotification(`${selectedImages.length} resim seçildi.`, 'success');
+        });
+
+        function generateImagePreviews() {
+            const grid = document.getElementById('imagePreviewGrid');
+            grid.innerHTML = '';
+            
+            selectedImages.forEach((imageData, index) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imageData.url = e.target.result;
+                    
+                    const col = document.createElement('div');
+                    col.className = 'col-md-4 col-sm-6';
+                    col.innerHTML = `
+                        <div class="card image-preview-card ${index === mainImageIndex ? 'border-primary' : ''}" data-index="${index}">
+                            <img src="${e.target.result}" class="card-img-top" style="height: 120px; object-fit: cover;" alt="Preview ${index + 1}">
+                            <div class="card-body p-2">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">${imageData.file.name}</small>
+                                    <div class="btn-group btn-group-sm">
+                                        <button type="button" class="btn btn-outline-primary btn-sm ${index === mainImageIndex ? 'active' : ''}" 
+                                                onclick="setMainImage(${index})" title="Ana Resim Yap">
+                                            <i class="fas fa-star"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-outline-danger btn-sm" 
+                                                onclick="removeImage(${index})" title="Sil">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="mt-1">
+                                    <small class="text-muted">${formatFileSize(imageData.file.size)}</small>
+                                    ${index === mainImageIndex ? '<span class="badge bg-primary ms-2">Ana Resim</span>' : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    grid.appendChild(col);
+                };
+                reader.readAsDataURL(imageData.file);
+            });
+        }
+
+        function setMainImage(index) {
+            mainImageIndex = index;
+            document.getElementById('mainImageIndex').value = index;
+            
+            // Update UI
+            document.querySelectorAll('.image-preview-card').forEach((card, i) => {
+                card.classList.toggle('border-primary', i === index);
+                const btn = card.querySelector('.btn-outline-primary');
+                btn.classList.toggle('active', i === index);
+                
+                const badge = card.querySelector('.badge');
+                if (badge) badge.remove();
+                
+                if (i === index) {
+                    const cardBody = card.querySelector('.card-body > div:last-child');
+                    cardBody.innerHTML += '<span class="badge bg-primary ms-2">Ana Resim</span>';
+                }
+            });
+            
+            showNotification(`${index + 1}. resim ana resim olarak seçildi.`, 'info');
+        }
+
+        function removeImage(index) {
+            selectedImages.splice(index, 1);
+            
+            // Update main image index if needed
+            if (mainImageIndex >= selectedImages.length) {
+                mainImageIndex = Math.max(0, selectedImages.length - 1);
+            }
+            
+            if (selectedImages.length === 0) {
+                document.getElementById('imagePreviewContainer').style.display = 'none';
+                document.getElementById('productImages').value = '';
+                return;
+            }
+            
+            generateImagePreviews();
+            updateMainImageOptions();
+            showNotification('Resim kaldırıldı.', 'info');
+        }
+
+        function clearAllImages() {
+            selectedImages = [];
+            mainImageIndex = 0;
+            document.getElementById('imagePreviewContainer').style.display = 'none';
+            document.getElementById('productImages').value = '';
+            showNotification('Tüm resimler temizlendi.', 'info');
+        }
+
+        function updateMainImageOptions() {
+            const select = document.getElementById('mainImageIndex');
+            select.innerHTML = '';
+            
+            selectedImages.forEach((_, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = `${index + 1}. Resim${index === 0 ? ' (Varsayılan)' : ''}`;
+                if (index === mainImageIndex) option.selected = true;
+                select.appendChild(option);
+            });
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function showNotification(message, type = 'info') {
+            // Simple notification system
+            const alertClass = {
+                'success': 'alert-success',
+                'warning': 'alert-warning', 
+                'error': 'alert-danger',
+                'info': 'alert-info'
+            }[type] || 'alert-info';
+            
+            const notification = document.createElement('div');
+            notification.className = `alert ${alertClass} alert-dismissible fade show position-fixed`;
+            notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; max-width: 300px;';
+            notification.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+
+        // Auto-generate slug from product name
+        document.getElementById('Name').addEventListener('input', function() {
+            const nameInput = this;
+            const slugInput = document.getElementById('slugInput');
+            
+            // Only auto-generate if slug is empty or matches previous name
+            if (!slugInput.value || slugInput.value === generateSlug(nameInput.dataset.previousValue || '')) {
+                slugInput.value = generateSlug(nameInput.value);
+            }
+            nameInput.dataset.previousValue = nameInput.value;
+        });
+
+        function generateSlug(text) {
+            if (!text) return '';
+            
+            return text
+                .toLowerCase()
+                .trim()
+                // Turkish character replacements
+                .replace(/ğ/g, 'g')
+                .replace(/ü/g, 'u')
+                .replace(/ş/g, 's')
+                .replace(/ı/g, 'i')
+                .replace(/ö/g, 'o')
+                .replace(/ç/g, 'c')
+                // Remove special characters and replace spaces with hyphens
+                .replace(/[^a-z0-9\s-]/g, '')
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-')
+                .replace(/^-|-$/g, '');
+        }
+
+        // Form submission validation
+        document.querySelector('form').addEventListener('submit', function(e) {
+            if (selectedImages.length === 0) {
+                e.preventDefault();
+                showNotification('En az bir ürün resmi eklemelisiniz.', 'error');
+                return false;
+            }
+        });
+    </script>
+}

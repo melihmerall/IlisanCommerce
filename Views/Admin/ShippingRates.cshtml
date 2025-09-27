@@ -1,0 +1,150 @@
+@model IEnumerable<IlisanCommerce.Models.ShippingRate>
+@{
+    ViewData["Title"] = "Kargo Fiyatlandırması";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0">Kargo Fiyatlandırması</h1>
+                <a href="@Url.Action("CreateShippingRate", "Admin")" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Yeni Kargo Fiyatlandırması
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Kargo Fiyatlandırması Listesi</h6>
+                </div>
+                <div class="card-body">
+                    @if (Model.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>Ad</th>
+                                        <th>Desi Aralığı</th>
+                                        <th>Kargo Ücreti</th>
+                                        <th>Ücretsiz Kargo Limiti</th>
+                                        <th>Teslimat Süresi</th>
+                                        <th>Durum</th>
+                                        <th>Varsayılan</th>
+                                        <th>İşlemler</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <strong>@item.Name</strong>
+                                                @if (!string.IsNullOrEmpty(item.Description))
+                                                {
+                                                    <br><small class="text-muted">@item.Description</small>
+                                                }
+                                            </td>
+                                            <td>@item.DesiRange</td>
+                                            <td>@item.ShippingCost.ToString("C")</td>
+                                            <td>
+                                                @if (item.FreeShippingThreshold.HasValue)
+                                                {
+                                                    @item.FreeShippingThreshold.Value.ToString("C")
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">-</span>
+                                                }
+                                            </td>
+                                            <td>@item.EstimatedDeliveryDays</td>
+                                            <td>
+                                                @if (item.IsActive)
+                                                {
+                                                    <span class="badge bg-success">Aktif</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary">Pasif</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (item.IsDefault)
+                                                {
+                                                    <span class="badge bg-primary">Varsayılan</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">-</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    <a href="@Url.Action("EditShippingRate", "Admin", new { id = item.Id })" 
+                                                       class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <button type="button" class="btn btn-sm btn-outline-danger" 
+                                                            onclick="deleteShippingRate(@item.Id, '@item.Name')">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-shipping-fast fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">Henüz kargo fiyatlandırması bulunmuyor</h5>
+                            <p class="text-muted">İlk kargo fiyatlandırmanızı oluşturmak için yukarıdaki butona tıklayın.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Kargo Fiyatlandırmasını Sil</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bu kargo fiyatlandırmasını silmek istediğinizden emin misiniz?</p>
+                <p><strong id="shippingRateName"></strong></p>
+                <p class="text-danger"><small>Bu işlem geri alınamaz!</small></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                <form id="deleteForm" method="post" style="display: inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">Sil</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function deleteShippingRate(id, name) {
+            document.getElementById('shippingRateName').textContent = name;
+            document.getElementById('deleteForm').action = '@Url.Action("DeleteShippingRate", "Admin")/' + id;
+            new bootstrap.Modal(document.getElementById('deleteModal')).show();
+        }
+    </script>
+}

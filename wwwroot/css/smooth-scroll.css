@@ -1,0 +1,293 @@
+/* Varsayılan Scroll ve Genel UI İyileştirmeleri */
+
+/* Ana HTML scroll davranışı - varsayılan */
+html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Body scroll iyileştirmeleri - varsayılan */
+body {
+    -webkit-overflow-scrolling: touch;
+    line-height: 1.6;
+}
+
+/* Custom scrollbar stillleri */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+    transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Firefox scrollbar */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #c1c1c1 #f1f1f1;
+}
+
+/* Scroll to top butonu */
+.scroll-to-top {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
+.scroll-to-top.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.scroll-to-top:hover {
+    background: #20c997;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(40, 167, 69, 0.4);
+}
+
+.scroll-to-top i {
+    font-size: 20px;
+}
+
+/* Parallax scroll iyileştirmeleri */
+.mv-parallax {
+    background-attachment: scroll !important; /* Mobile için fixed yerine scroll */
+}
+
+@media (min-width: 768px) {
+    .mv-parallax {
+        background-attachment: fixed;
+    }
+}
+
+/* Accordion ve dropdown animasyonları */
+.collapse {
+    transition: height 0.35s ease;
+}
+
+.dropdown-menu {
+    transition: all 0.3s ease;
+    transform-origin: top;
+}
+
+/* Cart dropdown scroll */
+.dropdown-menu .block-39-list {
+    max-height: 300px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
+
+.dropdown-menu .block-39-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+.dropdown-menu .block-39-list::-webkit-scrollbar-thumb {
+    background: #ddd;
+    border-radius: 2px;
+}
+
+/* Modal scroll davranışı */
+.modal {
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.modal-dialog {
+    margin: 30px auto;
+}
+
+/* Loading state smooth transitions */
+.loading {
+    opacity: 0.7;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.loading * {
+    cursor: wait !important;
+}
+
+/* Form smooth transitions */
+.form-control, .mv-inputbox {
+    transition: all 0.3s ease;
+}
+
+.form-control:focus, .mv-inputbox:focus {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15);
+}
+
+/* Button hover iyileştirmeleri */
+.mv-btn {
+    transition: all 0.3s ease;
+    transform: translateZ(0); /* Hardware acceleration */
+}
+
+.mv-btn:hover {
+    transform: translateY(-2px);
+}
+
+.mv-btn:active {
+    transform: translateY(0);
+}
+
+/* Image lazy loading iyileştirmeleri */
+img {
+    transition: opacity 0.3s ease;
+}
+
+img[data-src] {
+    opacity: 0;
+}
+
+img.loaded {
+    opacity: 1;
+}
+
+/* Header scroll davranışı */
+.header.scrolled {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+/* Responsive scroll iyileştirmeleri */
+@media (max-width: 768px) {
+    /* Mobile scroll momentum */
+    body {
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Mobile friendly scrollbar */
+    ::-webkit-scrollbar {
+        width: 3px;
+    }
+
+    /* Scroll to top mobile */
+    .scroll-to-top {
+        bottom: 15px;
+        right: 15px;
+        width: 45px;
+        height: 45px;
+    }
+
+    .scroll-to-top i {
+        font-size: 18px;
+    }
+}
+
+/* Scroll snap iyileştirmeleri */
+.section-scroll-snap {
+    scroll-snap-type: y mandatory;
+}
+
+.section-scroll-snap > section {
+    scroll-snap-align: start;
+}
+
+/* Quantity control smooth transitions */
+.quantity-controls .quantity-btn {
+    transition: all 0.2s ease;
+}
+
+.quantity-controls .quantity-btn:hover {
+    background: #007bff;
+    color: white;
+    transform: scale(1.1);
+}
+
+.quantity-controls .quantity-input {
+    transition: border-color 0.3s ease;
+}
+
+.quantity-controls .quantity-input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Notification smooth slide */
+.alert {
+    animation: slideInDown 0.5s ease;
+}
+
+@keyframes slideInDown {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Preload critical images */
+.preload-image {
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.preload-image.loaded {
+    opacity: 1;
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* Performance improvements */
+.gpu-accelerated {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000;
+}
+
+/* Smooth list rendering */
+.cart-item, .product-item {
+    contain: layout;
+    will-change: transform;
+}
+
+/* Intersection observer fade in */
+.fade-in-on-scroll {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s ease;
+}
+
+.fade-in-on-scroll.visible {
+    opacity: 1;
+    transform: translateY(0);
+}

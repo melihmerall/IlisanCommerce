@@ -1,0 +1,695 @@
+@model UserProfileViewModel
+
+@{
+    ViewData["Title"] = "Hesabım";
+    ViewData["MetaDescription"] = "ILISAN kullanıcı hesap paneli - Kişisel bilgiler, adresler ve sipariş geçmişi";
+    Layout = "_Layout";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/account-profile.css" />
+}
+
+<section class="main-banner mv-wrap">
+    <div data-image-src="/images/background/demo_bg_1920x1680.png" class="mv-banner-style-1 mv-bg-overlay-dark overlay-0-85 mv-parallax">
+        <div class="page-name mv-caption-style-6">
+            <div class="container">
+                <div class="mv-title-style-9"><span class="main">Hesabım</span><img src="/images/icon/icon_line_polygon_line.png" alt="icon" class="line" /></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="main-breadcrumb mv-wrap">
+    <div class="mv-breadcrumb-style-1">
+        <div class="container">
+            <ul class="breadcrumb-1-list">
+                <li><a asp-controller="Home" asp-action="Index"><i class="fa fa-home"></i></a></li>
+                <li><a>Hesabım</a></li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<section class="mv-main-body account-profile-main mv-bg-gray mv-wrap">
+    <div class="container">
+
+    <div class="row">
+        <!-- Profile Sidebar -->
+        <div class="col-lg-3 mb-4">
+            <!-- Profile Card -->
+            <div class="mv-well-style-2 mv-box-shadow-gray-1 mv-bg-white profile-sidebar">
+                <div class="well-2-body text-center">
+                    <div class="profile-avatar mb-3">
+                        <div class="avatar-circle">
+                            <i class="fa fa-user"></i>
+                        </div>
+                    </div>
+                    <h5 class="profile-name">@Model.User.FullName</h5>
+                    <p class="profile-email">@Model.User.Email</p>
+
+                    <div class="profile-stats mt-4">
+                        <div class="row text-center">
+                            <div class="col-6">
+                                <div class="stat-item">
+                                    <div class="stat-number">@Model.TotalOrders</div>
+                                    <div class="stat-label">Toplam Sipariş</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="stat-item">
+                                    <div class="stat-number">@Model.TotalSpent.ToString("C", new System.Globalization.CultureInfo("tr-TR"))</div>
+                                    <div class="stat-label">Toplam Harcama</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Navigation -->
+            <div class="mv-well-style-2 mv-box-shadow-gray-1 mv-bg-white mt-3">
+                <div class="well-2-header">
+                    <div class="mv-title-style-13">
+                        <div class="text-main">Hızlı Erişim</div>
+                    </div>
+                </div>
+                <div class="well-2-body">
+                    <nav class="profile-navigation">
+                        <a href="#personal-info" class="nav-item active">
+                            <i class="fa fa-user"></i>
+                            <span>Kişisel Bilgiler</span>
+                        </a>
+                        <a href="#addresses" class="nav-item">
+                            <i class="fa fa-map-marker"></i>
+                            <span>Adreslerim</span>
+                        </a>
+                        <a href="#orders" class="nav-item">
+                            <i class="fa fa-shopping-bag"></i>
+                            <span>Siparişlerim</span>
+                        </a>
+                        <a href="/siparislerim" class="nav-item">
+                            <i class="fa fa-list"></i>
+                            <span>Tüm Siparişler</span>
+                        </a>
+                        <a href="#" class="nav-item" onclick="confirmLogout()">
+                            <i class="fa fa-sign-out"></i>
+                            <span>Çıkış Yap</span>
+                        </a>
+                    </nav>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-lg-9">
+            <!-- Personal Information -->
+            <div id="personal-info" class="mv-well-style-2 mv-box-shadow-gray-1 mv-bg-white">
+                <div class="well-2-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="mv-title-style-13">
+                            <div class="text-main"><i class="fa fa-user mr-2"></i>Kişisel Bilgiler</div>
+                        </div>
+                        <button class="btn btn-primary-custom btn-sm">
+                            <i class="fa fa-edit mr-1"></i> Düzenle
+                        </button>
+                    </div>
+                </div>
+                <div class="well-2-body">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label class="info-label">Ad</label>
+                            <div class="info-value">@Model.User.FirstName</div>
+                        </div>
+                        <div class="info-item">
+                            <label class="info-label">Soyad</label>
+                            <div class="info-value">@Model.User.LastName</div>
+                        </div>
+                        <div class="info-item">
+                            <label class="info-label">E-posta</label>
+                            <div class="info-value">@Model.User.Email</div>
+                        </div>
+                        <div class="info-item">
+                            <label class="info-label">Telefon</label>
+                            <div class="info-value">@(!string.IsNullOrEmpty(Model.User.Phone) ? Model.User.Phone : "Belirtilmemiş")</div>
+                        </div>
+                        @if (!string.IsNullOrEmpty(Model.User.CompanyName))
+                        {
+                            <div class="info-item">
+                                <label class="info-label">Şirket Adı</label>
+                                <div class="info-value">@Model.User.CompanyName</div>
+                            </div>
+                        }
+                        @if (!string.IsNullOrEmpty(Model.User.TaxNumber))
+                        {
+                            <div class="info-item">
+                                <label class="info-label">Vergi Numarası</label>
+                                <div class="info-value">@Model.User.TaxNumber</div>
+                            </div>
+                        }
+                        <div class="info-item">
+                            <label class="info-label">Üyelik Tarihi</label>
+                            <div class="info-value">@Model.User.CreatedDate.ToString("dd.MM.yyyy")</div>
+                        </div>
+                        <div class="info-item">
+                            <label class="info-label">Hesap Durumu</label>
+                            <div class="info-value">
+                                @if (Model.User.IsActive)
+                                {
+                                    <span class="badge badge-success">Aktif</span>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-danger">Pasif</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Addresses -->
+            <div id="addresses" class="mv-well-style-2 mv-box-shadow-gray-1 mv-bg-white">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-map-marker-alt me-2"></i>
+                        Adreslerim (@Model.Addresses.Count)
+                    </h5>
+                    <button class="btn btn-sm btn-outline-primary" onclick="openAddressModal()">
+                        <i class="fas fa-plus me-1"></i> Yeni Adres Ekle
+                    </button>
+                </div>
+                <div class="card-body">
+                    @if (Model.Addresses.Any())
+                    {
+                        <div class="row">
+                            @foreach (var address in Model.Addresses)
+                            {
+                                <div class="col-md-6 mb-3">
+                                    <div class="address-card @(address.IsDefault ? "default-address" : "")">
+                                        <div class="address-header d-flex justify-content-between align-items-start mb-2">
+                                            <div>
+                                                <h6 class="address-title mb-1">
+                                                    @address.AddressTitle
+                                                    @if (address.IsDefault)
+                                                    {
+                                                        <span class="badge bg-primary ms-2">Varsayılan</span>
+                                                    }
+                                                </h6>
+                                                <small class="text-muted">
+                                                    @switch (address.AddressType)
+                                                    {
+                                                        case AddressType.Shipping:
+                                                            <span>Teslimat Adresi</span>
+                                                            break;
+                                                        case AddressType.Billing:
+                                                            <span>Fatura Adresi</span>
+                                                            break;
+                                                        case AddressType.Both:
+                                                            <span>Fatura & Teslimat</span>
+                                                            break;
+                                                    }
+                                                </small>
+                                            </div>
+                                            <div class="address-actions">
+                                                <button class="btn btn-sm btn-outline-secondary me-1" title="Düzenle" onclick="editAddress(@address.Id)">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger" title="Sil" onclick="deleteAddress(@address.Id)">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="address-details">
+                                            <p class="address-name mb-1">
+                                                <strong>@address.FullName</strong>
+                                            </p>
+                                            <p class="address-text mb-2">
+                                                @address.AddressLine1
+                                                @if (!string.IsNullOrEmpty(address.AddressLine2))
+                                                {
+                                                    <br>@address.AddressLine2
+                                                }
+                                                @if (!string.IsNullOrEmpty(address.Neighborhood))
+                                                {
+                                                    <br>@address.Neighborhood
+                                                }
+                                                <br>@address.District / @address.City
+                                                @if (!string.IsNullOrEmpty(address.PostalCode))
+                                                {
+                                                    <span> - @address.PostalCode</span>
+                                                }
+                                            </p>
+                                            <p class="address-phone mb-0">
+                                                <i class="fas fa-phone me-1"></i>
+                                                @address.Phone
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+                            <i class="fas fa-map-marker-alt fa-3x text-muted mb-3"></i>
+                            <h6 class="text-muted">Henüz bir adres eklenmemiş</h6>
+                            <p class="text-muted mb-3">Siparişleriniz için adres bilgilerini ekleyebilirsiniz.</p>
+                            <button class="btn btn-primary" onclick="openAddressModal()">
+                                <i class="fas fa-plus me-2"></i>
+                                İlk Adresimi Ekle
+                            </button>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Recent Orders -->
+            <div id="orders" class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-shopping-bag me-2"></i>
+                        Son Siparişlerim
+                    </h5>
+                    <a href="@Url.Action("Orders", "Account")" class="btn btn-sm btn-outline-primary">
+                        Tüm Siparişler
+                    </a>
+                </div>
+                <div class="card-body">
+                    @if (Model.RecentOrders.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Sipariş No</th>
+                                        <th>Tarih</th>
+                                        <th>Durum</th>
+                                        <th>Ödeme</th>
+                                        <th>Toplam</th>
+                                        <th>İşlemler</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var order in Model.RecentOrders)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <strong class="order-number">#@order.OrderNumber</strong>
+                                            </td>
+                                            <td>
+                                                @order.OrderDate.ToString("dd.MM.yyyy")
+                                                <br>
+                                                <small class="text-muted">@order.OrderDate.ToString("HH:mm")</small>
+                                            </td>
+                                            <td>
+                                                @switch (order.Status)
+                                                {
+                                                    case OrderStatus.Pending:
+                                                        <span class="badge bg-warning">Beklemede</span>
+                                                        break;
+                                                    case OrderStatus.Confirmed:
+                                                        <span class="badge bg-info">Onaylandı</span>
+                                                        break;
+                                                    case OrderStatus.Processing:
+                                                        <span class="badge bg-primary">Hazırlanıyor</span>
+                                                        break;
+                                                    case OrderStatus.Shipped:
+                                                        <span class="badge bg-success">Kargoya Verildi</span>
+                                                        break;
+                                                    case OrderStatus.Delivered:
+                                                    case OrderStatus.Completed:
+                                                        <span class="badge bg-success">Teslim Edildi</span>
+                                                        break;
+                                                    case OrderStatus.Cancelled:
+                                                        <span class="badge bg-danger">İptal Edildi</span>
+                                                        break;
+                                                    case OrderStatus.Returned:
+                                                        <span class="badge bg-secondary">İade Edildi</span>
+                                                        break;
+                                                }
+                                            </td>
+                                            <td>
+                                                @switch (order.PaymentStatus)
+                                                {
+                                                    case PaymentStatus.Pending:
+                                                        <span class="badge bg-warning">Bekliyor</span>
+                                                        break;
+                                                    case PaymentStatus.Processing:
+                                                        <span class="badge bg-info">İşleniyor</span>
+                                                        break;
+                                                    case PaymentStatus.Paid:
+                                                    case PaymentStatus.Completed:
+                                                        <span class="badge bg-success">Ödendi</span>
+                                                        break;
+                                                    case PaymentStatus.Failed:
+                                                        <span class="badge bg-danger">Başarısız</span>
+                                                        break;
+                                                    case PaymentStatus.Refunded:
+                                                        <span class="badge bg-secondary">İade Edildi</span>
+                                                        break;
+                                                }
+                                            </td>
+                                            <td>
+                                                <strong class="order-total">₺@order.TotalAmount.ToString("N2")</strong>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1" title="Detay Görüntüle">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                @if (!string.IsNullOrEmpty(order.TrackingNumber))
+                                                {
+                                                    <button class="btn btn-sm btn-outline-info" title="Kargo Takip">
+                                                        <i class="fas fa-truck"></i>
+                                                    </button>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+                            <i class="fas fa-shopping-bag fa-3x text-muted mb-3"></i>
+                            <h6 class="text-muted">Henüz bir siparişiniz yok</h6>
+                            <p class="text-muted mb-3">Alışverişe başlamak için ürünlerimizi keşfedin.</p>
+                            <a href="@Url.Action("Index", "Home")" class="btn btn-primary">
+                                <i class="fas fa-shopping-cart me-2"></i>
+                                Alışverişe Başla
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+</section>
+
+<!-- Address Modal -->
+<div class="modal fade" id="addressModal" tabindex="-1" aria-labelledby="addressModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addressModalLabel">Adres Ekle/Düzenle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="addressForm">
+                <div class="modal-body">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" id="addressId" name="Id" value="0">
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="addressTitle" class="form-label">Adres Başlığı <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="addressTitle" name="AddressTitle" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="addressType" class="form-label">Adres Türü <span class="text-danger">*</span></label>
+                            <select class="form-select" id="addressType" name="AddressType" required>
+                                <option value="0">Teslimat Adresi</option>
+                                <option value="1">Fatura Adresi</option>
+                                <option value="2">Fatura & Teslimat</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="firstName" class="form-label">Ad <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="firstName" name="FirstName" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="lastName" class="form-label">Soyad <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="lastName" name="LastName" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="phone" class="form-label">Telefon <span class="text-danger">*</span></label>
+                            <input type="tel" class="form-control" id="phone" name="Phone" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="city" class="form-label">Şehir <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="city" name="City" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="district" class="form-label">İlçe <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="district" name="District" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="postalCode" class="form-label">Posta Kodu</label>
+                            <input type="text" class="form-control" id="postalCode" name="PostalCode">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="addressLine1" class="form-label">Adres Satırı 1 <span class="text-danger">*</span></label>
+                        <textarea class="form-control" id="addressLine1" name="AddressLine1" rows="2" required></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="addressLine2" class="form-label">Adres Satırı 2</label>
+                        <textarea class="form-control" id="addressLine2" name="AddressLine2" rows="2"></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="neighborhood" class="form-label">Mahalle</label>
+                        <input type="text" class="form-control" id="neighborhood" name="Neighborhood">
+                    </div>
+                    
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="isDefault" name="IsDefault">
+                        <label class="form-check-label" for="isDefault">
+                            Varsayılan adres olarak ayarla
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-primary">Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Logout confirmation
+        function confirmLogout() {
+            if (confirm('Çıkış yapmak istediğinizden emin misiniz?')) {
+                // Create a form and submit to logout
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '@Url.Action("Logout", "Account")';
+
+                // Add anti-forgery token
+                const token = document.createElement('input');
+                token.type = 'hidden';
+                token.name = '__RequestVerificationToken';
+                token.value = $('input[name="__RequestVerificationToken"]').val();
+                form.appendChild(token);
+
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+
+        // Navigation highlighting
+        document.addEventListener('DOMContentLoaded', function() {
+            const navItems = document.querySelectorAll('.profile-navigation .nav-item');
+            const sections = document.querySelectorAll('[id^="personal-info"], [id^="addresses"], [id^="orders"]');
+
+            // Smooth scroll for navigation
+            navItems.forEach(item => {
+                if (item.getAttribute('href').startsWith('#')) {
+                    item.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const target = document.querySelector(this.getAttribute('href'));
+                        if (target) {
+                            // Remove active class from all nav items
+                            navItems.forEach(nav => nav.classList.remove('active'));
+                            // Add active class to clicked item
+                            this.classList.add('active');
+
+                            // Scroll to target
+                            target.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'start'
+                            });
+                        }
+                    });
+                }
+            });
+
+            // Intersection Observer for auto-highlighting
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.id;
+                        navItems.forEach(nav => {
+                            nav.classList.remove('active');
+                            if (nav.getAttribute('href') === `#${id}`) {
+                                nav.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }, {
+                threshold: 0.3,
+                rootMargin: '-100px 0px'
+            });
+
+            sections.forEach(section => observer.observe(section));
+        });
+
+        // Address actions
+        function openAddressModal(addressId = 0) {
+            const modal = new bootstrap.Modal(document.getElementById('addressModal'));
+            const form = document.getElementById('addressForm');
+            
+            // Reset form
+            form.reset();
+            document.getElementById('addressId').value = addressId;
+            
+            if (addressId > 0) {
+                // Edit mode - load address data
+                loadAddressData(addressId);
+                document.getElementById('addressModalLabel').textContent = 'Adres Düzenle';
+            } else {
+                // Add mode
+                document.getElementById('addressModalLabel').textContent = 'Yeni Adres Ekle';
+            }
+            
+            modal.show();
+        }
+
+        function loadAddressData(addressId) {
+            fetch(`/api/address/${addressId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const address = data.data;
+                        document.getElementById('addressId').value = address.id;
+                        document.getElementById('addressTitle').value = address.addressTitle || '';
+                        document.getElementById('addressType').value = address.addressType || 0;
+                        document.getElementById('firstName').value = address.firstName || '';
+                        document.getElementById('lastName').value = address.lastName || '';
+                        document.getElementById('phone').value = address.phone || '';
+                        document.getElementById('city').value = address.city || '';
+                        document.getElementById('district').value = address.district || '';
+                        document.getElementById('postalCode').value = address.postalCode || '';
+                        document.getElementById('addressLine1').value = address.addressLine1 || '';
+                        document.getElementById('addressLine2').value = address.addressLine2 || '';
+                        document.getElementById('neighborhood').value = address.neighborhood || '';
+                        document.getElementById('isDefault').checked = address.isDefault || false;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading address:', error);
+                    alert('Adres bilgileri yüklenirken hata oluştu.');
+                });
+        }
+
+        function editAddress(addressId) {
+            openAddressModal(addressId);
+        }
+
+        function deleteAddress(addressId) {
+            if (confirm('Bu adresi silmek istediğinizden emin misiniz?')) {
+                fetch(`/api/address/${addressId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Adres başarıyla silindi.');
+                        location.reload();
+                    } else {
+                        alert('Adres silinirken hata oluştu: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error deleting address:', error);
+                    alert('Adres silinirken hata oluştu.');
+                });
+            }
+        }
+
+        function addNewAddress() {
+            openAddressModal(0);
+        }
+
+        // Form submission
+        document.getElementById('addressForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const addressId = formData.get('Id');
+            const isEdit = addressId > 0;
+            
+            const url = isEdit ? `/api/address/${addressId}` : '/api/address';
+            const method = isEdit ? 'PUT' : 'POST';
+            
+            fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                },
+                body: JSON.stringify({
+                    Id: parseInt(addressId),
+                    AddressTitle: formData.get('AddressTitle'),
+                    AddressType: parseInt(formData.get('AddressType')),
+                    FirstName: formData.get('FirstName'),
+                    LastName: formData.get('LastName'),
+                    Phone: formData.get('Phone'),
+                    City: formData.get('City'),
+                    District: formData.get('District'),
+                    PostalCode: formData.get('PostalCode'),
+                    AddressLine1: formData.get('AddressLine1'),
+                    AddressLine2: formData.get('AddressLine2'),
+                    Neighborhood: formData.get('Neighborhood'),
+                    IsDefault: formData.get('IsDefault') === 'on'
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(isEdit ? 'Adres başarıyla güncellendi.' : 'Adres başarıyla eklendi.');
+                    bootstrap.Modal.getInstance(document.getElementById('addressModal')).hide();
+                    location.reload();
+                } else {
+                    alert('İşlem sırasında hata oluştu: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error saving address:', error);
+                alert('Adres kaydedilirken hata oluştu.');
+            });
+        });
+
+        // Order actions
+        function viewOrderDetail(orderId) {
+            window.location.href = `/siparislerim/${orderId}`;
+        }
+
+        function trackOrder(trackingNumber) {
+            // TODO: Implement order tracking
+            console.log('Track order:', trackingNumber);
+        }
+    </script>
+}

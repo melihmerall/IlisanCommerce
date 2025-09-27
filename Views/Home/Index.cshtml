@@ -1,0 +1,318 @@
+@model IlisanCommerce.Models.HomePageViewModel
+
+@{
+    ViewData["Title"] = "Ana Sayfa - ILISAN";
+    ViewData["MetaDescription"] = "ILISAN - Güvenlik ve sağlık sektörlerinde yenilikçi çözümler. Balistik yelekler, anti-radyasyon ürünleri ve askeri tekstil.";
+}
+
+<section class="home-2-slideshow mv-wrap">
+    <div id="home-2-slideshow" class="mv-caroufredsel">
+        <ul class="mv-slider-wrapper">
+            @if (Model.Sliders != null && Model.Sliders.Any())
+            {
+                @foreach (var slider in Model.Sliders)
+                {
+                    <li class="mv-slider-item">
+                        <img src="@slider.ImageUrl" alt="@slider.Title" class="mv-slider-img" />
+                        <div class="mv-caption-style-2">
+                            <div class="container">
+                                <img src="images/icon/icon_stars.png" alt="icon" class="caption-2-img-1" />
+                                <div class="caption-2-text-1">@slider.Title</div>
+                                <div class="caption-2-text-2">@slider.Subtitle</div>
+                                @if (!string.IsNullOrEmpty(slider.ButtonText) && !string.IsNullOrEmpty(slider.ButtonUrl))
+                                {
+                                    <div class="caption-2-button">
+                                        <a href="@slider.ButtonUrl" class="mv-btn mv-btn-style-1">
+                                            <span class="btn-inner">
+                                                <span class="btn-text">@slider.ButtonText</span>
+                                            </span>
+                                        </a>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </li>
+                }
+            }
+            else
+            {
+                <li class="mv-slider-item">
+                    <img src="images/slideshow/slide_1920x1080.png" alt="ILISAN" class="mv-slider-img" />
+                    <div class="mv-caption-style-2">
+                        <div class="container">
+                            <img src="images/icon/icon_stars.png" alt="icon" class="caption-2-img-1" />
+                            <div class="caption-2-text-1">ILISAN Savunma Sanayi</div>
+                            <div class="caption-2-text-2">Tam bağımsız Türkiye için hiç durmadan çalışmaya devam edeceğiz.</div>
+                        </div>
+                    </div>
+                </li>
+            }
+        </ul>
+    </div>
+</section>
+<!-- .home-2-slideshow-->
+
+<section class="home-2-highlight mv-wrap">
+    <div class="container">
+        <div class="mv-block-style-8">
+            <div class="row block-8-list">
+                @if (Model.FeaturedProducts != null && Model.FeaturedProducts.Any())
+                {
+                    @foreach (var product in Model.FeaturedProducts.Take(3))
+                    {
+                        <article class="col-xs-6 col-sm-4 item post">
+                            <div class="item-inner mv-effect-translate-top-bottom mv-effect-relative">
+                                <div class="block-8-thumb">
+                                    <div class="block-8-thumb-inner">
+                                        <a asp-controller="Product" asp-action="Details" asp-route-slug="@product.Slug" title="@product.Name">
+                                            <img src="@(product.ProductImages?.FirstOrDefault(pi => pi.IsMainImage)?.ImagePath ?? "/images/demo/demo_400x280.png")" alt="@product.Name" class="block-8-thumb-img mv-effect-item active" />
+                                            <img src="@(product.ProductImages?.FirstOrDefault(pi => pi.IsMainImage)?.ImagePath ?? "/images/demo/demo_400x280.png")" alt="@product.Name" class="block-8-thumb-img mv-effect-item" />
+                                        </a>
+                                        <a asp-controller="Product" asp-action="Details" asp-route-slug="@product.Slug" title="@product.Name" class="mv-btn mv-btn-style-25 btn-readmore-plus hidden-xs">
+                                            <span class="btn-inner"></span>
+                                        </a>
+                                    </div>
+                                </div>
+                                <!-- .block-8-thumb-->
+
+                                @if (product.IsSpecialProduct)
+                                {
+                                    <div class="block-8-label mv-label-style-1 label-hot">
+                                        <div class="label-inner">özel</div>
+                                    </div>
+                                }
+                                else if (product.ComparePrice.HasValue && product.ComparePrice > product.Price)
+                                {
+                                    <div class="block-8-label mv-label-style-1 label-sale">
+                                        <div class="label-inner">indirim</div>
+                                    </div>
+                                }
+                                <!-- .block-8-label-->
+
+                                <div class="block-8-main">
+                                    <div class="mv-dp-table align-top">
+                                        <div class="mv-dp-table-cell block-8-title">
+                                            <a asp-controller="Product" asp-action="Details" asp-route-slug="@product.Slug" title="@product.Name">@product.Name</a>
+                                        </div>
+                                        <div class="mv-dp-table-cell block-8-price">@product.Price.ToString("C", new System.Globalization.CultureInfo("tr-TR"))</div>
+                                    </div>
+                                </div>
+                                <!-- .block-8-main-->
+                            </div>
+                        </article>
+                    }
+                }
+            </div>
+        </div>
+        <!-- .mv-block-style-8-->
+    </div>
+</section>
+<!-- .home-2-highlight-->
+
+<section class="home-2-featured-products mv-wrap">
+    <div class="container">
+        <div class="featured-title mv-title-style-3">
+            <div class="title-3-text"><span class="behind">en iyi</span><span class="main">yeni ürünler</span></div>
+        </div>
+        <!-- .featured-title-->
+
+        <div class="featured-main mv-filter-style-2">
+            <div class="filter-button mv-btn-group">
+                <div class="group-inner">
+                    <button data-filter="*" class="mv-btn mv-btn-style-8 active">Tümü</button>
+                    @if (Model.Categories != null && Model.Categories.Any())
+                    {
+                        @foreach (var category in Model.Categories.Take(5))
+                        {
+                            <button data-filter=".category-@category.Id" class="mv-btn mv-btn-style-8">@category.Name</button>
+                        }
+                    }
+                </div>
+            </div>
+            <!-- .filter-button-->
+
+            <div class="row filter-list-wrapper">
+                <div class="filter-list mv-block-style-9">
+                    <div class="block-9-list">
+                        @if (Model.FeaturedProducts != null && Model.FeaturedProducts.Any())
+                        {
+                            @foreach (var product in Model.FeaturedProducts)
+                            {
+                                <article class="col-xs-6 col-sm-4 col-md-3 item post filter-item category-@product.CategoryId">
+                                    <div class="item-inner mv-effect-translate-top-bottom">
+                                        <div class="content-thumb">
+                                            <div class="thumb-inner mv-effect-relative">
+                                                <a asp-controller="Product" asp-action="Details" asp-route-slug="@product.Slug" title="@product.Name">
+                                                    <img src="@(product.ProductImages?.FirstOrDefault(pi => pi.IsMainImage)?.ImagePath ?? "/images/demo/demo_300x400.png")" alt="@product.Name" class="mv-effect-item active" />
+                                                    <img src="@(product.ProductImages?.FirstOrDefault(pi => pi.IsMainImage)?.ImagePath ?? "/images/demo/demo_300x400.png")" alt="@product.Name" class="mv-effect-item" />
+                                                </a>
+
+                                                @if (product.ComparePrice.HasValue && product.ComparePrice > product.Price)
+                                                {
+                                                    var discountPercent = (int)((product.ComparePrice.Value - product.Price) / product.ComparePrice.Value * 100);
+                                                    <div class="content-sale-off mv-label-style-2 text-center">
+                                                        <div class="label-2-inner">
+                                                            <ul class="label-2-ul">
+                                                                <li class="number">-%@discountPercent</li>
+                                                                <li class="text">indirim</li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                }
+
+                                                <div class="content-message mv-message-style-1">
+                                                    <div class="message-inner"></div>
+                                                </div>
+                                            </div>
+
+                                            <div class="content-hover">
+                                                <div class="content-button mv-btn-group text-center">
+                                                    <div class="group-inner">
+                                                        <button type="button" class="mv-btn mv-btn-style-3 btn-3-h-40 responsive-btn-3-type-1 btn-add-to-cart" data-product-id="@product.Id"><i class="fa fa-cart-plus"></i></button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="content-default">
+                                            <div class="content-price">
+                                                <span class="new-price">@product.Price.ToString("C", new System.Globalization.CultureInfo("tr-TR"))</span>
+                                                @if (product.ComparePrice.HasValue && product.ComparePrice > product.Price)
+                                                {
+                                                    <span class="old-price">@product.ComparePrice.Value.ToString("C", new System.Globalization.CultureInfo("tr-TR"))</span>
+                                                }
+                                            </div>
+                                            <div class="content-desc">
+                                                <a asp-controller="Product" asp-action="Details" asp-route-slug="@product.Slug" title="@product.Name" class="mv-overflow-ellipsis">@product.Name</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </article>
+                            }
+                        }
+                        else
+                        {
+                            <div class="col-12 text-center">
+                                <p>Öne çıkan ürün bulunamadı.</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+            <!-- .filter-list-wrapper-->
+        </div>
+        <!-- .featured-main-->
+    </div>
+</section>
+<!-- .home-2-featured-products-->
+
+
+<section class="home-2-service mv-wrap">
+    <div class="container">
+        <div class="home-2-service-main">
+            <div class="mv-block-style-11">
+                <div class="mv-dp-table align-middle">
+                    <div class="mv-dp-table-cell hidden-xs">
+                        <div class="block-11-icon">
+                            <div class="text-behind">ücretsiz kargo</div>
+                            <div class="polygon hidden-xs hidden-sm"><i class="icon fa fa-truck"></i></div>
+                        </div>
+                    </div>
+                    <div class="mv-dp-table-cell">
+                        <div class="block-11-gift">
+                            <div class="icon-gift"><i class="icon fa fa-gift"></i></div>
+                            <div class="mv-title-style-3 no-text-behind">
+                                <div class="title-3-text">
+                                    <span class="main">SİPARİŞ HEDİYESİ İNDİRİMİ</span>
+                                    <span class="sub">Tüm siparişlerinizde özel indirim fırsatları</span>
+                                </div>
+                                <div class="title-3-line"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mv-dp-table-cell hidden-xs">
+                        <div class="block-11-icon">
+                            <div class="text-behind">GÜVENLİ ÖDEME</div>
+                            <div class="polygon hidden-xs hidden-sm"><i class="icon fa fa-shield"></i></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- .mv-block-style-11-->
+        </div>
+        <!-- .home-2-service-main-->
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Add to cart functionality for home page products
+            $('.btn-add-to-cart').click(function() {
+                var productId = $(this).data('product-id');
+                var button = $(this);
+                var messageDiv = $('.content-message .message-inner', $(this).closest('.item-inner'));
+                
+                // Disable button during request
+                button.prop('disabled', true);
+                
+                $.ajax({
+                    url: '@Url.Action("AddToCart", "Cart")',
+                    type: 'POST',
+                    data: {
+                        productId: productId,
+                        quantity: 1
+                    },
+                    dataType: 'json',
+                    success: function(result) {
+                        if (result.success) {
+                            // Update cart count with animation
+                            if (result.cartCount !== undefined) {
+                                $('#cart-count').addClass('cart-update-animation').text(result.cartCount);
+                                setTimeout(() => $('#cart-count').removeClass('cart-update-animation'), 600);
+                            }
+                            
+                            // Show professional notification
+                            if (window.cartManager) {
+                                window.cartManager.showToast({
+                                    type: 'success',
+                                    title: 'Sepete Eklendi!',
+                                    message: 'Ürün başarıyla sepete eklendi.',
+                                    duration: 3000
+                                });
+                                
+                                // Update cart preview
+                                window.cartManager.updateCartPreview();
+                            }
+                        } else {
+                            // Show error notification
+                            if (window.cartManager) {
+                                window.cartManager.showToast({
+                                    type: 'error',
+                                    title: 'Hata!',
+                                    message: result.message || 'Ürün sepete eklenemedi.',
+                                    duration: 4000
+                                });
+                            }
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.log('Error:', xhr.responseText);
+                        if (window.cartManager) {
+                            window.cartManager.showToast({
+                                type: 'error',
+                                title: 'Bağlantı Hatası!',
+                                message: 'Bir hata oluştu. Lütfen tekrar deneyin.',
+                                duration: 4000
+                            });
+                        }
+                    },
+                    complete: function() {
+                        // Re-enable button
+                        button.prop('disabled', false);
+                    }
+                });
+            });
+        });
+    </script>
+}

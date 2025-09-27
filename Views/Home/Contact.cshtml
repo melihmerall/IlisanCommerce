@@ -1,0 +1,261 @@
+@model IlisanCommerce.Models.ContactFormModel
+@using IlisanCommerce.Services
+@inject SettingsService SettingsService
+
+@{
+    ViewData["Title"] = "İletişim";
+    ViewData["MetaDescription"] = "ILISAN ile iletişime geçin. Güvenlik ve sağlık çözümleri için uzman ekibimizden destek alın.";
+    
+    var sitePhone = await SettingsService.GetContactPhoneAsync();
+    var siteEmail = await SettingsService.GetContactEmailAsync();
+    var siteAddress = await SettingsService.GetContactAddressAsync();
+    var siteName = await SettingsService.GetSiteNameAsync();
+}
+
+<!-- Hero Section -->
+<section class="hero-section bg-gradient-primary text-white py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="display-4 fw-bold mb-3">İletişim</h1>
+                <p class="lead mb-0">@siteName ile iletişime geçin. Güvenlik ve sağlık çözümleri için uzman ekibimizden destek alın.</p>
+            </div>
+            <div class="col-lg-4 text-end">
+                <i class="fas fa-envelope fa-5x opacity-50"></i>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Breadcrumb -->
+<nav aria-label="breadcrumb" class="bg-light py-3">
+    <div class="container">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="/" class="text-decoration-none">Ana Sayfa</a></li>
+            <li class="breadcrumb-item active" aria-current="page">İletişim</li>
+        </ol>
+    </div>
+</nav>
+
+<!-- Contact Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <!-- Contact Form -->
+            <div class="col-lg-8 mb-5">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="card-title mb-0">
+                            <i class="fas fa-paper-plane me-2"></i>İletişim Formu
+                        </h3>
+                    </div>
+                    <div class="card-body p-4">
+                        @if (TempData["Success"] != null)
+                        {
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        }
+                        @if (TempData["Error"] != null)
+                        {
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="fas fa-exclamation-circle me-2"></i>@TempData["Error"]
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        }
+
+                        <form asp-action="Contact" method="post" class="needs-validation" novalidate>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="FullName" class="form-label">Ad Soyad <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="FullName" name="FullName" required>
+                                    <div class="invalid-feedback">
+                                        Lütfen ad soyadınızı girin.
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="Email" class="form-label">E-posta <span class="text-danger">*</span></label>
+                                    <input type="email" class="form-control" id="Email" name="Email" required>
+                                    <div class="invalid-feedback">
+                                        Lütfen geçerli bir e-posta adresi girin.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="Phone" class="form-label">Telefon</label>
+                                    <input type="tel" class="form-control" id="Phone" name="Phone">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="Subject" class="form-label">Konu <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="Subject" name="Subject" required>
+                                    <div class="invalid-feedback">
+                                        Lütfen konu girin.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="Message" class="form-label">Mesaj <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="Message" name="Message" rows="5" required></textarea>
+                                <div class="invalid-feedback">
+                                    Lütfen mesajınızı yazın.
+                                </div>
+                            </div>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-paper-plane me-2"></i>Mesaj Gönder
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Information -->
+            <div class="col-lg-4">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="card-title mb-0">
+                            <i class="fas fa-info-circle me-2"></i>İletişim Bilgileri
+                        </h3>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="contact-info">
+                            <div class="contact-item mb-4">
+                                <div class="d-flex align-items-start">
+                                    <div class="contact-icon me-3">
+                                        <i class="fas fa-map-marker-alt text-primary fa-lg"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="mb-1">Adres</h5>
+                                        <p class="text-muted mb-0">@siteAddress</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="contact-item mb-4">
+                                <div class="d-flex align-items-start">
+                                    <div class="contact-icon me-3">
+                                        <i class="fas fa-phone text-primary fa-lg"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="mb-1">Telefon</h5>
+                                        <p class="text-muted mb-0">
+                                            <a href="tel:@sitePhone" class="text-decoration-none">@sitePhone</a>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="contact-item mb-4">
+                                <div class="d-flex align-items-start">
+                                    <div class="contact-icon me-3">
+                                        <i class="fas fa-envelope text-primary fa-lg"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="mb-1">E-posta</h5>
+                                        <p class="text-muted mb-0">
+                                            <a href="mailto:@siteEmail" class="text-decoration-none">@siteEmail</a>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="contact-item">
+                                <div class="d-flex align-items-start">
+                                    <div class="contact-icon me-3">
+                                        <i class="fas fa-clock text-primary fa-lg"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="mb-1">Çalışma Saatleri</h5>
+                                        <p class="text-muted mb-0">
+                                            Pazartesi - Cuma: 09:00 - 18:00<br>
+                                            Cumartesi: 09:00 - 14:00<br>
+                                            Pazar: Kapalı
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Social Media -->
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="card-title mb-0">
+                            <i class="fas fa-share-alt me-2"></i>Sosyal Medya
+                        </h3>
+                    </div>
+                    <div class="card-body p-4 text-center">
+                        <p class="text-muted mb-3">Bizi sosyal medyada takip edin</p>
+                        <div class="social-links">
+                            <a href="@(await SettingsService.GetFacebookUrlAsync())" class="btn btn-outline-primary me-2 mb-2" target="_blank">
+                                <i class="fab fa-facebook-f"></i> Facebook
+                            </a>
+                            <a href="@(await SettingsService.GetTwitterUrlAsync())" class="btn btn-outline-info me-2 mb-2" target="_blank">
+                                <i class="fab fa-twitter"></i> Twitter
+                            </a>
+                            <a href="@(await SettingsService.GetInstagramUrlAsync())" class="btn btn-outline-danger me-2 mb-2" target="_blank">
+                                <i class="fab fa-instagram"></i> Instagram
+                            </a>
+                            <a href="@(await SettingsService.GetLinkedInUrlAsync())" class="btn btn-outline-primary me-2 mb-2" target="_blank">
+                                <i class="fab fa-linkedin-in"></i> LinkedIn
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Map Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="card-title mb-0">
+                            <i class="fas fa-map me-2"></i>Konum
+                        </h3>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="map-container" style="height: 400px;">
+                            <iframe 
+                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3153.8354345093747!2d36.9173!3d37.5776!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzfCsDM0JzM5LjQiTiAzNsKwNTUnMDIuMyJF!5e0!3m2!1str!2str!4v1234567890123!5m2!1str!2str"
+                                width="100%" 
+                                height="400" 
+                                style="border:0;" 
+                                allowfullscreen="" 
+                                loading="lazy" 
+                                referrerpolicy="no-referrer-when-downgrade">
+                            </iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+// Form validation
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        var validation = Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
+</script>

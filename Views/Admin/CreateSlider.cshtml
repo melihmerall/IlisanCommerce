@@ -1,0 +1,179 @@
+@model IlisanCommerce.Models.Slider
+@{
+    ViewData["Title"] = "Yeni Slider Oluştur";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0">Yeni Slider Oluştur</h1>
+                <a href="@Url.Action("Sliders", "Admin")" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Geri Dön
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow admin-card">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Slider Bilgileri</h6>
+                </div>
+                <div class="card-body">
+                    <form asp-action="CreateSlider" method="post" enctype="multipart/form-data">
+                        @Html.AntiForgeryToken()
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Title" class="form-label">Başlık *</label>
+                                    <input asp-for="Title" class="form-control" placeholder="Slider başlığı" />
+                                    <span asp-validation-for="Title" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Subtitle" class="form-label">Alt Başlık</label>
+                                    <input asp-for="Subtitle" class="form-control" placeholder="Alt başlık (opsiyonel)" />
+                                    <span asp-validation-for="Subtitle" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label">Açıklama</label>
+                            <textarea asp-for="Description" class="form-control" rows="3" placeholder="Slider açıklaması (opsiyonel)"></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="ButtonText" class="form-label">Buton Metni</label>
+                                    <input asp-for="ButtonText" class="form-control" placeholder="Örn: Detayları Gör" />
+                                    <span asp-validation-for="ButtonText" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="ButtonUrl" class="form-label">Buton URL</label>
+                                    <input asp-for="ButtonUrl" class="form-control" placeholder="Örn: /urunler" />
+                                    <span asp-validation-for="ButtonUrl" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="SortOrder" class="form-label">Sıralama</label>
+                                    <input asp-for="SortOrder" class="form-control" type="number" value="0" />
+                                    <small class="form-text text-muted">Küçük sayılar önce görünür</small>
+                                    <span asp-validation-for="SortOrder" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <div class="form-check mt-4">
+                                        <input asp-for="IsActive" class="form-check-input" type="checkbox" checked />
+                                        <label asp-for="IsActive" class="form-check-label">
+                                            Aktif
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="imageFile" class="form-label">Slider Resmi *</label>
+                            <input type="file" name="imageFile" id="imageFile" class="form-control" accept="image/*" required />
+                            <small class="form-text text-muted">Önerilen boyut: 1920x800px. Maksimum dosya boyutu: 5MB</small>
+                            <div id="imagePreview" class="mt-2" style="display: none;">
+                                <img id="previewImg" src="" alt="Önizleme" style="max-width: 300px; max-height: 150px; object-fit: cover;" class="rounded" />
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="@Url.Action("Sliders", "Admin")" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> İptal
+                            </a>
+                            <button type="submit" class="btn btn-primary btn-admin-primary" id="saveSliderBtn">
+                                <i class="fas fa-save"></i> Slider Oluştur
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow admin-card">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Yardım</h6>
+                </div>
+                <div class="card-body">
+                    <h6>Slider Oluşturma İpuçları:</h6>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-check text-success"></i> Başlık alanı zorunludur</li>
+                        <li><i class="fas fa-check text-success"></i> Resim yüklemek zorunludur</li>
+                        <li><i class="fas fa-check text-success"></i> Sıralama numarası küçük olan önce görünür</li>
+                        <li><i class="fas fa-check text-success"></i> Buton metni ve URL'si opsiyoneldir</li>
+                        <li><i class="fas fa-check text-success"></i> Önerilen resim boyutu: 1920x800px</li>
+                    </ul>
+                    
+                    <hr>
+                    
+                    <h6>Desteklenen Formatlar:</h6>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-image text-info"></i> JPG, JPEG</li>
+                        <li><i class="fas fa-image text-info"></i> PNG</li>
+                        <li><i class="fas fa-image text-info"></i> GIF</li>
+                        <li><i class="fas fa-image text-info"></i> WebP</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const imageInput = document.getElementById('imageFile');
+        const saveBtn = document.getElementById('saveSliderBtn');
+        imageInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const maxSize = 5 * 1024 * 1024;
+                const allowed = ['image/jpeg','image/jpg','image/png','image/gif','image/webp'];
+                if (!allowed.includes(file.type)) {
+                    alert('Sadece JPG, PNG, GIF ve WebP formatları desteklenir.');
+                    imageInput.value = '';
+                    document.getElementById('imagePreview').style.display = 'none';
+                    return;
+                }
+                if (file.size > maxSize) {
+                    alert('Resim dosyası 5MB\'dan büyük olamaz.');
+                    imageInput.value = '';
+                    document.getElementById('imagePreview').style.display = 'none';
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    document.getElementById('previewImg').src = ev.target.result;
+                    document.getElementById('imagePreview').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                document.getElementById('imagePreview').style.display = 'none';
+            }
+        });
+
+        // Disable submit to prevent double post
+        document.querySelector('form').addEventListener('submit', function() {
+            saveBtn.disabled = true;
+        });
+    </script>
+}

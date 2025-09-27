@@ -1,0 +1,386 @@
+@model IlisanCommerce.Models.Category
+
+@{
+    ViewData["Title"] = "Kategori Düzenle";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h4 class="mb-0 fw-bold text-dark">
+                        <i class="fas fa-edit text-primary me-2"></i>
+                        Kategori Düzenle
+                    </h4>
+                    <p class="text-muted small mb-0 mt-1">@Model.Name kategorisini düzenleyin</p>
+                </div>
+                <div>
+                    <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>
+                        Kategorilere Dön
+                    </a>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card shadow-sm border-0 admin-card">
+                        <div class="card-header bg-white border-bottom">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0 fw-semibold">
+                                    <i class="fas fa-info-circle text-primary me-2"></i>
+                                    Kategori Bilgileri
+                                </h5>
+                                <div class="text-muted small">
+                                    ID: @Model.Id | 
+                                    Oluşturulma: @Model.CreatedDate.ToString("dd.MM.yyyy HH:mm")
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <form asp-action="Edit" method="post" id="categoryForm">
+                                <input asp-for="Id" type="hidden" />
+                                <input asp-for="CreatedDate" type="hidden" />
+                                <input asp-for="Slug" type="hidden" />
+                                
+                                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label asp-for="Name" class="form-label fw-semibold">
+                                                Kategori Adı <span class="text-danger">*</span>
+                                            </label>
+                                            <input asp-for="Name" class="form-control" placeholder="Örn: Elektronik, Giyim..." />
+                                            <span asp-validation-for="Name" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label asp-for="ParentCategoryId" class="form-label fw-semibold">
+                                                Üst Kategori
+                                            </label>
+                                            <select asp-for="ParentCategoryId" class="form-select" asp-items="@(new SelectList(ViewBag.ParentCategories, "Id", "Name"))">
+                                                <option value="">Ana kategori olarak ayarla</option>
+                                            </select>
+                                            <div class="form-text">
+                                                <i class="fas fa-info-circle text-info me-1"></i>
+                                                Boş bırakırsanız ana kategori olur
+                                            </div>
+                                            @if (Model.SubCategories.Any())
+                                            {
+                                                <div class="alert alert-warning mt-2 small">
+                                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                                    Bu kategorinin @Model.SubCategories.Count() alt kategorisi var. 
+                                                    Başka bir kategorinin alt kategorisi yapılamaz.
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="Description" class="form-label fw-semibold">
+                                        Açıklama
+                                    </label>
+                                    <textarea asp-for="Description" class="form-control" rows="3" 
+                                              placeholder="Kategori hakkında kısa bir açıklama yazın..."></textarea>
+                                    <span asp-validation-for="Description" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="ImageUrl" class="form-label fw-semibold">
+                                        Kategori Görseli URL
+                                    </label>
+                                    <input asp-for="ImageUrl" class="form-control" placeholder="https://example.com/image.jpg" />
+                                    <span asp-validation-for="ImageUrl" class="text-danger"></span>
+                                    <div class="form-text">
+                                        <i class="fas fa-image text-info me-1"></i>
+                                        Kategori için görsel URL'si ekleyebilirsiniz (opsiyonel)
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <div class="form-check form-switch">
+                                                <input asp-for="IsActive" class="form-check-input" />
+                                                <label asp-for="IsActive" class="form-check-label fw-semibold">
+                                                    Kategori Aktif
+                                                </label>
+                                            </div>
+                                            <div class="form-text">
+                                                <i class="fas fa-toggle-on text-success me-1"></i>
+                                                Aktif kategoriler ürün ekleme sırasında görünür
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                                    <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+                                        <i class="fas fa-times me-1"></i>
+                                        İptal
+                                    </a>
+                                    <button type="submit" class="btn btn-primary" id="saveButton">
+                                        <span class="button-text">
+                                            <i class="fas fa-save me-1"></i>
+                                            Değişiklikleri Kaydet
+                                        </span>
+                                        <span class="button-loading d-none">
+                                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                            Kaydediliyor...
+                                        </span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <!-- Önizleme Kartı -->
+                    <div class="card shadow-sm border-0 mb-4">
+                        <div class="card-header bg-light border-bottom">
+                            <h6 class="mb-0 fw-semibold">
+                                <i class="fas fa-eye text-info me-2"></i>
+                                Kategori Önizleme
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div id="categoryPreview" class="text-center">
+                                <div class="mb-3">
+                                    <div id="previewImage" class="mx-auto mb-2" style="width: 64px; height: 64px; display: none;">
+                                        <img src="" alt="Kategori Görseli" class="rounded" style="width: 100%; height: 100%; object-fit: cover;">
+                                    </div>
+                                    <div id="previewIcon" class="mx-auto mb-2 bg-light rounded d-flex align-items-center justify-content-center" 
+                                         style="width: 64px; height: 64px;">
+                                        <i class="fas fa-folder fa-2x text-muted"></i>
+                                    </div>
+                                </div>
+                                <h6 id="previewName" class="fw-semibold text-dark mb-1">@Model.Name</h6>
+                                <p id="previewDescription" class="text-muted small mb-2">@(Model.Description ?? "Kategori açıklaması")</p>
+                                <div>
+                                    <span id="previewStatus" class="badge @(Model.IsActive ? "bg-success" : "bg-secondary")">
+                                        @(Model.IsActive ? "Aktif" : "Pasif")
+                                    </span>
+                                    <span id="previewType" class="badge @(Model.ParentCategoryId.HasValue ? "bg-warning" : "bg-info") ms-1">
+                                        @(Model.ParentCategoryId.HasValue ? "Alt Kategori" : "Ana Kategori")
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- İstatistik Kartı -->
+                    <div class="card shadow-sm border-0 mb-4">
+                        <div class="card-header bg-info bg-opacity-10 border-bottom">
+                            <h6 class="mb-0 fw-semibold text-info">
+                                <i class="fas fa-chart-bar me-2"></i>
+                                Kategori İstatistikleri
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <div class="border-end">
+                                        <div class="h4 mb-1 text-success fw-bold">@Model.Products.Count()</div>
+                                        <div class="small text-muted">Ürün Sayısı</div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="h4 mb-1 text-info fw-bold">@Model.SubCategories.Count()</div>
+                                    <div class="small text-muted">Alt Kategori</div>
+                                </div>
+                            </div>
+                            
+                            @if (Model.SubCategories.Any())
+                            {
+                                <hr class="my-3">
+                                <div class="small">
+                                    <div class="fw-semibold mb-2 text-muted">Alt Kategoriler:</div>
+                                    @foreach (var subCategory in Model.SubCategories.Take(5))
+                                    {
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <span class="text-truncate">@subCategory.Name</span>
+                                            <span class="badge bg-light text-dark">@subCategory.Products.Count() ürün</span>
+                                        </div>
+                                    }
+                                    @if (Model.SubCategories.Count() > 5)
+                                    {
+                                        <div class="text-muted small">ve @(Model.SubCategories.Count() - 5) tane daha...</div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Uyarı Kartı -->
+                    @if (Model.Products.Any() || Model.SubCategories.Any())
+                    {
+                        <div class="card shadow-sm border-0">
+                            <div class="card-header bg-warning bg-opacity-10 border-bottom">
+                                <h6 class="mb-0 fw-semibold text-warning">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    Önemli Uyarılar
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="small">
+                                    @if (Model.Products.Any())
+                                    {
+                                        <div class="mb-2">
+                                            <i class="fas fa-info-circle text-info me-2"></i>
+                                            Bu kategoride <strong>@Model.Products.Count() ürün</strong> bulunuyor
+                                        </div>
+                                    }
+                                    @if (Model.SubCategories.Any())
+                                    {
+                                        <div class="mb-2">
+                                            <i class="fas fa-info-circle text-info me-2"></i>
+                                            Bu kategorinin <strong>@Model.SubCategories.Count() alt kategorisi</strong> var
+                                        </div>
+                                    }
+                                    <div class="text-warning">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                        Kategoriyi pasif hale getirmek ürünlerin görünürlüğünü etkileyebilir
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+$(document).ready(function() {
+    // Form submit loading state
+    $('#categoryForm').on('submit', function() {
+        const saveButton = $('#saveButton');
+        saveButton.find('.button-text').addClass('d-none');
+        saveButton.find('.button-loading').removeClass('d-none');
+        saveButton.prop('disabled', true);
+    });
+
+    // Alt kategorisi olan kategoriler üst kategori olamaz
+    @if (Model.SubCategories.Any())
+    {
+        <text>
+        $('#ParentCategoryId').prop('disabled', true);
+        </text>
+    }
+
+    // Önizleme güncelleme
+    function updatePreview() {
+        const name = $('#Name').val() || '@Model.Name';
+        const description = $('#Description').val() || '@(Model.Description ?? "Kategori açıklaması")';
+        const imageUrl = $('#ImageUrl').val();
+        const isActive = $('#IsActive').is(':checked');
+        const parentCategoryId = $('#ParentCategoryId').val();
+        
+        $('#previewName').text(name);
+        $('#previewDescription').text(description);
+        
+        // Görsel önizleme
+        if (imageUrl && imageUrl.trim() !== '') {
+            $('#previewImage img').attr('src', imageUrl);
+            $('#previewImage').show();
+            $('#previewIcon').hide();
+        } else {
+            $('#previewImage').hide();
+            $('#previewIcon').show();
+        }
+        
+        // Durum önizleme
+        if (isActive) {
+            $('#previewStatus').removeClass('bg-secondary').addClass('bg-success').text('Aktif');
+        } else {
+            $('#previewStatus').removeClass('bg-success').addClass('bg-secondary').text('Pasif');
+        }
+        
+        // Tip önizleme
+        if (parentCategoryId) {
+            $('#previewType').removeClass('bg-info').addClass('bg-warning').text('Alt Kategori');
+        } else {
+            $('#previewType').removeClass('bg-warning').addClass('bg-info').text('Ana Kategori');
+        }
+    }
+
+    // Input değişikliklerini dinle
+    $('#Name, #Description, #ImageUrl').on('input', updatePreview);
+    $('#IsActive, #ParentCategoryId').on('change', updatePreview);
+    
+    // İlk yükleme için mevcut görsel kontrol et
+    const currentImageUrl = $('#ImageUrl').val();
+    if (currentImageUrl && currentImageUrl.trim() !== '') {
+        $('#previewImage img').attr('src', currentImageUrl);
+        $('#previewImage').show();
+        $('#previewIcon').hide();
+    }
+
+    // Görsel URL hata kontrolü
+    $('#ImageUrl').on('input', function() {
+        const url = $(this).val();
+        if (url && url.trim() !== '') {
+            const img = new Image();
+            img.onload = function() {
+                $('#previewImage img').attr('src', url);
+                $('#previewImage').show();
+                $('#previewIcon').hide();
+            };
+            img.onerror = function() {
+                $('#previewImage').hide();
+                $('#previewIcon').show();
+            };
+            img.src = url;
+        } else {
+            $('#previewImage').hide();
+            $('#previewIcon').show();
+        }
+    });
+});
+</script>
+
+<style>
+.card {
+    transition: box-shadow 0.15s ease-in-out;
+}
+
+.card:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1) !important;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.btn {
+    transition: all 0.15s ease-in-out;
+}
+
+#categoryPreview {
+    transition: all 0.3s ease;
+}
+
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+}
+
+.badge {
+    font-size: 0.75em;
+}
+
+.border-end {
+    border-right: 1px solid #dee2e6 !important;
+}
+</style>
+}

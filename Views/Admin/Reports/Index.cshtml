@@ -1,0 +1,379 @@
+@model ReportsViewModel
+@{
+    ViewData["Title"] = "Raporlar ve Analitik";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-0">📊 Raporlar ve Analitik</h2>
+            <p class="text-muted mb-0">Satış raporları ve istatistikler</p>
+        </div>
+        
+        <!-- Date Filter -->
+        <div class="card">
+            <div class="card-body p-3">
+                <form method="post" asp-action="FilterReports" class="d-flex align-items-center gap-2">
+                    <label class="form-label mb-0 me-2">Tarih Aralığı:</label>
+                    <input type="date" name="startDate" class="form-control form-control-sm" 
+                           value="@Model.StartDate.ToString("yyyy-MM-dd")" style="width: 150px;">
+                    <span class="mx-1">-</span>
+                    <input type="date" name="endDate" class="form-control form-control-sm" 
+                           value="@Model.EndDate.ToString("yyyy-MM-dd")" style="width: 150px;">
+                    <button type="submit" class="btn btn-primary btn-sm">
+                        <i class="fas fa-filter"></i> Filtrele
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title">Toplam Sipariş</h6>
+                            <h3 class="mb-0">@Model.OrderSummary.TotalOrders</h3>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-shopping-cart fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title">Toplam Gelir</h6>
+                            <h3 class="mb-0">@Model.OrderSummary.TotalRevenue.ToString("C", new System.Globalization.CultureInfo("tr-TR"))</h3>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-lira-sign fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title">Ortalama Sipariş</h6>
+                            <h3 class="mb-0">@Model.OrderSummary.AverageOrderValue.ToString("C", new System.Globalization.CultureInfo("tr-TR"))</h3>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-calculator fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title">Bekleyen Sipariş</h6>
+                            <h3 class="mb-0">@Model.OrderSummary.PendingOrders</h3>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-clock fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Period Comparison Cards -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">📅 Bugün</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6">
+                            <small class="text-muted">Sipariş</small>
+                            <h4 class="text-primary">@Model.OrderSummary.TodayOrders</h4>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">Gelir</small>
+                            <h4 class="text-success">@Model.OrderSummary.TodayRevenue.ToString("C", new System.Globalization.CultureInfo("tr-TR"))</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">📊 Bu Hafta</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6">
+                            <small class="text-muted">Sipariş</small>
+                            <h4 class="text-primary">@Model.OrderSummary.WeekOrders</h4>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">Gelir</small>
+                            <h4 class="text-success">@Model.OrderSummary.WeekRevenue.ToString("C", new System.Globalization.CultureInfo("tr-TR"))</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">📈 Bu Ay</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6">
+                            <small class="text-muted">Sipariş</small>
+                            <h4 class="text-primary">@Model.OrderSummary.MonthOrders</h4>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">Gelir</small>
+                            <h4 class="text-success">@Model.OrderSummary.MonthRevenue.ToString("C", new System.Globalization.CultureInfo("tr-TR"))</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row mb-4">
+        <!-- Daily Sales Chart -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">📈 Günlük Satış Trendi</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="dailySalesChart" height="100"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Order Status Chart -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">🥧 Sipariş Durumları</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="orderStatusChart" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Monthly Revenue & Top Products -->
+    <div class="row mb-4">
+        <!-- Monthly Revenue Chart -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">📊 Aylık Gelir Trendi (Son 12 Ay)</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="monthlyRevenueChart" height="100"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Top Products -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">🏆 En Çok Satan Ürünler</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Ürün</th>
+                                    <th>Adet</th>
+                                    <th>Gelir</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var product in Model.TopProducts.Take(5))
+                                {
+                                    <tr>
+                                        <td>
+                                            <small>@product.ProductName</small>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-primary">@product.TotalSold</span>
+                                        </td>
+                                        <td>
+                                            <small class="text-success">@product.TotalRevenue.ToString("C", new System.Globalization.CultureInfo("tr-TR"))</small>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Daily Sales Chart
+    const dailySalesCtx = document.getElementById('dailySalesChart').getContext('2d');
+    const dailySalesData = @Html.Raw(Json.Serialize(Model.DailySales));
+    
+    new Chart(dailySalesCtx, {
+        type: 'line',
+        data: {
+            labels: dailySalesData.map(d => new Date(d.date).toLocaleDateString('tr-TR')),
+            datasets: [{
+                label: 'Günlük Gelir (₺)',
+                data: dailySalesData.map(d => d.revenue),
+                borderColor: 'rgb(75, 192, 192)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                tension: 0.1
+            }, {
+                label: 'Sipariş Sayısı',
+                data: dailySalesData.map(d => d.orderCount),
+                borderColor: 'rgb(255, 99, 132)',
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                yAxisID: 'y1',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            interaction: {
+                mode: 'index',
+                intersect: false,
+            },
+            scales: {
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    grid: {
+                        drawOnChartArea: false,
+                    },
+                }
+            }
+        }
+    });
+
+    // Order Status Chart
+    const orderStatusCtx = document.getElementById('orderStatusChart').getContext('2d');
+    const statusData = @Html.Raw(Json.Serialize(Model.StatusCounts));
+    
+    new Chart(orderStatusCtx, {
+        type: 'doughnut',
+        data: {
+            labels: statusData.map(s => s.statusText),
+            datasets: [{
+                data: statusData.map(s => s.count),
+                backgroundColor: [
+                    '#FF6384',
+                    '#36A2EB',
+                    '#FFCE56',
+                    '#4BC0C0',
+                    '#9966FF',
+                    '#FF9F40',
+                    '#FF6384'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+
+    // Monthly Revenue Chart
+    const monthlyRevenueCtx = document.getElementById('monthlyRevenueChart').getContext('2d');
+    const monthlyData = @Html.Raw(Json.Serialize(Model.MonthlyRevenue));
+    
+    new Chart(monthlyRevenueCtx, {
+        type: 'bar',
+        data: {
+            labels: monthlyData.map(m => `${m.monthName} ${m.year}`),
+            datasets: [{
+                label: 'Aylık Gelir (₺)',
+                data: monthlyData.map(m => m.revenue),
+                backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+});
+</script>
+
+<style>
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    border: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.bg-primary { background-color: #0d6efd !important; }
+.bg-success { background-color: #198754 !important; }
+.bg-info { background-color: #0dcaf0 !important; }
+.bg-warning { background-color: #ffc107 !important; }
+
+.table-sm th,
+.table-sm td {
+    padding: 0.3rem;
+}
+
+.opacity-75 {
+    opacity: 0.75;
+}
+</style>

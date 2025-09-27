@@ -1,0 +1,181 @@
+@model IlisanCommerce.ViewComponents.HeaderViewModel
+
+<div class="header-top">
+    <div class="container">
+        <div class="header-top-inner">
+            <div class="mv-col-wrapper">
+                <div class="mv-col-left header-contact">
+                    <ul class="mv-ul clearfix group-contact hidden-xs">
+                        <li class="item-button mv-icon-left-style-2">
+                            <span class="text"> 
+                                <span class="icon"><i class="fa fa-clock-o"></i></span>@Model.WorkingHours
+                            </span>
+                        </li>
+                        <li class="item-button mv-icon-left-style-2">
+                            <a href="tel:@Model.SitePhone.Replace(" ", "").Replace("(", "").Replace(")", "").Replace("-", "")" class="text"> 
+                                <span class="icon"><i class="fa fa-phone"></i></span>Telefon: @Model.SitePhone
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <!-- .header-contact-->
+
+                <div class="mv-col-right align-bottom header-account">
+                    <div class="mv-btn-group text-right">
+                        <div class="group-inner">
+                            <div class="item-button mv-btn dropdown mv-dropdown-style-1">
+                                <button type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="mv-btn mv-btn-style-12">
+                                    <span class="btn-text hidden-xs hidden-sm">Hesabım</span>
+                                    <i class="btn-icon fa fa-user hidden-md hidden-lg"></i>
+                                    <i class="icon fa fa-caret-down"></i>
+                                </button>
+                                <div class="dropdown-menu pull-right">
+                                    <div class="dropdown-menu-inner">
+                                        <nav class="mv-menu-style-3">
+                                            @if (Model.IsAuthenticated)
+                                            {
+                                                <ul>
+                                                    <li class="header-user-info">
+                                                        <div style="padding: 10px; border-bottom: 1px solid #eee; margin-bottom: 5px;">
+                                                            <strong>@Model.UserName</strong><br>
+                                                            <small class="text-muted">@Model.UserEmail</small>
+                                                        </div>
+                                                    </li>
+                                                    <li>
+                                                        <a href="/hesabim">
+                                                            <i class="fa fa-user mv-color-primary"></i>&nbsp;
+                                                            Hesabım
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="/siparislerim">
+                                                            <i class="fa fa-shopping-bag mv-color-primary"></i>&nbsp;
+                                                            Siparişlerim
+                                                        </a>
+                                                    </li>
+                                                    <li><a href="#"><i class="fa fa-heart mv-color-primary"></i>&nbsp; Favorilerim</a></li>
+                                                    <li style="border-top: 1px solid #eee; margin-top: 5px;">
+                                                        <form asp-controller="Account" asp-action="Logout" method="post" style="margin: 0;">
+                                                            <button type="submit" style="background: none; border: none; color: #d32f2f; width: 100%; text-align: left; padding: 10px 15px; font-size: 14px;">
+                                                                <i class="fa fa-sign-out"></i>&nbsp; Çıkış Yap
+                                                            </button>
+                                                        </form>
+                                                    </li>
+                                                </ul>
+                                            }
+                                            else
+                                            {
+                                                <ul>
+                                                    <li>
+                                                        <a asp-controller="Account" asp-action="Login">
+                                                            <i class="fa fa-sign-in mv-color-primary"></i>&nbsp;
+                                                            Giriş Yap
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a asp-controller="Account" asp-action="Register">
+                                                            <i class="fa fa-pencil-square-o mv-color-primary"></i>&nbsp;
+                                                            Üye Ol
+                                                        </a>
+                                                    </li>
+                                                    <li><a href="#"><i class="fa fa-heart mv-color-primary"></i>&nbsp; Favorilerim</a></li>
+                                                </ul>
+                                            }
+                                        </nav>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="item-button mv-btn">
+                                <a href="/odeme" class="item-button mv-btn mv-btn-style-12"> 
+                                    <i class="btn-icon fa fa-shopping-cart hidden-md hidden-lg"></i>
+                                    <span class="btn-text hidden-xs hidden-sm">Ödeme</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- .header-account-->
+            </div>
+        </div>
+    </div>
+</div>
+<!-- .header-top-->
+
+<div class="header-main-nav mv-fixed-enabled">
+    <div class="container">
+        <div class="container-inner">
+            <div class="header-toggle-off-canvas hidden-md hidden-lg">
+                <button type="button" class="mv-btn mv-btn-style-5 btn-off-canvas-toggle click-btn-off-canvas-left">
+                    <i class="icon fa fa-bars"></i>
+                </button>
+            </div>
+            <!-- .header-toggle-off-canvas-->
+
+            <div class="header-logo">
+                <a asp-controller="Home" asp-action="Index" title="@Model.SiteName">
+                    <img src="@Model.LogoUrl" alt="logo" class="logo-img img-default image-live-view" />
+                    <img src="@Model.LogoUrl" alt="logo" class="logo-img img-scroll image-live-view" />
+                </a>
+            </div>
+            <!-- .header-logo-->
+
+            <div class="main-nav-wrapper hidden-xs hidden-sm">
+                <nav class="main-nav">
+                    <ul class="nav sf-menu">
+                        <li>
+                            <a asp-controller="Home" asp-action="Index">
+                                <span class="menu-text">Ana Sayfa</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <span class="menu-text">Ürünler <i class="menu-icon fa fa-angle-down"></i></span>
+                            </a>
+                            <ul>
+                                <li><a href="/urunler">Tüm Ürünler</a></li>
+                                @foreach (var category in Model.Categories)
+                                {
+                                    <li><a href="/kategori/@category.Slug">@category.Name</a></li>
+                                }
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <span class="menu-text">Mağaza <i class="menu-icon fa fa-angle-down"></i></span>
+                            </a>
+                            <ul>
+                                <li><a href="/sepet">Sepet</a></li>
+                                <li><a href="/odeme">Ödeme</a></li>
+                                <li><a href="#">Favorilerim</a></li>
+                                <li><a href="/siparislerim">Sipariş Takibi</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="https://ilisan.com.tr/hakkimizda/" target="_blank"><span class="menu-text">Hakkımızda</span></a></li>
+                        <li><a asp-controller="Home" asp-action="Contact"><span class="menu-text">İletişim</span></a></li>
+                    </ul>
+                </nav>
+            </div>
+            <!-- .header-main-nav-->
+
+            <div class="header-right-button">
+                <div class="header-search">
+                    <div class="item-button">
+                        <button type="button" data-toggle="modal" data-target="#popupSearch" class="mv-btn mv-btn-style-10 btn-open-field-search">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        <button type="button" class="mv-btn mv-btn-style-10 btn-open-filter click-btn-off-canvas-right hidden-md hidden-lg">
+                            <i class="fa fa-filter mv-f-18"></i>
+                        </button>
+                    </div>
+                </div>
+                <!-- .header-search-->
+
+                <div class="header-shop">
+                    @await Component.InvokeAsync("Cart")
+                </div>
+                <!-- .header-shop-->
+            </div>
+        </div>
+    </div>
+</div>
+<!-- .header-main-nav-->
