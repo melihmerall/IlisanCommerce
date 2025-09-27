@@ -1,0 +1,205 @@
+@model TestEmailViewModel
+@{
+    ViewData["Title"] = "Test Email Gönder";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-envelope"></i> Test Email Gönder
+                    </h3>
+                </div>
+                <div class="card-body">
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    }
+
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-circle"></i> @TempData["ErrorMessage"]
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    }
+
+                    <form asp-action="TestEmail" method="post">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="RecipientEmail" class="form-label">
+                                        <i class="fas fa-envelope"></i> Alıcı Email *
+                                    </label>
+                                    <input asp-for="RecipientEmail" class="form-control" placeholder="ornek@email.com" />
+                                    <span asp-validation-for="RecipientEmail" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="RecipientName" class="form-label">
+                                        <i class="fas fa-user"></i> Alıcı Adı
+                                    </label>
+                                    <input asp-for="RecipientName" class="form-control" placeholder="Test Kullanıcı" />
+                                    <span asp-validation-for="RecipientName" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="EmailType" class="form-label">
+                                <i class="fas fa-list"></i> Email Tipi *
+                            </label>
+                            <select asp-for="EmailType" class="form-control" id="emailTypeSelect">
+                                <option value="">Email tipi seçiniz...</option>
+                                <option value="welcome">🎉 Hoş Geldin Email</option>
+                                <option value="order_confirmation">📦 Sipariş Onay Email</option>
+                                <option value="password_reset">🔐 Şifre Sıfırlama Email</option>
+                                <option value="shipping_notification">🚚 Kargo Bildirimi Email</option>
+                                <option value="delivery_confirmation">✅ Teslimat Onayı Email</option>
+                                <option value="order_cancellation">❌ Sipariş İptali Email</option>
+                                <option value="contact_form">📧 İletişim Formu Email</option>
+                                <option value="custom">✏️ Özel Email</option>
+                            </select>
+                            <span asp-validation-for="EmailType" class="text-danger"></span>
+                        </div>
+
+                        <!-- Custom Email Fields (hidden by default) -->
+                        <div id="customEmailFields" style="display: none;">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="Subject" class="form-label">
+                                            <i class="fas fa-tag"></i> Konu
+                                        </label>
+                                        <input asp-for="Subject" class="form-control" placeholder="Email konusu" />
+                                        <span asp-validation-for="Subject" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Message" class="form-label">
+                                    <i class="fas fa-comment"></i> Mesaj
+                                </label>
+                                <textarea asp-for="Message" class="form-control" rows="5" placeholder="Email içeriği"></textarea>
+                                <span asp-validation-for="Message" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Email Template Info -->
+                        <div id="templateInfo" class="alert alert-info" style="display: none;">
+                            <h6><i class="fas fa-info-circle"></i> Seçilen Email Template Bilgisi:</h6>
+                            <div id="templateDescription"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane"></i> Test Email Gönder
+                            </button>
+                            <a href="@Url.Action("Dashboard")" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Geri Dön
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Email Templates Info Card -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-info-circle"></i> Email Template'leri Hakkında
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-envelope text-primary"></i> Müşteri Email'leri</h6>
+                            <ul class="list-unstyled">
+                                <li><strong>Hoş Geldin:</strong> Yeni üye kaydında gönderilir</li>
+                                <li><strong>Sipariş Onay:</strong> Sipariş alındığında gönderilir</li>
+                                <li><strong>Şifre Sıfırlama:</strong> Şifre sıfırlama talebinde gönderilir</li>
+                                <li><strong>Kargo Bildirimi:</strong> Sipariş kargoya verildiğinde gönderilir</li>
+                                <li><strong>Teslimat Onayı:</strong> Sipariş teslim edildiğinde gönderilir</li>
+                                <li><strong>Sipariş İptali:</strong> Sipariş iptal edildiğinde gönderilir</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-cog text-success"></i> Sistem Email'leri</h6>
+                            <ul class="list-unstyled">
+                                <li><strong>İletişim Formu:</strong> Admin'e iletişim formu bildirimi</li>
+                                <li><strong>Özel Email:</strong> Kendi konu ve mesajınızla test</li>
+                            </ul>
+                            
+                            <div class="alert alert-warning mt-3">
+                                <small>
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <strong>Not:</strong> Test email'leri gerçek verilerle gönderilir. 
+                                    SMTP ayarlarınızın doğru olduğundan emin olun.
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Email type change handler
+            $('#emailTypeSelect').change(function() {
+                var selectedType = $(this).val();
+                var customFields = $('#customEmailFields');
+                var templateInfo = $('#templateInfo');
+                var templateDescription = $('#templateDescription');
+                
+                // Hide custom fields by default
+                customFields.hide();
+                templateInfo.hide();
+                
+                // Show custom fields for custom email type
+                if (selectedType === 'custom') {
+                    customFields.show();
+                    templateInfo.hide();
+                } else if (selectedType) {
+                    // Show template info for other types
+                    customFields.hide();
+                    templateInfo.show();
+                    
+                    // Set template description
+                    var descriptions = {
+                        'welcome': 'Müşteri kayıt olduğunda gönderilen hoş geldin email template\'i. Kişiselleştirilmiş içerik ve üyelik avantajları içerir.',
+                        'order_confirmation': 'Sipariş alındığında müşteriye gönderilen onay email\'i. Sipariş detayları ve ödeme bilgileri içerir.',
+                        'password_reset': 'Şifre sıfırlama talebinde gönderilen güvenlik email\'i. 24 saat geçerli link içerir.',
+                        'shipping_notification': 'Sipariş kargoya verildiğinde gönderilen bildirim. Takip numarası ve kargo bilgileri içerir.',
+                        'delivery_confirmation': 'Sipariş teslim edildiğinde gönderilen onay email\'i. Teslimat detayları ve değerlendirme linki içerir.',
+                        'order_cancellation': 'Sipariş iptal edildiğinde gönderilen bildirim. İptal sebebi ve iade bilgileri içerir.',
+                        'contact_form': 'İletişim formu gönderildiğinde admin\'e gönderilen bildirim. Gönderen bilgileri ve mesaj içeriği içerir.'
+                    };
+                    
+                    templateDescription.html(descriptions[selectedType] || '');
+                }
+            });
+            
+            // Trigger change event on page load
+            $('#emailTypeSelect').trigger('change');
+        });
+    </script>
+}

@@ -52,7 +52,7 @@ namespace IlisanCommerce.ViewComponents
                 SiteEmail = await _settingsService.GetSettingAsync("Email", "info@ilisan.com.tr"),
                 SiteAddress = await _settingsService.GetSettingAsync("Address", "Üngüt Mah. 71093.Sk 14/C Onikişubat / Kahramanmaraş"),
                 WorkingHours = await _settingsService.GetSettingAsync("WorkingHours", "24/7 Destek"),
-                LogoUrl = await _settingsService.GetSettingAsync("Logo", "/images/logo/logo_2.png"),
+                LogoUrl = await _settingsService.GetSettingAsync("Logo", "/logo.png"),
                 FacebookUrl = await _settingsService.GetSettingAsync("FacebookUrl", "#"),
                 InstagramUrl = await _settingsService.GetSettingAsync("InstagramUrl", "https://instagram.com/ilisansavunma"),
                 LinkedInUrl = await _settingsService.GetSettingAsync("LinkedInUrl", "#"),

@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using IlisanCommerce.Data;
 using IlisanCommerce.Services;
@@ -7,15 +7,38 @@ using IlisanCommerce.Services.Pdf;
 using IlisanCommerce.Services.Reports;
 using IlisanCommerce.Models;
 using Serilog;
+using Serilog.Sinks.MSSqlServer;
+using System.Collections.ObjectModel;
+using System.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configure Serilog
+// Log tablosu ayarları
+var columnOptions = new ColumnOptions
+{
+    AdditionalColumns = new Collection<SqlColumn>
+    {
+        new SqlColumn("UserName", SqlDbType.NVarChar, allowNull: true, dataLength: 50),
+        new SqlColumn("MachineName", SqlDbType.NVarChar, allowNull: true, dataLength: 50),
+    }
+};
+
 Log.Logger = new LoggerConfiguration()
-    .ReadFrom.Configuration(builder.Configuration)
+    .ReadFrom.Configuration(builder.Configuration) // appsettings.json'dan oku
     .Enrich.FromLogContext()
+    .Enrich.WithMachineName()
+    .Enrich.WithThreadId()
+    .Enrich.WithProperty("Application", "IlisanShop") // sabit uygulama adı ekle
     .WriteTo.Console()
-    .WriteTo.File("logs/ilisan-.txt", rollingInterval: RollingInterval.Day)
+    .WriteTo.MSSqlServer(
+        connectionString: builder.Configuration.GetConnectionString("DefaultConnection"),
+        sinkOptions: new MSSqlServerSinkOptions
+        {
+            TableName = "ilisan.Logs",
+            AutoCreateSqlTable = true // tablo yoksa otomatik oluştur
+        },
+        columnOptions: columnOptions
+    )
     .CreateLogger();
 
 builder.Host.UseSerilog();
@@ -68,6 +91,7 @@ builder.Services.AddScoped<SettingsService>();
 builder.Services.AddScoped<IIyzicoPaymentService, IyzicoPaymentService>();
 builder.Services.AddScoped<IShippingService, ShippingService>();
 builder.Services.AddScoped<IFileUploadService, FileUploadService>();
+builder.Services.AddScoped<IApplicationLogService, ApplicationLogService>();
 
 // Logging services - Enterprise-grade logging system
 builder.Services.AddScoped<ILoggingService, LoggingService>();
@@ -191,6 +215,16 @@ app.MapControllerRoute(
     constraints: new { controller = @"^[Aa]pi.*" });
 
 // Default route - fallback for any unmatched URLs  
+app.MapControllerRoute(
+    name: "about",
+    pattern: "hakkimizda",
+    defaults: new { controller = "Home", action = "About" });
+
+app.MapControllerRoute(
+    name: "contact",
+    pattern: "iletisim",
+    defaults: new { controller = "Home", action = "Contact" });
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");

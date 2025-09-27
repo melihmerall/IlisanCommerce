@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace IlisanCommerce.Models
@@ -11,18 +11,18 @@ namespace IlisanCommerce.Models
         public int ProductId { get; set; }
         public Product Product { get; set; } = null!;
 
-        [Required(ErrorMessage = "Varyant adı zorunludur")]
+        [Required(ErrorMessage = "Varyant adi zorunludur")]
         [StringLength(100)]
-        public string VariantName { get; set; } = string.Empty; // Örn: "Mavi - Large"
+        public string VariantName { get; set; } = string.Empty; // Ornek: "Mavi - Large"
 
         [Required(ErrorMessage = "SKU zorunludur")]
         [StringLength(50)]
-        public string SKU { get; set; } = string.Empty; // Stok Kodu
+        public string SKU { get; set; } = string.Empty; // Stok kodu
 
         [Column(TypeName = "decimal(18,2)")]
-        public decimal? PriceAdjustment { get; set; } = 0; // Ana ürün fiyatına ekleme/çıkarma
-        
-        // Calculated property for view compatibility
+        public decimal? PriceAdjustment { get; set; } = 0; // Ana urun fiyatina ekleme/cikarma
+
+        // Computed property for view compatibility
         public decimal Price => Product?.Price + (PriceAdjustment ?? 0) ?? 0;
 
         [Range(0, int.MaxValue)]
@@ -47,11 +47,11 @@ namespace IlisanCommerce.Models
         public string? Dimensions { get; set; }
 
         [Column(TypeName = "decimal(8,2)")]
-        [Range(0.01, double.MaxValue, ErrorMessage = "Desi değeri 0'dan büyük olmalıdır")]
-        public decimal? Desi { get; set; } // Varyant için özel desi bilgisi (null ise ana ürünün desi bilgisini kullan)
+        [Range(0.01, double.MaxValue, ErrorMessage = "Desi degeri 0'dan buyuk olmalidir")]
+        public decimal? Desi { get; set; } // Varyant icin ozel desi bilgisi
 
-        [StringLength(7)] // #FFFFFF formatı için
-        public string? ColorCode { get; set; } // Hex color code
+        [StringLength(7)] // #FFFFFF formati icin
+        public string? ColorCode { get; set; } // Hex renk kodu
 
         public bool IsDefault { get; set; } = false;
         public bool IsActive { get; set; } = true;
@@ -61,12 +61,12 @@ namespace IlisanCommerce.Models
         public DateTime CreatedDate { get; set; } = DateTime.Now;
         public DateTime? UpdatedDate { get; set; }
 
-        // Navigation Properties
+        // Navigation properties
         public virtual ICollection<ProductVariantImage> VariantImages { get; set; } = new List<ProductVariantImage>();
         public virtual ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
         public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 
-        // Computed Properties
+        // Computed properties
         [NotMapped]
         public decimal FinalPrice => Product?.Price + (PriceAdjustment ?? 0) ?? 0;
 
@@ -75,5 +75,8 @@ namespace IlisanCommerce.Models
 
         [NotMapped]
         public bool IsLowStock => StockQuantity <= MinStockLevel && StockQuantity > 0;
+
+        [NotMapped]
+        public bool IsDeleted { get; set; } = false;
     }
 }

@@ -419,4 +419,26 @@ namespace IlisanCommerce.Models
         public bool HasPrevious => CurrentPage > 1;
         public bool HasNext => CurrentPage < TotalPages;
     }
+
+    public class TestEmailViewModel
+    {
+        [Required(ErrorMessage = "Alıcı email adresi zorunludur")]
+        [EmailAddress(ErrorMessage = "Geçerli bir email adresi giriniz")]
+        [Display(Name = "Alıcı Email")]
+        public string RecipientEmail { get; set; } = string.Empty;
+
+        [Display(Name = "Alıcı Adı")]
+        public string? RecipientName { get; set; }
+
+        [Required(ErrorMessage = "Email tipi seçiniz")]
+        [Display(Name = "Email Tipi")]
+        public string EmailType { get; set; } = string.Empty;
+
+        [Display(Name = "Konu")]
+        public string? Subject { get; set; }
+
+        [Display(Name = "Mesaj")]
+        public string? Message { get; set; }
+    }
+
 }

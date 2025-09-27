@@ -1,110 +1,96 @@
-@model IlisanCommerce.Models.ContactFormModel
+﻿@model IlisanCommerce.Models.ContactFormModel
 @using IlisanCommerce.Services
 @inject SettingsService SettingsService
 
 @{
-    ViewData["Title"] = "İletişim";
-    ViewData["MetaDescription"] = "ILISAN ile iletişime geçin. Güvenlik ve sağlık çözümleri için uzman ekibimizden destek alın.";
-    
+    ViewData["Title"] = "Iletisim";
+    ViewData["MetaDescription"] = "ILISAN ile iletisime gecerek guvenlik ve saglik urunlerimiz hakkinda bilgi alabilirsiniz.";
+
+    var siteName = await SettingsService.GetSiteNameAsync();
     var sitePhone = await SettingsService.GetContactPhoneAsync();
     var siteEmail = await SettingsService.GetContactEmailAsync();
     var siteAddress = await SettingsService.GetContactAddressAsync();
-    var siteName = await SettingsService.GetSiteNameAsync();
 }
 
-<!-- Hero Section -->
-<section class="hero-section bg-gradient-primary text-white py-5">
-    <div class="container">
-        <div class="row align-items-center">
+<section class="py-5 text-white" style="background: linear-gradient(120deg, #1c2735 0%, #4b3f72 50%, #c3317d 100%);">
+    <div class="container py-4">
+        <div class="row g-4 align-items-center">
             <div class="col-lg-8">
-                <h1 class="display-4 fw-bold mb-3">İletişim</h1>
-                <p class="lead mb-0">@siteName ile iletişime geçin. Güvenlik ve sağlık çözümleri için uzman ekibimizden destek alın.</p>
+                <h1 class="display-5 fw-bold mb-3">Bizimle iletisime gecin</h1>
+                <p class="lead text-white-50 mb-0">
+                    @siteName ekibi, projeleriniz icin dogru malzemeyi secmenize yardimci olmak icin burada. 
+                    Formu doldurun ya da asagidaki kanallardan bize ulasin.
+                </p>
             </div>
-            <div class="col-lg-4 text-end">
-                <i class="fas fa-envelope fa-5x opacity-50"></i>
+            <div class="col-lg-4 text-lg-end">
+                <span class="icon-circle bg-white text-primary shadow"><i class="fas fa-comments"></i></span>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Breadcrumb -->
-<nav aria-label="breadcrumb" class="bg-light py-3">
-    <div class="container">
-        <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a href="/" class="text-decoration-none">Ana Sayfa</a></li>
-            <li class="breadcrumb-item active" aria-current="page">İletişim</li>
-        </ol>
-    </div>
-</nav>
-
-<!-- Contact Section -->
 <section class="py-5">
     <div class="container">
-        <div class="row">
-            <!-- Contact Form -->
-            <div class="col-lg-8 mb-5">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-primary text-white">
-                        <h3 class="card-title mb-0">
-                            <i class="fas fa-paper-plane me-2"></i>İletişim Formu
-                        </h3>
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-primary text-white py-3">
+                        <h3 class="mb-0"><i class="fas fa-paper-plane me-2"></i>Iletisim formu</h3>
                     </div>
                     <div class="card-body p-4">
-                        @if (TempData["Success"] != null)
+                        @if (TempData["Success"] is string successMessage)
                         {
                             <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+                                <i class="fas fa-check-circle me-2"></i>@successMessage
                                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                             </div>
                         }
-                        @if (TempData["Error"] != null)
+                        @if (TempData["Error"] is string errorMessage)
                         {
                             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                <i class="fas fa-exclamation-circle me-2"></i>@TempData["Error"]
+                                <i class="fas fa-exclamation-circle me-2"></i>@errorMessage
                                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                             </div>
                         }
 
-                        <form asp-action="Contact" method="post" class="needs-validation" novalidate>
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="FullName" class="form-label">Ad Soyad <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="FullName" name="FullName" required>
-                                    <div class="invalid-feedback">
-                                        Lütfen ad soyadınızı girin.
-                                    </div>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="Email" class="form-label">E-posta <span class="text-danger">*</span></label>
-                                    <input type="email" class="form-control" id="Email" name="Email" required>
-                                    <div class="invalid-feedback">
-                                        Lütfen geçerli bir e-posta adresi girin.
-                                    </div>
-                                </div>
+                        <form asp-action="Contact" method="post" class="row g-3 needs-validation" novalidate>
+                            @Html.AntiForgeryToken()
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                            <div class="col-md-6">
+                                <label asp-for="FullName" class="form-label">Ad soyad</label>
+                                <input asp-for="FullName" class="form-control" placeholder="Adiniz ve soyadiniz" required />
+                                <span asp-validation-for="FullName" class="text-danger small"></span>
                             </div>
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="Phone" class="form-label">Telefon</label>
-                                    <input type="tel" class="form-control" id="Phone" name="Phone">
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="Subject" class="form-label">Konu <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="Subject" name="Subject" required>
-                                    <div class="invalid-feedback">
-                                        Lütfen konu girin.
-                                    </div>
-                                </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="Email" class="form-label">E-posta</label>
+                                <input asp-for="Email" class="form-control" placeholder="ornek@eposta.com" required />
+                                <span asp-validation-for="Email" class="text-danger small"></span>
                             </div>
-                            <div class="mb-3">
-                                <label for="Message" class="form-label">Mesaj <span class="text-danger">*</span></label>
-                                <textarea class="form-control" id="Message" name="Message" rows="5" required></textarea>
-                                <div class="invalid-feedback">
-                                    Lütfen mesajınızı yazın.
-                                </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="Phone" class="form-label">Telefon</label>
+                                <input asp-for="Phone" class="form-control" placeholder="(5xx) xxx xx xx" />
+                                <span asp-validation-for="Phone" class="text-danger small"></span>
                             </div>
-                            <div class="d-grid">
-                                <button type="submit" class="btn btn-primary btn-lg">
-                                    <i class="fas fa-paper-plane me-2"></i>Mesaj Gönder
+
+                            <div class="col-md-6">
+                                <label asp-for="Subject" class="form-label">Konu</label>
+                                <input asp-for="Subject" class="form-control" placeholder="Gorusmek istediginiz konu" required />
+                                <span asp-validation-for="Subject" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-12">
+                                <label asp-for="Message" class="form-label">Mesajiniz</label>
+                                <textarea asp-for="Message" class="form-control" rows="5" placeholder="Mesajinizi buraya yazabilirsiniz" required></textarea>
+                                <span asp-validation-for="Message" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-12 d-flex justify-content-between align-items-center pt-2">
+                                <small class="text-muted">Formu gonderdiginizde iletisime gecebilmemiz icin bilgilerinizi isleyebiliriz.</small>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-paper-plane me-2"></i>Mesaji gonder
                                 </button>
                             </div>
                         </form>
@@ -112,98 +98,42 @@
                 </div>
             </div>
 
-            <!-- Contact Information -->
             <div class="col-lg-4">
-                <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-primary text-white">
-                        <h3 class="card-title mb-0">
-                            <i class="fas fa-info-circle me-2"></i>İletişim Bilgileri
-                        </h3>
-                    </div>
+                <div class="card shadow-sm border-0 mb-4">
                     <div class="card-body p-4">
-                        <div class="contact-info">
-                            <div class="contact-item mb-4">
-                                <div class="d-flex align-items-start">
-                                    <div class="contact-icon me-3">
-                                        <i class="fas fa-map-marker-alt text-primary fa-lg"></i>
-                                    </div>
-                                    <div>
-                                        <h5 class="mb-1">Adres</h5>
-                                        <p class="text-muted mb-0">@siteAddress</p>
-                                    </div>
-                                </div>
+                        <h5 class="fw-bold mb-4">Iletisim kanallarimiz</h5>
+                        <div class="d-flex gap-3 mb-3">
+                            <span class="icon-circle bg-primary text-white"><i class="fas fa-phone"></i></span>
+                            <div>
+                                <p class="mb-1 fw-semibold">Telefon</p>
+                                <a href="tel:@sitePhone" class="text-decoration-none">@sitePhone</a>
                             </div>
-
-                            <div class="contact-item mb-4">
-                                <div class="d-flex align-items-start">
-                                    <div class="contact-icon me-3">
-                                        <i class="fas fa-phone text-primary fa-lg"></i>
-                                    </div>
-                                    <div>
-                                        <h5 class="mb-1">Telefon</h5>
-                                        <p class="text-muted mb-0">
-                                            <a href="tel:@sitePhone" class="text-decoration-none">@sitePhone</a>
-                                        </p>
-                                    </div>
-                                </div>
+                        </div>
+                        <div class="d-flex gap-3 mb-3">
+                            <span class="icon-circle bg-primary text-white"><i class="fas fa-envelope"></i></span>
+                            <div>
+                                <p class="mb-1 fw-semibold">E-posta</p>
+                                <a href="mailto:@siteEmail" class="text-decoration-none">@siteEmail</a>
                             </div>
-
-                            <div class="contact-item mb-4">
-                                <div class="d-flex align-items-start">
-                                    <div class="contact-icon me-3">
-                                        <i class="fas fa-envelope text-primary fa-lg"></i>
-                                    </div>
-                                    <div>
-                                        <h5 class="mb-1">E-posta</h5>
-                                        <p class="text-muted mb-0">
-                                            <a href="mailto:@siteEmail" class="text-decoration-none">@siteEmail</a>
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="contact-item">
-                                <div class="d-flex align-items-start">
-                                    <div class="contact-icon me-3">
-                                        <i class="fas fa-clock text-primary fa-lg"></i>
-                                    </div>
-                                    <div>
-                                        <h5 class="mb-1">Çalışma Saatleri</h5>
-                                        <p class="text-muted mb-0">
-                                            Pazartesi - Cuma: 09:00 - 18:00<br>
-                                            Cumartesi: 09:00 - 14:00<br>
-                                            Pazar: Kapalı
-                                        </p>
-                                    </div>
-                                </div>
+                        </div>
+                        <div class="d-flex gap-3">
+                            <span class="icon-circle bg-primary text-white"><i class="fas fa-map-marker-alt"></i></span>
+                            <div>
+                                <p class="mb-1 fw-semibold">Adres</p>
+                                <p class="mb-0 text-muted">@siteAddress</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Social Media -->
-                <div class="card shadow-sm">
-                    <div class="card-header bg-primary text-white">
-                        <h3 class="card-title mb-0">
-                            <i class="fas fa-share-alt me-2"></i>Sosyal Medya
-                        </h3>
-                    </div>
-                    <div class="card-body p-4 text-center">
-                        <p class="text-muted mb-3">Bizi sosyal medyada takip edin</p>
-                        <div class="social-links">
-                            <a href="@(await SettingsService.GetFacebookUrlAsync())" class="btn btn-outline-primary me-2 mb-2" target="_blank">
-                                <i class="fab fa-facebook-f"></i> Facebook
-                            </a>
-                            <a href="@(await SettingsService.GetTwitterUrlAsync())" class="btn btn-outline-info me-2 mb-2" target="_blank">
-                                <i class="fab fa-twitter"></i> Twitter
-                            </a>
-                            <a href="@(await SettingsService.GetInstagramUrlAsync())" class="btn btn-outline-danger me-2 mb-2" target="_blank">
-                                <i class="fab fa-instagram"></i> Instagram
-                            </a>
-                            <a href="@(await SettingsService.GetLinkedInUrlAsync())" class="btn btn-outline-primary me-2 mb-2" target="_blank">
-                                <i class="fab fa-linkedin-in"></i> LinkedIn
-                            </a>
-                        </div>
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3">Calisma saatleri</h5>
+                        <ul class="list-unstyled text-muted mb-0">
+                            <li class="mb-2"><strong>Pazartesi - Cuma:</strong> 09:00 - 18:00</li>
+                            <li class="mb-2"><strong>Cumartesi:</strong> 09:00 - 14:00</li>
+                            <li><strong>Pazar:</strong> Kapali</li>
+                        </ul>
                     </div>
                 </div>
             </div>
@@ -211,29 +141,50 @@
     </div>
 </section>
 
-<!-- Map Section -->
 <section class="py-5 bg-light">
     <div class="container">
-        <div class="row">
-            <div class="col-12">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-primary text-white">
-                        <h3 class="card-title mb-0">
-                            <i class="fas fa-map me-2"></i>Konum
-                        </h3>
+        <div class="row g-4 align-items-stretch">
+            <div class="col-lg-6">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <h4 class="fw-bold mb-3">Neden ILISAN ile calismalisiniz?</h4>
+                        <ul class="list-unstyled text-muted mb-0 d-grid gap-3">
+                            <li class="d-flex gap-3">
+                                <span class="icon-circle bg-primary text-white"><i class="fas fa-shield-alt"></i></span>
+                                <div>
+                                    <h6 class="fw-semibold mb-1">Yerli Ar-Ge ve uretim</h6>
+                                    <p class="mb-0">Balistik ve radyasyon koruma urunlerinde patentli cozumler.</p>
+                                </div>
+                            </li>
+                            <li class="d-flex gap-3">
+                                <span class="icon-circle bg-primary text-white"><i class="fas fa-headset"></i></span>
+                                <div>
+                                    <h6 class="fw-semibold mb-1">Teknik destek</h6>
+                                    <p class="mb-0">Urun secimi, montaj ve bakim surecinde uzman ekibimiz yaninizda.</p>
+                                </div>
+                            </li>
+                            <li class="d-flex gap-3">
+                                <span class="icon-circle bg-primary text-white"><i class="fas fa-seedling"></i></span>
+                                <div>
+                                    <h6 class="fw-semibold mb-1">Surdurulebilir yaklasim</h6>
+                                    <p class="mb-0">Cevreye duyarlı malzemeler ve enerji verimli uretim altyapisi.</p>
+                                </div>
+                            </li>
+                        </ul>
                     </div>
-                    <div class="card-body p-0">
-                        <div class="map-container" style="height: 400px;">
-                            <iframe 
-                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3153.8354345093747!2d36.9173!3d37.5776!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzfCsDM0JzM5LjQiTiAzNsKwNTUnMDIuMyJF!5e0!3m2!1str!2str!4v1234567890123!5m2!1str!2str"
-                                width="100%" 
-                                height="400" 
-                                style="border:0;" 
-                                allowfullscreen="" 
-                                loading="lazy" 
-                                referrerpolicy="no-referrer-when-downgrade">
-                            </iframe>
-                        </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card h-100 shadow-sm border-0 overflow-hidden">
+                    <div class="ratio ratio-4x3">
+                        <iframe 
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3153.8354345093747!2d36.9173!3d37.5776!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzfCsDM0JzM5LjQiTiAzNsKwNTUnMDIuMyJF!5e0!3m2!1str!2str!4v1234567890123!5m2!1str!2str"
+                            width="100%"
+                            height="100%"
+                            style="border:0;"
+                            allowfullscreen=""
+                            loading="lazy"
+                            referrerpolicy="no-referrer-when-downgrade"></iframe>
                     </div>
                 </div>
             </div>
@@ -241,21 +192,32 @@
     </div>
 </section>
 
-<script>
-// Form validation
-(function() {
-    'use strict';
-    window.addEventListener('load', function() {
-        var forms = document.getElementsByClassName('needs-validation');
-        var validation = Array.prototype.filter.call(forms, function(form) {
-            form.addEventListener('submit', function(event) {
-                if (form.checkValidity() === false) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                }
-                form.classList.add('was-validated');
-            }, false);
-        });
-    }, false);
-})();
-</script>
+@section Scripts {
+    <script>
+        (function () {
+            "use strict";
+            const forms = document.querySelectorAll(".needs-validation");
+            forms.forEach(form => {
+                form.addEventListener("submit", event => {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add("was-validated");
+                }, false);
+            });
+        })();
+    </script>
+}
+
+<style>
+    .icon-circle {
+        width: 42px;
+        height: 42px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        font-size: 1rem;
+    }
+</style>

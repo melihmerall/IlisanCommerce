@@ -27,7 +27,7 @@
                 <div class="position-sticky pt-3">
                     <div class="text-center mb-4 px-3">
                         <div class="mb-3">
-                            <img src="/images/logo-admin.png" alt="ILISAN" class="logo-admin mb-2" style="max-height: 40px; width: auto;" onerror="this.style.display='none';">
+                            <img src="/logo.png" alt="ILISAN" class="logo-admin mb-2" style="max-height: 40px; width: auto;" onerror="this.style.display='none';">
                             <h5 class="text-dark mb-0 fw-bold">🛡️ ILISAN</h5>
                             <small class="text-muted fw-medium">Admin Paneli</small>
                         </div>
@@ -136,6 +136,14 @@
                                href="@Url.Action("SiteSettings", "Admin")" data-bs-toggle="tooltip" data-bs-placement="right" title="Site Ayarları">
                                 <i class="fas fa-cogs me-2"></i>
                                 <span class="nav-text">Site Ayarları</span>
+                            </a>
+                        </li>
+                        
+                        <li class="nav-item mb-1">
+                            <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "TestEmail" ? "active" : "")" 
+                               href="@Url.Action("TestEmail", "Admin")" data-bs-toggle="tooltip" data-bs-placement="right" title="Test Email Gönder">
+                                <i class="fas fa-envelope me-2"></i>
+                                <span class="nav-text">Test Email</span>
                             </a>
                         </li>
                         

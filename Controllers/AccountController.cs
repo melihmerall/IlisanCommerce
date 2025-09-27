@@ -17,15 +17,18 @@ namespace IlisanCommerce.Controllers
         private readonly IEmailService _emailService;
         private readonly ICartService _cartService;
         private readonly SettingsService _settingsService;
+        private readonly IApplicationLogService _applicationLogService;
 
         public AccountController(ApplicationDbContext context, ILogger<AccountController> logger, 
-            IEmailService emailService, ICartService cartService, SettingsService settingsService)
+            IEmailService emailService, ICartService cartService, SettingsService settingsService,
+            IApplicationLogService applicationLogService)
         {
             _context = context;
             _logger = logger;
             _emailService = emailService;
             _cartService = cartService;
             _settingsService = settingsService;
+            _applicationLogService = applicationLogService;
         }
 
         // GET: Account/Login
@@ -65,12 +68,44 @@ namespace IlisanCommerce.Controllers
                         _logger.LogInformation("Admin user search for email: {Email}, AdminUser found: {AdminUserFound}", 
                             model.Email, adminUser != null);
 
+                        // Database logging
+                        await _applicationLogService.LogInformationAsync(
+                            $"Admin user search for email: {model.Email}, AdminUser found: {adminUser != null}",
+                            source: "AccountController",
+                            action: "Login",
+                            userEmail: model.Email,
+                            userRole: "Admin",
+                            properties: new { Email = model.Email, AdminUserFound = adminUser != null }
+                        );
+
                         if (adminUser != null)
                         {
                             _logger.LogInformation("AdminUser PasswordHash: {Hash}", adminUser.PasswordHash);
                             
+                            // Database logging for password verification
+                            await _applicationLogService.LogInformationAsync(
+                                $"AdminUser PasswordHash verification started for user: {adminUser.Email}",
+                                source: "AccountController",
+                                action: "PasswordVerification",
+                                userId: adminUser.Id.ToString(),
+                                userEmail: adminUser.Email,
+                                userRole: "Admin",
+                                properties: new { AdminUserId = adminUser.Id, Email = adminUser.Email }
+                            );
+                            
                             bool passwordValid = BCrypt.Net.BCrypt.Verify(model.Password, adminUser.PasswordHash);
                             _logger.LogInformation("Password verification result: {Result}", passwordValid);
+                            
+                            // Database logging for password verification result
+                            await _applicationLogService.LogInformationAsync(
+                                $"Password verification result: {passwordValid} for user: {adminUser.Email}",
+                                source: "AccountController",
+                                action: "PasswordVerification",
+                                userId: adminUser.Id.ToString(),
+                                userEmail: adminUser.Email,
+                                userRole: "Admin",
+                                properties: new { AdminUserId = adminUser.Id, Email = adminUser.Email, PasswordValid = passwordValid }
+                            );
                             
                             if (passwordValid)
                             {
@@ -532,120 +567,21 @@ namespace IlisanCommerce.Controllers
         // Professional welcome email
         private async Task SendWelcomeEmailAsync(User user)
         {
-            var subject = "ILISAN'a Hoş Geldiniz! 🎉";
-            
-            var body = $@"
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <meta charset='utf-8'>
-                <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-                <title>Hoş Geldiniz</title>
-                <style>
-                    body {{ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f4f4f4; }}
-                    .container {{ max-width: 600px; margin: 0 auto; background-color: #ffffff; box-shadow: 0 0 20px rgba(0,0,0,0.1); }}
-                    .header {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px 30px; text-align: center; }}
-                    .header h1 {{ margin: 0; font-size: 28px; font-weight: 300; }}
-                    .header .logo {{ font-size: 32px; margin-bottom: 10px; }}
-                    .content {{ padding: 40px 30px; }}
-                    .welcome-message {{ text-align: center; margin-bottom: 30px; }}
-                    .welcome-message h2 {{ color: #2c3e50; margin: 0 0 15px 0; font-size: 24px; }}
-                    .welcome-message p {{ color: #666; font-size: 16px; margin: 0; }}
-                    .benefits {{ background-color: #f8f9fa; padding: 25px; border-radius: 10px; margin: 25px 0; }}
-                    .benefits h3 {{ color: #2c3e50; margin-top: 0; text-align: center; }}
-                    .benefit-list {{ list-style: none; padding: 0; margin: 0; }}
-                    .benefit-list li {{ padding: 10px 0; border-bottom: 1px solid #e9ecef; }}
-                    .benefit-list li:last-child {{ border-bottom: none; }}
-                    .benefit-icon {{ color: #28a745; font-weight: bold; margin-right: 10px; }}
-                    .cta-section {{ text-align: center; margin: 30px 0; }}
-                    .btn {{ display: inline-block; background: linear-gradient(135deg, #007bff, #0056b3); color: white; padding: 15px 30px; text-decoration: none; border-radius: 25px; font-weight: bold; font-size: 16px; transition: transform 0.2s; }}
-                    .btn:hover {{ transform: translateY(-2px); color: white; }}
-                    .social-section {{ text-align: center; margin: 30px 0; }}
-                    .social-links {{ margin: 20px 0; }}
-                    .social-links a {{ display: inline-block; margin: 0 10px; color: #666; text-decoration: none; }}
-                    .footer {{ background-color: #2c3e50; color: white; padding: 30px; text-align: center; }}
-                    .footer h4 {{ margin: 0 0 15px 0; color: #ecf0f1; }}
-                    .footer p {{ margin: 5px 0; color: #bdc3c7; }}
-                    .footer .contact-info {{ margin: 15px 0; }}
-                    .stats {{ display: flex; justify-content: space-around; text-align: center; margin: 25px 0; padding: 20px; background: #f8f9fa; border-radius: 10px; }}
-                    .stat {{ flex: 1; }}
-                    .stat-number {{ font-size: 24px; font-weight: bold; color: #007bff; display: block; }}
-                    .stat-label {{ font-size: 14px; color: #666; }}
-                    
-                    @media (max-width: 600px) {{
-                        .container {{ margin: 0 10px; }}
-                        .header, .content {{ padding: 20px 15px; }}
-                        .stats {{ flex-direction: column; }}
-                        .stat {{ margin-bottom: 15px; }}
-                    }}
-                </style>
-            </head>
-            <body>
-                <div class='container'>
-                    <div class='header'>
-                        <div class='logo'>🛡️</div>
-                        <h1>ILISAN Savunma Sanayi</h1>
-                        <p>Kalite ve Güvenin Adresi</p>
-                    </div>
-                    
-                    <div class='content'>
-                        <div class='welcome-message'>
-                            <h2>Hoş Geldin {user.FirstName}! 🎉</h2>
-                            <p>ILISAN ailesine katıldığın için çok mutluyuz. Hesabın başarıyla oluşturuldu ve artık tüm ayrıcalıklardan yararlanabilirsin.</p>
-                        </div>
-
-                        <div class='stats'>
-                            <div class='stat'>
-                                <span class='stat-number'>500+</span>
-                                <span class='stat-label'>Ürün Çeşidi</span>
-                            </div>
-                            <div class='stat'>
-                                <span class='stat-number'>10K+</span>
-                                <span class='stat-label'>Mutlu Müşteri</span>
-                            </div>
-                            <div class='stat'>
-                                <span class='stat-number'>24/7</span>
-                                <span class='stat-label'>Destek</span>
-                            </div>
-                        </div>
-
-                        <div class='cta-section'>
-                            <p style='margin-bottom: 20px; color: #666;'>Alışverişe başlamak için hemen giriş yap!</p>
-                            <a href='https://localhost:7049/giris' class='btn'>Giriş Yap & Alışverişe Başla</a>
-                        </div>
-
-                        <div class='social-section'>
-                            <p style='color: #666; margin-bottom: 15px;'>Bizi sosyal medyada takip et:</p>
-                            <div class='social-links'>
-                                <a href='#'>📘 Facebook</a>
-                                <a href='#'>📷 Instagram</a>
-                                <a href='#'>🐦 Twitter</a>
-                                <a href='#'>💼 LinkedIn</a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class='footer'>
-                        <h4>📞 İletişim Bilgileri</h4>
-                        <div class='contact-info'>
-                            <p>📍 Üngüt Mah. 71093.Sk 14/C Onikişubat / Kahramanmaraş</p>
-                            <p>☎️ +90 (850) 532 5237</p>
-                            <p>📧 info@ilisan.com.tr</p>
-                            <p>🌐 <a href='https://ilisan.com.tr' style='color: #3498db;'>ilisan.com.tr</a></p>
-                        </div>
-                        <div style='margin-top: 25px; padding-top: 20px; border-top: 1px solid #34495e;'>
-                            <p style='font-size: 14px; margin: 0;'>© 2024 ILISAN Savunma Sanayi. Tüm hakları saklıdır.</p>
-                            <p style='font-size: 12px; margin: 5px 0 0 0; color: #95a5a6;'>
-                                Bu e-posta {user.Email} adresine gönderilmiştir. 
-                                Eğer bu hesabı oluşturmadıysanız, bu e-postayı görmezden gelebilirsiniz.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </body>
-            </html>";
-
-            await _emailService.SendEmailAsync(user.Email, subject, body);
+            try
+            {
+                // Template'den hoş geldin email'i gönder
+                await _emailService.SendNewUserWelcomeAsync(user);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to send welcome email template to {Email}", user.Email);
+                
+                // Fallback: Basit email gönder
+                var subject = "ILISAN'a Hoş Geldiniz! 🎉";
+                var body = $"Merhaba {user.FirstName},\n\nILISAN ailesine hoş geldiniz! Hesabınız başarıyla oluşturuldu.\n\nGiriş yapmak için: https://ilisan.com.tr/giris\n\nTeşekkürler,\nILISAN Savunma Sanayi";
+                
+                await _emailService.SendEmailAsync(user.Email, subject, body);
+            }
         }
     }
 }

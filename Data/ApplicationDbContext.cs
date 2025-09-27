@@ -34,6 +34,7 @@ namespace IlisanCommerce.Data
         public DbSet<SystemLog> SystemLogs { get; set; }
         public DbSet<ActivityLog> ActivityLogs { get; set; }
         public DbSet<ErrorLog> ErrorLogs { get; set; }
+        public DbSet<ApplicationLog> ApplicationLogs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
