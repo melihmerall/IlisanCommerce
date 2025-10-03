@@ -28,18 +28,6 @@ namespace IlisanCommerce.Models
         [StringLength(20)]
         public string? GuestPhone { get; set; }
 
-        // Fatura adresi
-        [Required]
-        public int BillingAddressId { get; set; }
-        [ForeignKey("BillingAddressId")]
-        public Address BillingAddress { get; set; } = null!;
-
-        // Teslimat adresi
-        [Required]
-        public int ShippingAddressId { get; set; }
-        [ForeignKey("ShippingAddressId")]
-        public Address ShippingAddress { get; set; } = null!;
-
         // String adres alanları (view uyumluluğu için)
         [StringLength(100)]
         public string? ShippingFirstName { get; set; }

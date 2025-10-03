@@ -4,6 +4,7 @@ using IlisanCommerce.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IlisanCommerce.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251003122802_adressUpdate")]
+    partial class adressUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -921,15 +924,12 @@ namespace IlisanCommerce.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("AddressId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("AddressId1")
-                        .HasColumnType("int");
-
                     b.Property<string>("AdminNotes")
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
+
+                    b.Property<int>("BillingAddressId")
+                        .HasColumnType("int");
 
                     b.Property<string>("BillingAddressText")
                         .HasMaxLength(500)
@@ -1027,6 +1027,9 @@ namespace IlisanCommerce.Migrations
                     b.Property<DateTime?>("ShippedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("ShippingAddressId")
+                        .HasColumnType("int");
+
                     b.Property<string>("ShippingAddressText")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
@@ -1082,12 +1085,12 @@ namespace IlisanCommerce.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AddressId");
-
-                    b.HasIndex("AddressId1");
+                    b.HasIndex("BillingAddressId");
 
                     b.HasIndex("OrderNumber")
                         .IsUnique();
+
+                    b.HasIndex("ShippingAddressId");
 
                     b.HasIndex("UserId");
 
@@ -2143,18 +2146,26 @@ namespace IlisanCommerce.Migrations
 
             modelBuilder.Entity("IlisanCommerce.Models.Order", b =>
                 {
-                    b.HasOne("IlisanCommerce.Models.Address", null)
+                    b.HasOne("IlisanCommerce.Models.Address", "BillingAddress")
                         .WithMany("BillingOrders")
-                        .HasForeignKey("AddressId");
+                        .HasForeignKey("BillingAddressId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
-                    b.HasOne("IlisanCommerce.Models.Address", null)
+                    b.HasOne("IlisanCommerce.Models.Address", "ShippingAddress")
                         .WithMany("ShippingOrders")
-                        .HasForeignKey("AddressId1");
+                        .HasForeignKey("ShippingAddressId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("IlisanCommerce.Models.User", "User")
                         .WithMany("Orders")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("BillingAddress");
+
+                    b.Navigation("ShippingAddress");
 
                     b.Navigation("User");
                 });

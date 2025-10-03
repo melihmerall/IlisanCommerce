@@ -116,18 +116,6 @@ namespace IlisanCommerce.Data
                 .HasForeignKey(o => o.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<Order>()
-                .HasOne(o => o.BillingAddress)
-                .WithMany(a => a.BillingOrders)
-                .HasForeignKey(o => o.BillingAddressId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Order>()
-                .HasOne(o => o.ShippingAddress)
-                .WithMany(a => a.ShippingOrders)
-                .HasForeignKey(o => o.ShippingAddressId)
-                .OnDelete(DeleteBehavior.Restrict);
-
             // OrderItem relationships
             modelBuilder.Entity<OrderItem>()
                 .HasOne(oi => oi.Order)

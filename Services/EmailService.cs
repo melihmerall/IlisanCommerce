@@ -850,9 +850,9 @@ namespace IlisanCommerce.Services
 
                 var customerName = order.CustomerName;
 
-                var shippingCity = order.ShippingCity ?? order.ShippingAddress?.City ?? string.Empty;
+                var shippingCity = order.ShippingCity ?? order.ShippingCity ?? string.Empty;
 
-                var shippingAddress = order.ShippingAddressText ?? order.ShippingAddress?.AddressLine1 ?? string.Empty;
+                var shippingAddress = order.ShippingAddressText ?? order.ShippingAddressText ?? string.Empty;
 
 
 
@@ -956,9 +956,9 @@ namespace IlisanCommerce.Services
 
                 var customerName = order.CustomerName;
 
-                var deliveryAddress = order.ShippingAddressText ?? order.ShippingAddress?.AddressLine1 ?? string.Empty;
+                var deliveryAddress = order.ShippingAddressText ?? order.ShippingAddressText ?? string.Empty;
 
-                var deliveryCity = order.ShippingCity ?? order.ShippingAddress?.City ?? string.Empty;
+                var deliveryCity = order.ShippingCity ?? order.ShippingCity ?? string.Empty;
 
                 string deliveryAddressDisplay;
 

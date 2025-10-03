@@ -47,8 +47,6 @@ namespace IlisanCommerce.Controllers
             var query = _context.Orders
                 .Include(o => o.OrderItems)
                     .ThenInclude(oi => oi.Product)
-                .Include(o => o.BillingAddress)
-                .Include(o => o.ShippingAddress)
                 .Where(o => o.UserId == userId.Value);
 
             if (status.HasValue)
@@ -93,8 +91,6 @@ namespace IlisanCommerce.Controllers
                         .ThenInclude(p => p.ProductImages)
                 .Include(o => o.OrderItems)
                     .ThenInclude(oi => oi.ProductVariant)
-                .Include(o => o.BillingAddress)
-                .Include(o => o.ShippingAddress)
                 // StatusHistory removed - using simple status tracking
                 .FirstOrDefaultAsync(o => o.Id == id && o.UserId == userId.Value);
 
@@ -244,7 +240,7 @@ namespace IlisanCommerce.Controllers
                     PaymentStatus = PaymentStatus.Pending,
                     SubTotal = model.Cart.SubTotal,
                     ShippingCost = model.Cart.ShippingCost,
-                    TotalAmount = model.Cart.Total,
+                    TotalAmount = model.Cart.Total, // Total = SubTotal + Shipping - Discount + Tax
                     Notes = model.Form.Notes,
                     CreatedDate = DateTime.Now,
                     OrderItems = new List<OrderItem>(),
@@ -255,64 +251,28 @@ namespace IlisanCommerce.Controllers
                     GuestPhone = userId == null ? model.Form.Phone : null
                 };
 
-                // Adresleri ayarla
+                // --- Adres işlemleri ---
                 if (userId.HasValue)
                 {
-                    // Kayıtlı kullanıcı
-                    if (model.Form.BillingAddressId.HasValue && model.Form.BillingAddressId.Value > 0)
-                        order.BillingAddressId = model.Form.BillingAddressId.Value;
-                    else
-                        ModelState.AddModelError("Form.BillingAddressId", "Geçerli bir fatura adresi seçiniz.");
-
-                    if (!model.Form.SameAsShipping)
-                    {
-                        if (model.Form.ShippingAddressId.HasValue && model.Form.ShippingAddressId.Value > 0)
-                            order.ShippingAddressId = model.Form.ShippingAddressId.Value;
-                        else
-                            ModelState.AddModelError("Form.ShippingAddressId", "Geçerli bir teslimat adresi seçiniz.");
-                    }
-                    else
-                    {
-                        order.ShippingAddressId = order.BillingAddressId;
-                    }
-
-                    if (!ModelState.IsValid)
-                    {
-                        model.UserAddresses = await _context.Addresses
-                            .Where(a => a.UserId == userId.Value && a.IsActive)
-                            .ToListAsync();
-                        return View(model);
-                    }
-
-                    // Adres bilgilerini Order modeline kopyala
-                    var billingAddress = await _context.Addresses.FindAsync(order.BillingAddressId);
-                    var shippingAddress = await _context.Addresses.FindAsync(order.ShippingAddressId);
-
-                    if (billingAddress != null)
-                    {
-                        order.BillingFirstName = billingAddress.FullName?.Split(' ').FirstOrDefault();
-                        order.BillingLastName = billingAddress.FullName?.Split(' ').Skip(1).FirstOrDefault();
-                        order.BillingPhone = billingAddress.Phone;
-                        order.BillingCity = billingAddress.City;
-                        order.BillingDistrict = billingAddress.District;
-                        order.BillingPostalCode = billingAddress.PostalCode;
-                        order.BillingAddressText = $"{billingAddress.AddressLine1} {billingAddress.AddressLine2}".Trim();
-                    }
-
-                    if (shippingAddress != null)
-                    {
-                        order.ShippingFirstName = shippingAddress.FullName?.Split(' ').FirstOrDefault();
-                        order.ShippingLastName = shippingAddress.FullName?.Split(' ').Skip(1).FirstOrDefault();
-                        order.ShippingPhone = shippingAddress.Phone;
-                        order.ShippingCity = shippingAddress.City;
-                        order.ShippingDistrict = shippingAddress.District;
-                        order.ShippingPostalCode = shippingAddress.PostalCode;
-                        order.ShippingAddressText = $"{shippingAddress.AddressLine1} {shippingAddress.AddressLine2}".Trim();
-                    }
+                    order.BillingFirstName = model.Form.FirstName?.Split(' ').FirstOrDefault();
+                    order.BillingLastName = model.Form.LastName?.Split(' ').Skip(1).FirstOrDefault();
+                    order.BillingPhone = model.Form.Phone;
+                    order.BillingCity = model.Form.ShippingAddress?.City;
+                    order.BillingDistrict = model.Form.ShippingAddress?.District;
+                    order.BillingPostalCode = model.Form.ShippingAddress?.PostalCode;
+                    order.BillingAddressText = $"{model.Form.ShippingAddress?.AddressLine1} {model.Form.ShippingAddress?.AddressLine2}".Trim();
+                    
+                    order.ShippingFirstName = model.Form.ShippingAddress?.FullName?.Split(' ').FirstOrDefault() ?? model.Form.FirstName;
+                    order.ShippingLastName = model.Form.ShippingAddress?.FullName?.Split(' ').Skip(1).FirstOrDefault() ?? model.Form.LastName;
+                    order.ShippingPhone = model.Form.ShippingAddress?.Phone ?? model.Form.Phone;
+                    order.ShippingCity = model.Form.ShippingAddress?.City;
+                    order.ShippingDistrict = model.Form.ShippingAddress?.District;
+                    order.ShippingPostalCode = model.Form.ShippingAddress?.PostalCode;
+                    order.ShippingAddressText = $"{model.Form.ShippingAddress?.AddressLine1} {model.Form.ShippingAddress?.AddressLine2}".Trim();
                 }
                 else
                 {
-                    // Guest kullanıcı
+                    // ✅ Guest kullanıcı → yeni adres oluşturulacak
                     var billingAddress = new Address
                     {
                         UserId = null,
@@ -331,15 +291,14 @@ namespace IlisanCommerce.Controllers
 
                     _context.Addresses.Add(billingAddress);
                     await _context.SaveChangesAsync();
-                    order.BillingAddressId = billingAddress.Id;
 
-                    order.BillingFirstName = model.Form.FirstName;
-                    order.BillingLastName = model.Form.LastName;
-                    order.BillingPhone = model.Form.Phone;
-                    order.BillingCity = model.Form.BillingAddress.City;
-                    order.BillingDistrict = model.Form.BillingAddress.District;
-                    order.BillingPostalCode = model.Form.BillingAddress.PostalCode;
-                    order.BillingAddressText = $"{model.Form.BillingAddress.AddressLine1} {model.Form.BillingAddress.AddressLine2}".Trim();
+                    order.BillingFirstName = model.Form.ShippingAddress?.FullName?.Split(' ').FirstOrDefault() ?? model.Form.FirstName;
+                    order.BillingLastName = model.Form.ShippingAddress?.FullName?.Split(' ').Skip(1).FirstOrDefault() ?? model.Form.LastName;
+                    order.BillingPhone = model.Form.ShippingAddress?.Phone;
+                    order.BillingCity = model.Form.ShippingAddress?.City;
+                    order.BillingDistrict = model.Form.ShippingAddress?.District;
+                    order.BillingPostalCode = model.Form.ShippingAddress?.PostalCode;
+                    order.BillingAddressText = $"{model.Form.ShippingAddress?.AddressLine1} {model.Form.ShippingAddress?.AddressLine2}".Trim();
 
                     if (!model.Form.SameAsShipping)
                     {
@@ -347,7 +306,7 @@ namespace IlisanCommerce.Controllers
                         {
                             UserId = null,
                             AddressTitle = "Teslimat Adresi",
-                            FullName = model.Form.ShippingAddress!.FullName,
+                            FullName = model.Form.ShippingAddress!.FullName??"",
                             Phone = model.Form.ShippingAddress.Phone,
                             City = model.Form.ShippingAddress.City,
                             District = model.Form.ShippingAddress.District,
@@ -360,7 +319,6 @@ namespace IlisanCommerce.Controllers
                         };
                         _context.Addresses.Add(shippingAddress);
                         await _context.SaveChangesAsync();
-                        order.ShippingAddressId = shippingAddress.Id;
 
                         order.ShippingFirstName = model.Form.ShippingAddress.FullName?.Split(' ').FirstOrDefault() ?? model.Form.FirstName;
                         order.ShippingLastName = model.Form.ShippingAddress.FullName?.Split(' ').Skip(1).FirstOrDefault() ?? model.Form.LastName;
@@ -372,18 +330,17 @@ namespace IlisanCommerce.Controllers
                     }
                     else
                     {
-                        order.ShippingAddressId = order.BillingAddressId;
-                        order.ShippingFirstName = order.BillingFirstName;
-                        order.ShippingLastName = order.BillingLastName;
-                        order.ShippingPhone = order.BillingPhone;
-                        order.ShippingCity = order.BillingCity;
-                        order.ShippingDistrict = order.BillingDistrict;
-                        order.ShippingPostalCode = order.BillingPostalCode;
-                        order.ShippingAddressText = order.BillingAddressText;
+                        order.ShippingFirstName = model.Form.ShippingAddress?.FullName?.Split(' ').FirstOrDefault() ?? model.Form.FirstName;
+                        order.ShippingLastName = model.Form.ShippingAddress?.FullName?.Split(' ').Skip(1).FirstOrDefault() ?? model.Form.LastName;
+                        order.ShippingPhone = model.Form.ShippingAddress?.Phone ?? model.Form.Phone;
+                        order.ShippingCity = model.Form.ShippingAddress?.City;
+                        order.ShippingDistrict = model.Form.ShippingAddress?.District;
+                        order.ShippingPostalCode = model.Form.ShippingAddress?.PostalCode;
+                        order.ShippingAddressText = $"{model.Form.ShippingAddress?.AddressLine1} {model.Form.ShippingAddress?.AddressLine2}".Trim();
                     }
                 }
 
-                // Order items ekle
+                // ✅ Order items ekle
                 foreach (var cartItem in cartItems)
                 {
                     var orderItem = new OrderItem
@@ -392,6 +349,7 @@ namespace IlisanCommerce.Controllers
                         ProductVariantId = cartItem.ProductVariantId,
                         Quantity = cartItem.Quantity,
                         UnitPrice = cartItem.UnitPrice,
+                        TotalPrice = cartItem.TotalPrice,
                         ProductName = cartItem.Product.Name,
                         ProductCode = cartItem.Product.ProductCode,
                         VariantName = cartItem.ProductVariant?.VariantName
@@ -402,14 +360,13 @@ namespace IlisanCommerce.Controllers
                 _context.Orders.Add(order);
                 await _context.SaveChangesAsync();
 
-                // Ödeme işlemi
+                // ✅ Ödeme işlemi
                 if (model.Form.PaymentMethod == PaymentMethod.CreditCard)
                 {
                     return await InitializeIyzicoCheckoutFormAsync(order, model, cartItems);
                 }
                 else
                 {
-                    // Diğer ödeme metodları
                     await _cartService.ClearCartAsync(userId, sessionId);
 
                     try
@@ -448,8 +405,6 @@ namespace IlisanCommerce.Controllers
             var order = await _context.Orders
                 .Include(o => o.OrderItems)
                     .ThenInclude(oi => oi.Product)
-                .Include(o => o.BillingAddress)
-                .Include(o => o.ShippingAddress)
                 .FirstOrDefaultAsync(o => o.Id == id && (userId == null || o.UserId == userId));
 
             if (order == null)
@@ -518,12 +473,6 @@ namespace IlisanCommerce.Controllers
         {
             try
             {
-                var billingAddress = await _context.Addresses.FindAsync(order.BillingAddressId);
-                var shippingAddress = await _context.Addresses.FindAsync(order.ShippingAddressId);
-
-                if (billingAddress == null || shippingAddress == null)
-                    throw new InvalidOperationException("Address not found");
-
                 var callbackUrl = Url.Action("PaymentCallback", "Order", null, Request.Scheme);
 
                 // BasketItem listesini hazırla ve toplamı kontrol et
@@ -572,27 +521,27 @@ namespace IlisanCommerce.Controllers
 
                     // Buyer
                     BuyerId = order.UserId?.ToString() ?? "guest",
-                    BuyerName = billingAddress.FullName.Split(' ').FirstOrDefault() ?? "Guest",
-                    BuyerSurname = billingAddress.FullName.Split(' ').Skip(1).FirstOrDefault() ?? "User",
+                    BuyerName = order.BillingFirstName?.Split(' ').FirstOrDefault() ?? "Guest",
+                    BuyerSurname = order.BillingLastName?.Split(' ').Skip(1).FirstOrDefault() ?? "User",
                     BuyerEmail = model.Form.Email ?? "guest@ilisan.com.tr",
-                    BuyerGsmNumber = billingAddress.Phone,
+                    BuyerGsmNumber = order.ShippingPhone??"",
                     BuyerIdentityNumber = "11111111111",
-                    BuyerAddress = billingAddress.AddressLine1,
+                    BuyerAddress = order.ShippingAddressText??"",
                     BuyerIp = GetClientIpAddress(),
-                    BuyerCity = billingAddress.City,
-                    BuyerZipCode = billingAddress.PostalCode,
+                    BuyerCity = order.ShippingCity??"",
+                    BuyerZipCode = order.ShippingPostalCode??"",
 
                     // Shipping
-                    ShippingContactName = shippingAddress.FullName,
-                    ShippingCity = shippingAddress.City,
-                    ShippingAddress = shippingAddress.AddressLine1,
-                    ShippingZipCode = shippingAddress.PostalCode,
+                    ShippingContactName = order.ShippingFirstName??"",
+                    ShippingCity = order.ShippingCity??"",
+                    ShippingAddress = order.ShippingAddressText??"",
+                    ShippingZipCode = order.ShippingPostalCode??"",
 
                     // Billing
-                    BillingContactName = billingAddress.FullName,
-                    BillingCity = billingAddress.City,
-                    BillingAddress = billingAddress.AddressLine1,
-                    BillingZipCode = billingAddress.PostalCode,
+                    BillingContactName = order.ShippingFirstName??"",
+                    BillingCity = order.BillingCity??"",
+                    BillingAddress = order.ShippingAddressText??"",
+                    BillingZipCode = order.ShippingPostalCode??"",
 
                     BasketItems = basketItems
                 };
@@ -809,45 +758,6 @@ namespace IlisanCommerce.Controllers
                 return ipAddress.ToString();
             }
             return "127.0.0.1";
-        }
-
-        // Legacy: This method has been replaced by Checkout Form implementation
-        // Keeping it commented for reference but not used anymore
-        /*
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ProcessIyzicoPayment(IyzicoPaymentRequest model)
-        {
-            // This method is no longer used - replaced by Checkout Form flow
-            return BadRequest("This payment method is no longer supported. Please use the standard checkout flow.");
-        }
-        */
-
-        // GET: Order/Success
-        public async Task<IActionResult> Success(string orderNumber)
-        {
-            if (string.IsNullOrEmpty(orderNumber))
-            {
-                return RedirectToAction("Index", "Home");
-            }
-
-            var order = await _context.Orders
-                .Include(o => o.OrderItems)
-                    .ThenInclude(oi => oi.Product)
-                .Include(o => o.BillingAddress)
-                .Include(o => o.ShippingAddress)
-                .FirstOrDefaultAsync(o => o.OrderNumber == orderNumber);
-
-            if (order == null)
-            {
-                TempData["Error"] = "Sipariş bulunamadı.";
-                return RedirectToAction("Index", "Home");
-            }
-
-            ViewData["Title"] = "Sipariş Tamamlandı";
-            ViewData["Description"] = "Siparişiniz başarıyla tamamlandı";
-
-            return View(order);
         }
     }
 }

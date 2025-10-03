@@ -281,45 +281,38 @@
                     <div class="billing-address" style="margin-bottom: 25px;">
                         <strong style="color: #333; margin-bottom: 10px; display: block;">Fatura Adresi:</strong>
                         <div style="background: #f8f9fa; border-radius: 10px; padding: 15px; color: #666; line-height: 1.5;">
-                            @Model.Order.BillingAddress.FullName<br>
-                            @Model.Order.BillingAddress.AddressLine1<br>
-                            @if (!string.IsNullOrEmpty(Model.Order.BillingAddress.AddressLine2))
+                            @Model.Order.ShippingFirstName<br>
+                            @Model.Order.ShippingAddressText<br>
+                            @if (!string.IsNullOrEmpty(Model.Order.ShippingAddressText))
                             {
-                                <text>@Model.Order.BillingAddress.AddressLine2<br></text>
+                                <text>@Model.Order.ShippingAddressText<br></text>
                             }
-                            @Model.Order.BillingAddress.District / @Model.Order.BillingAddress.City<br>
-                            @if (!string.IsNullOrEmpty(Model.Order.BillingAddress.PostalCode))
+                            @Model.Order.ShippingAddressText / @Model.Order.ShippingCity<br>
+                            @if (!string.IsNullOrEmpty(Model.Order.ShippingPostalCode))
                             {
-                                <text>@Model.Order.BillingAddress.PostalCode<br></text>
+                                <text>@Model.Order.ShippingPostalCode<br></text>
                             }
-                            Tel: @Model.Order.BillingAddress.Phone
+                            Tel: @Model.Order.ShippingPhone
                         </div>
                     </div>
                     
                     <div class="shipping-address">
                         <strong style="color: #333; margin-bottom: 10px; display: block;">Teslimat Adresi:</strong>
                         <div style="background: #f8f9fa; border-radius: 10px; padding: 15px; color: #666; line-height: 1.5;">
-                            @if (Model.Order.BillingAddressId == Model.Order.ShippingAddressId)
-                            {
-                                <em style="color: #ffb535;">Fatura adresi ile aynı</em>
-                            }
-                            else
-                            {
-                                <text>
-                                    @Model.Order.ShippingAddress.FullName<br>
-                                    @Model.Order.ShippingAddress.AddressLine1<br>
-                                    @if (!string.IsNullOrEmpty(Model.Order.ShippingAddress.AddressLine2))
-                                    {
-                                        <text>@Model.Order.ShippingAddress.AddressLine2<br></text>
-                                    }
-                                    @Model.Order.ShippingAddress.District / @Model.Order.ShippingAddress.City<br>
-                                    @if (!string.IsNullOrEmpty(Model.Order.ShippingAddress.PostalCode))
-                                    {
-                                        <text>@Model.Order.ShippingAddress.PostalCode<br></text>
-                                    }
-                                    Tel: @Model.Order.ShippingAddress.Phone
-                                </text>
-                            }
+                            <text>
+                                @Model.Order.ShippingFirstName<br>
+                                @Model.Order.ShippingAddressText<br>
+                                @if (!string.IsNullOrEmpty(Model.Order.ShippingAddressText))
+                                {
+                                    <text>@Model.Order.ShippingAddressText<br></text>
+                                }
+                                @Model.Order.ShippingAddressText / @Model.Order.ShippingCity<br>
+                                @if (!string.IsNullOrEmpty(Model.Order.ShippingPostalCode))
+                                {
+                                    <text>@Model.Order.ShippingPostalCode<br></text>
+                                }
+                                Tel: @Model.Order.ShippingPhone
+                            </text>
                         </div>
                     </div>
                 </div>

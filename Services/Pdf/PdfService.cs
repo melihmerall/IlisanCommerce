@@ -467,11 +467,11 @@ namespace IlisanCommerce.Services.Pdf
                 column.Item().Padding(10).Text($"{order.CustomerName}")
                     .SemiBold();
                 column.Item().PaddingHorizontal(10).Text($"Email: {order.CustomerEmail}");
-                column.Item().PaddingHorizontal(10).Text($"Telefon: {order.ShippingAddress?.Phone ?? "N/A"}");
+                column.Item().PaddingHorizontal(10).Text($"Telefon: {order.ShippingPhone ?? "N/A"}");
                 
-                if (order.ShippingAddress != null)
+                if (order.ShippingAddressText != null)
                 {
-                    column.Item().PaddingHorizontal(10).Text($"Adres: {order.ShippingAddress?.AddressLine1}, {order.ShippingAddress?.City}");
+                    column.Item().PaddingHorizontal(10).Text($"Adres: {order.ShippingAddressText??""}, {order.ShippingCity??""}");
                 }
 
                 // Order items table
@@ -581,8 +581,8 @@ namespace IlisanCommerce.Services.Pdf
                 // Customer address
                 column.Item().PaddingTop(20).Text("GÖNDERİLECEK ADRES:").SemiBold();
                 column.Item().Text(order.CustomerName).FontSize(12);
-                column.Item().Text(order.ShippingAddress != null ? $"{order.ShippingAddress.AddressLine1}, {order.ShippingAddress.City}" : "Adres belirtilmemiş").FontSize(12);
-                column.Item().Text($"Tel: {order.ShippingAddress?.Phone ?? "N/A"}").FontSize(12);
+                column.Item().Text(order.ShippingAddressText != null ? $"{order.ShippingAddressText??""}, {order.ShippingCity??""}" : "Adres belirtilmemiş").FontSize(12);
+                column.Item().Text($"Tel: {order.ShippingAddressText?? "N/A"}").FontSize(12);
 
                 // Barcode placeholder
                 column.Item().PaddingTop(30).AlignCenter().Text($"||||| {order.OrderNumber} |||||")

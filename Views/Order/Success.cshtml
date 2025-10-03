@@ -280,18 +280,18 @@
                         Teslimat Adresi
                     </h6>
                     <div style="background: #f8f9fa; border-radius: 10px; padding: 15px; color: #666; line-height: 1.5;">
-                        @Model.ShippingAddress.FullName<br>
-                        @Model.ShippingAddress.AddressLine1<br>
-                        @if (!string.IsNullOrEmpty(Model.ShippingAddress.AddressLine2))
+                        @Model.ShippingFirstName<br>
+                        @Model.ShippingAddressText<br>
+                        @if (!string.IsNullOrEmpty(Model.ShippingAddressText))
                         {
-                            <text>@Model.ShippingAddress.AddressLine2<br></text>
+                            <text>@Model.ShippingAddressText<br></text>
                         }
-                        @Model.ShippingAddress.District / @Model.ShippingAddress.City<br>
-                        @if (!string.IsNullOrEmpty(Model.ShippingAddress.PostalCode))
+                        @Model.ShippingAddressText / @Model.ShippingCity<br>
+                        @if (!string.IsNullOrEmpty(Model.ShippingPostalCode))
                         {
-                            <text>@Model.ShippingAddress.PostalCode<br></text>
+                            <text>@Model.ShippingPostalCode<br></text>
                         }
-                        Tel: @Model.ShippingAddress.Phone
+                        Tel: @Model.ShippingPhone
                     </div>
                 </div>
 
