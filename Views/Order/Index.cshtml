@@ -1,0 +1,261 @@
+@model IlisanCommerce.Models.OrderListViewModel
+
+@{
+    ViewData["Title"] = "Siparişlerim";
+    ViewData["Description"] = "Sipariş geçmişi ve durumu";
+}
+
+<section class="modern-orders-header" style="background: linear-gradient(135deg, #1a1a1a 0%, #333333 100%); padding: 60px 0; position: relative; border-bottom: 3px solid #ffb535;">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <div style="color: white;">
+                    <h1 style="font-size: 2.5rem; font-weight: 700; margin-bottom: 15px; background: linear-gradient(45deg, #ffb535, #e6a635); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                        Siparişlerim
+                    </h1>
+                    <p style="font-size: 1.1rem; opacity: 0.9; margin: 0;">
+                        Sipariş geçmişinizi görüntüleyin ve durumlarını takip edin
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="orders-summary" style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 15px; padding: 25px; text-align: center;">
+                    <div style="color: #ffb535; font-size: 2rem; font-weight: 700;">@Model.TotalOrders</div>
+                    <div style="color: white; font-size: 1.1rem; margin-top: 5px;">Toplam Sipariş</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section style="padding: 60px 0; background: #f8f9fa;">
+    <div class="container">
+        
+        <!-- Filtreleme Seçenekleri -->
+        <div class="filter-section" style="margin-bottom: 40px;">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="filter-card" style="background: white; border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                        <h5 style="color: #333; font-weight: 600; margin-bottom: 20px;">
+                            <i class="fas fa-filter" style="color: #ffb535; margin-right: 10px;"></i>
+                            Siparişleri Filtrele
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <form method="get" action="@Url.Action("Index")">
+                                    <div class="form-group">
+                                        <label style="color: #666; font-weight: 500; margin-bottom: 8px;">Sipariş Durumu</label>
+                                        <select name="status" class="form-control" style="border: 2px solid #e9ecef; border-radius: 12px; padding: 12px 15px; font-size: 14px;" onchange="this.form.submit()">
+                                            <option value="">Tümü</option>
+                                            <option value="1" selected="@(Model.StatusFilter == OrderStatus.Pending)">Beklemede</option>
+                                            <option value="2" selected="@(Model.StatusFilter == OrderStatus.Confirmed)">Onaylandı</option>
+                                            <option value="3" selected="@(Model.StatusFilter == OrderStatus.Processing)">Hazırlanıyor</option>
+                                            <option value="4" selected="@(Model.StatusFilter == OrderStatus.Shipped)">Kargoya Verildi</option>
+                                            <option value="5" selected="@(Model.StatusFilter == OrderStatus.Delivered)">Teslim Edildi</option>
+                                            <option value="6" selected="@(Model.StatusFilter == OrderStatus.Completed)">Tamamlandı</option>
+                                            <option value="7" selected="@(Model.StatusFilter == OrderStatus.Cancelled)">İptal Edildi</option>
+                                        </select>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="quick-stats" style="display: flex; gap: 20px; align-items: center; padding-top: 25px;">
+                                    <div style="text-align: center;">
+                                        <div style="color: #ffb535; font-size: 1.5rem; font-weight: 700;">@Model.Orders.Count(o => o.Status == OrderStatus.Processing)</div>
+                                        <div style="color: #666; font-size: 0.9rem;">Hazırlanıyor</div>
+                                    </div>
+                                    <div style="text-align: center;">
+                                        <div style="color: #28a745; font-size: 1.5rem; font-weight: 700;">@Model.Orders.Count(o => o.Status == OrderStatus.Delivered)</div>
+                                        <div style="color: #666; font-size: 0.9rem;">Teslim Edildi</div>
+                                    </div>
+                                    <div style="text-align: center;">
+                                        <div style="color: #17a2b8; font-size: 1.5rem; font-weight: 700;">@Model.Orders.Count(o => o.Status == OrderStatus.Shipped)</div>
+                                        <div style="color: #666; font-size: 0.9rem;">Kargoda</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if (Model.Orders.Any())
+        {
+            <!-- Siparişler Listesi -->
+            <div class="orders-list">
+                @foreach (var order in Model.Orders)
+                {
+                    <div class="order-card" style="background: white; border-radius: 20px; margin-bottom: 30px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1); transition: transform 0.3s ease, box-shadow 0.3s ease;">
+                        <div class="order-header" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 25px 30px; border-bottom: 2px solid #ffb535;">
+                            <div class="row align-items-center">
+                                <div class="col-lg-3">
+                                    <div class="order-number" style="font-size: 1.2rem; font-weight: 700; color: #333;">
+                                        <i class="fas fa-receipt" style="color: #ffb535; margin-right: 10px;"></i>
+                                        #@order.OrderNumber
+                                    </div>
+                                    <div style="color: #666; font-size: 0.9rem; margin-top: 5px;">
+                                        @order.OrderDate.ToString("dd MMMM yyyy", new System.Globalization.CultureInfo("tr-TR"))
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div style="text-align: center;">
+                                        @{
+                                            var statusColor = order.Status switch
+                                            {
+                                                OrderStatus.Pending => "#ffc107",
+                                                OrderStatus.Confirmed => "#17a2b8",
+                                                OrderStatus.Processing => "#ffb535",
+                                                OrderStatus.Shipped => "#007bff",
+                                                OrderStatus.Delivered => "#28a745",
+                                                OrderStatus.Completed => "#28a745",
+                                                OrderStatus.Cancelled => "#dc3545",
+                                                _ => "#6c757d"
+                                            };
+                                            
+                                            var statusText = order.Status switch
+                                            {
+                                                OrderStatus.Pending => "Beklemede",
+                                                OrderStatus.Confirmed => "Onaylandı",
+                                                OrderStatus.Processing => "Hazırlanıyor",
+                                                OrderStatus.Shipped => "Kargoya Verildi",
+                                                OrderStatus.Delivered => "Teslim Edildi",
+                                                OrderStatus.Completed => "Tamamlandı",
+                                                OrderStatus.Cancelled => "İptal Edildi",
+                                                _ => "Bilinmiyor"
+                                            };
+                                        }
+                                        <span class="status-badge" style="background: @statusColor; color: white; padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; font-weight: 600;">
+                                            @statusText
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div style="text-align: center;">
+                                        <div style="font-size: 1.4rem; font-weight: 700; color: #ffb535;">
+                                            @order.TotalAmount.ToString("C", new System.Globalization.CultureInfo("tr-TR"))
+                                        </div>
+                                        <div style="color: #666; font-size: 0.9rem;">
+                                            @order.TotalItems adet ürün
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div style="text-align: right;">
+                                        <a href="@Url.Action("Details", new { id = order.Id })" class="btn btn-outline-primary" style="border: 2px solid #ffb535; color: #ffb535; border-radius: 25px; padding: 10px 25px; font-weight: 600; text-decoration: none; transition: all 0.3s ease;">
+                                            <i class="fas fa-eye"></i> Detaylar
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="order-items" style="padding: 25px 30px;">
+                            <div class="row">
+                                @foreach (var item in order.OrderItems.Take(3))
+                                {
+                                    <div class="col-lg-4 col-md-6">
+                                        <div class="order-item" style="display: flex; align-items: center; margin-bottom: 15px;">
+                                            @if (item.Product.ProductImages.Any())
+                                            {
+                                                <img src="@item.Product.ProductImages.First().ImagePath" alt="@item.ProductName" 
+                                                     style="width: 50px; height: 50px; object-fit: cover; border-radius: 10px; margin-right: 15px;">
+                                            }
+                                            else
+                                            {
+                                                <div style="width: 50px; height: 50px; background: #f8f9fa; border-radius: 10px; margin-right: 15px; display: flex; align-items: center; justify-content: center;">
+                                                    <i class="fas fa-image" style="color: #ccc;"></i>
+                                                </div>
+                                            }
+                                            <div>
+                                                <div style="font-weight: 600; color: #333; font-size: 0.9rem;">@item.ProductName</div>
+                                                <div style="color: #666; font-size: 0.8rem;">@item.Quantity adet × @item.UnitPrice.ToString("C", new System.Globalization.CultureInfo("tr-TR"))</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                                
+                                @if (order.OrderItems.Count > 3)
+                                {
+                                    <div class="col-lg-4 col-md-6">
+                                        <div style="padding: 15px; text-align: center; background: #f8f9fa; border-radius: 10px;">
+                                            <span style="color: #666; font-size: 0.9rem;">+@(order.OrderItems.Count - 3) ürün daha</span>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <!-- Sayfalama -->
+            @if (Model.TotalPages > 1)
+            {
+                <div class="pagination-section" style="margin-top: 50px;">
+                    <nav aria-label="Sayfa navigasyonu">
+                        <ul class="pagination justify-content-center" style="margin: 0;">
+                            @if (Model.CurrentPage > 1)
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" href="@Url.Action("Index", new { page = Model.CurrentPage - 1, status = Model.StatusFilter })" 
+                                       style="border: 2px solid #ffb535; color: #ffb535; border-radius: 10px; margin: 0 5px; padding: 10px 15px;">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </a>
+                                </li>
+                            }
+
+                            @for (int i = Math.Max(1, Model.CurrentPage - 2); i <= Math.Min(Model.TotalPages, Model.CurrentPage + 2); i++)
+                            {
+                                <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                                    <a class="page-link" href="@Url.Action("Index", new { page = i, status = Model.StatusFilter })" 
+                                       style="@(i == Model.CurrentPage ? "background: #ffb535; border: 2px solid #ffb535; color: white;" : "border: 2px solid #e9ecef; color: #666;") border-radius: 10px; margin: 0 5px; padding: 10px 15px; text-decoration: none;">
+                                        @i
+                                    </a>
+                                </li>
+                            }
+
+                            @if (Model.CurrentPage < Model.TotalPages)
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" href="@Url.Action("Index", new { page = Model.CurrentPage + 1, status = Model.StatusFilter })" 
+                                       style="border: 2px solid #ffb535; color: #ffb535; border-radius: 10px; margin: 0 5px; padding: 10px 15px;">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </nav>
+                </div>
+            }
+        }
+        else
+        {
+            <!-- Boş Sipariş Durumu -->
+            <div class="empty-orders" style="text-align: center; padding: 80px 20px;">
+                <div style="background: white; border-radius: 20px; padding: 60px 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                    <div style="font-size: 4rem; color: #ffb535; margin-bottom: 20px;">
+                        <i class="fas fa-shopping-bag"></i>
+                    </div>
+                    <h3 style="color: #333; font-weight: 600; margin-bottom: 15px;">
+                        @(Model.StatusFilter.HasValue ? "Bu durumda sipariş bulunamadı" : "Henüz sipariş vermemişsiniz")
+                    </h3>
+                    <p style="color: #666; font-size: 1.1rem; margin-bottom: 30px;">
+                        @(Model.StatusFilter.HasValue ? "Farklı durum seçeneklerini kontrol edebilirsiniz." : "İlk siparişinizi vermek için ürünlerimizi inceleyin.")
+                    </p>
+                    <div>
+                        @if (Model.StatusFilter.HasValue)
+                        {
+                            <a href="@Url.Action("Index")" class="btn" style="background: linear-gradient(45deg, #ffb535, #e6a635); color: white; border: none; border-radius: 25px; padding: 15px 30px; font-weight: 600; text-decoration: none; margin-right: 15px;">
+                                <i class="fas fa-list"></i> Tüm Siparişler
+                            </a>
+                        }
+                        <a href="@Url.Action("Index", "Product")" class="btn btn-outline-primary" style="border: 2px solid #ffb535; color: #ffb535; border-radius: 25px; padding: 15px 30px; font-weight: 600; text-decoration: none;">
+                            <i class="fas fa-shopping-cart"></i> Alışverişe Başla
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</section>

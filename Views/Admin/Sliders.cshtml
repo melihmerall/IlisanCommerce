@@ -1,0 +1,156 @@
+@model IEnumerable<IlisanCommerce.Models.Slider>
+@{
+    ViewData["Title"] = "Slider Yönetimi";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0">Slider Yönetimi</h1>
+                <a href="@Url.Action("CreateSlider", "Admin")" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Yeni Slider
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Slider Listesi</h6>
+                </div>
+                <div class="card-body">
+                    @if (Model.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>Resim</th>
+                                        <th>Başlık</th>
+                                        <th>Alt Başlık</th>
+                                        <th>Buton</th>
+                                        <th>Sıralama</th>
+                                        <th>Durum</th>
+                                        <th>İşlemler</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var slider in Model)
+                                    {
+                                        <tr>
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(slider.ImageUrl))
+                                                {
+                                                    <img src="@slider.ImageUrl" alt="@slider.Title" style="width: 100px; height: 60px; object-fit: cover;" class="rounded" />
+                                                }
+                                                else
+                                                {
+                                                    <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 100px; height: 60px;">
+                                                        <i class="fas fa-image text-muted"></i>
+                                                    </div>
+                                                }
+                                            </td>
+                                            <td>
+                                                <strong>@slider.Title</strong>
+                                                @if (!string.IsNullOrEmpty(slider.Description))
+                                                {
+                                                    <br><small class="text-muted">@(slider.Description.Length > 50 ? slider.Description.Substring(0, 50) + "..." : slider.Description)</small>
+                                                }
+                                            </td>
+                                            <td>@slider.Subtitle</td>
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(slider.ButtonText))
+                                                {
+                                                    <span class="badge bg-info">@slider.ButtonText</span>
+                                                    @if (!string.IsNullOrEmpty(slider.ButtonUrl))
+                                                    {
+                                                        <br><small class="text-muted">@slider.ButtonUrl</small>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">-</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-secondary">@slider.SortOrder</span>
+                                            </td>
+                                            <td>
+                                                @if (slider.IsActive)
+                                                {
+                                                    <span class="badge bg-success">Aktif</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary">Pasif</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    <a href="@Url.Action("EditSlider", "Admin", new { id = slider.Id })" 
+                                                       class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <button type="button" class="btn btn-sm btn-outline-danger" 
+                                                            onclick="deleteSlider(@slider.Id, '@slider.Title')">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-images fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">Henüz slider bulunmuyor</h5>
+                            <p class="text-muted">İlk slider'ınızı oluşturmak için yukarıdaki butona tıklayın.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Slider Sil</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bu slider'ı silmek istediğinizden emin misiniz?</p>
+                <p><strong id="sliderName"></strong></p>
+                <p class="text-danger"><small>Bu işlem geri alınamaz!</small></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                <form id="deleteForm" method="post" style="display: inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">Sil</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function deleteSlider(id, title) {
+            document.getElementById('sliderName').textContent = title;
+            document.getElementById('deleteForm').action = '@Url.Action("DeleteSlider", "Admin")/' + id;
+            new bootstrap.Modal(document.getElementById('deleteModal')).show();
+        }
+    </script>
+}

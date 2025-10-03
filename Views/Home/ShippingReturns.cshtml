@@ -1,0 +1,481 @@
+@{
+    ViewData["Title"] = "Teslimat ve İade Şartları";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="page-content">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="page-header">
+                    <h1 class="page-title">Teslimat ve İade Şartları</h1>
+                    <p class="page-subtitle">ilisan.com.tr — 01.09.2025</p>
+                </div>
+
+                <div class="content-wrapper">
+                    <div class="intro-text">
+                        <p>Bu metin, ilisan.com.tr üzerinden yapılan alışverişlerde teslimat, kargo, iade, değişim ve para iadesi süreçlerini ayrıntılı şekilde düzenler. Tüketiciye tanınan haklar 6502 sayılı Tüketicinin Korunması Hakkında Kanun ve ilgili mevzuat çerçevesinde uygulanır.</p>
+                    </div>
+
+                    <!-- İçindekiler -->
+                    <div class="table-of-contents">
+                        <h3>İçindekiler</h3>
+                        <ol>
+                            <li><a href="#tanimlar">Tanımlar</a></li>
+                            <li><a href="#kapsam">Kapsam</a></li>
+                            <li><a href="#siparis-isleme">Siparişin İşleme Alınması ve Ödeme Onayı</a></li>
+                            <li><a href="#kargo-teslimat">Kargoya Verme Süresi ve Teslimat Süreleri</a></li>
+                            <li><a href="#kargo-sirketleri">Kargo Şirketleri, Takip ve Teslimat Bildirimi</a></li>
+                            <li><a href="#kargo-ucretleri">Kargo Ücretleri, Ücretsiz Kargo Kampanyaları ve İstisnalar</a></li>
+                            <li><a href="#kismi-gonderimler">Kısmi Gönderimler ve Stok/Sipariş Problemleri</a></li>
+                            <li><a href="#yurtdisi-gonderimler">Yurtdışı Gönderimler & Gümrük İşlemleri</a></li>
+                            <li><a href="#hasarli-teslimat">Hasarlı, Eksik veya Yanlış Ürün Teslimi Durumları</a></li>
+                            <li><a href="#cayma-hakki">Cayma Hakkı (14 Gün) ve İade Hakkının Kullanımı</a></li>
+                            <li><a href="#iade-istisna">İade Edilemeyecek Ürünler (İstisnalar)</a></li>
+                            <li><a href="#iade-sureci">İade Süreci — Adım Adım (Müşteri için kılavuz)</a></li>
+                            <li><a href="#iade-kosullari">Ürünün İade Koşulları — İnceleme Kriterleri</a></li>
+                            <li><a href="#degisim">Değişim İşlemleri</a></li>
+                            <li><a href="#para-iadesi">Para İadesi (Refund) Kuralları ve Süreler</a></li>
+                            <li><a href="#iade-ucretleri">İade ve Geri Gönderim Ücretleri</a></li>
+                            <li><a href="#islem-ucretleri">İşlem Ücretleri, İskonto ve Kampanyalı Ürünler</a></li>
+                            <li><a href="#garanti">Garanti, Teknik Servis ve Yetkili Servis Yönlendirmesi</a></li>
+                            <li><a href="#red-degerkaybi">İade Taleplerinin Reddedilmesi ve Değer Kaybı (Eksiltme)</a></li>
+                            <li><a href="#iletisim">İletişim, İade Formu ve RMA Numarası</a></li>
+                            <li><a href="#uyusmazlik">Uyuşmazlıkların Çözümü ve Yetkili Merciler</a></li>
+                            <li><a href="#yururluk">Yürürlük ve Değişiklikler</a></li>
+                        </ol>
+                    </div>
+
+                    <!-- 1. Tanımlar -->
+                    <section id="tanimlar" class="content-section">
+                        <h2>1. Tanımlar</h2>
+                        <ul>
+                            <li><strong>Satıcı / Site / Biz:</strong> shop.ilisan.com.tr (ILISAN SAVUNMA SANAYİ VE TİCARET LİMİTED ŞİRKETİ, Üngüt mahallesi 71093 sok. No: 14/C Onikişubat Kahramanmaraş, 465 155 4502, Aslanbey V.D. info@ilisan.com.tr).</li>
+                            <li><strong>Alıcı / Müşteri:</strong> Site üzerinden sipariş veren kişi/kurum.</li>
+                            <li><strong>Sipariş Onayı:</strong> Ödeme işleminin tamamlanması ve sistemimizin onay e-postası.</li>
+                            <li><strong>İade Onayı / RMA:</strong> Satıcı tarafından iade talebinin kabul edildiğine dair verilen onay numarası.</li>
+                        </ul>
+                    </section>
+
+                    <!-- 2. Kapsam -->
+                    <section id="kapsam" class="content-section">
+                        <h2>2. Kapsam</h2>
+                        <p>Bu hüküm ve koşullar, ilisan.com.tr üzerinden satın alınan tüm fiziksel ürünleri kapsar. Dijital içerik ve anında teslim edilen hizmetlere ilişkin hükümler ayrı koşullara tabi olabilir.</p>
+                    </section>
+
+                    <!-- 3. Siparişin İşleme Alınması -->
+                    <section id="siparis-isleme" class="content-section">
+                        <h2>3. Siparişin İşleme Alınması ve Ödeme Onayı</h2>
+                        <ul>
+                            <li>Siparişiniz, ödeme onayının sistemimize ulaşmasını takiben işleme alınır. Kredi kartı / havale / EFT / ödeme sağlayıcı onayı ve risk kontrolü gerekebilir.</li>
+                            <li>Ödeme doğrulama süresi normal şartlarda: aynı iş günü - en geç 2 iş günü içindedir. Yoğunluk, güvenlik kontrolleri veya banka/ödeme kuruluşu gecikmeleri nedeniyle bu süre uzayabilir.</li>
+                            <li>Ödeme onayı alınmadan sipariş kargoya verilmez. Ödeme onayı ile birlikte size sipariş onay e-postası gönderilir.</li>
+                        </ul>
+                    </section>
+
+                    <!-- 4. Kargoya Verme Süresi -->
+                    <section id="kargo-teslimat" class="content-section">
+                        <h2>4. Kargoya Verme Süresi ve Teslimat Süreleri</h2>
+                        <ul>
+                            <li><strong>Kargoya Verme Süresi (Hazırlık Süresi):</strong> Stokta olan ürünler için 1–3 iş günü (özellikle kampanya/yoğun dönemlerde 5 iş gününe kadar uzayabilir). Ön sipariş/özel üretim ürünlerde belirtilen süre geçerlidir.</li>
+                            <li><strong>Teslimat Süresi (Kargo Süresi):</strong> Kargo firmalarının teslimat sürelerine bağlı olarak bölgesel farklılıklar gösterir; genel aralık: 1–7 iş günü (ülke içi). Uzak bölgelere, hafta sonu ve resmi tatillere bağlı gecikmeler olabilir.</li>
+                            <li>Siparişin kargoya verilmesi ve kargo takip numarasının bildirilmesi ile teslimat zamanına ilişkin tahmini bilgi verilir; kesin teslimat kargo firmasına bağlıdır.</li>
+                        </ul>
+                    </section>
+
+                    <!-- 5. Kargo Şirketleri -->
+                    <section id="kargo-sirketleri" class="content-section">
+                        <h2>5. Kargo Şirketleri, Takip ve Teslimat Bildirimi</h2>
+                        <ul>
+                            <li>Siparişler, anlaşmalı kargo firmaları ile gönderilir. Hangi kargo şirketiyle gönderileceği sipariş sırasında veya onay e-postasında belirtilir.</li>
+                            <li>Kargoya verildiğinde e-posta / SMS yoluyla takip numarası paylaşılır. Takip bilgilerinin iletilmesinden sonra kargo sürecini kargo firmasının sistemi üzerinden takip etmeniz gerekir.</li>
+                            <li>Teslimatta alıcıya imza karşılığı teslim yapılır. Teslim almaya yetkili kişi siparişi teslim alabilir.</li>
+                        </ul>
+                    </section>
+
+                    <!-- 6. Kargo Ücretleri -->
+                    <section id="kargo-ucretleri" class="content-section">
+                        <h2>6. Kargo Ücretleri, Ücretsiz Kargo Kampanyaları ve İstisnalar</h2>
+                        <ul>
+                            <li>Kargo ücreti sipariş adımında net olarak gösterilir. Kampanya/ücretsiz kargo limitleri sepete uygulanır.</li>
+                            <li>Ücretsiz kargo kampanyaları, indirimli/çıkartılmış ürünler veya kampanya koşullarıyla sınırlı olabilir; kampanya koşulları belirtilir.</li>
+                            <li>Yurtdışı gönderimlerde ilave ücretler, vergi ve gümrük ücreti alıcıya aittir (bkz. 8. madde).</li>
+                        </ul>
+                    </section>
+
+                    <!-- 7. Kısmi Gönderimler -->
+                    <section id="kismi-gonderimler" class="content-section">
+                        <h2>7. Kısmi Gönderimler ve Stok/Sipariş Problemleri</h2>
+                        <ul>
+                            <li>Bazı durumlarda siparişinizdeki ürünler farklı zamanlarda kargoya verilebilir (kısmi gönderim). Bu durumda ilisan.com.tr, kısmi gönderimler için ayrı kargo takip numarası ve bilgilendirme gönderir.</li>
+                            <li>Bir ürün stokta yoksa: tarafınıza alternatif ürün, bekleme veya sipariş iptali seçenekleri sunulur. Stok yokluğu durumunda müşteri ile en geç 3 iş günü içinde iletişime geçilir.</li>
+                        </ul>
+                    </section>
+
+                    <!-- 8. Yurtdışı Gönderimler -->
+                    <section id="yurtdisi-gonderimler" class="content-section">
+                        <h2>8. Yurtdışı Gönderimler & Gümrük İşlemleri</h2>
+                        <ul>
+                            <li>Yurtdışına gönderilen siparişlerde; gümrük vergileri, ithalat vergileri, işlemler ve gecikmeler alıcıya aittir. Teslimatta ortaya çıkabilecek ek ücretler alıcı tarafından ödenir.</li>
+                            <li>İthalat işlemlerinin tamamlanma süresi ve şartları ülkeye göre değişir; ilisan.com.tr bu süreçlere ilişkin tahmin vermez fakat destek sağlar.</li>
+                        </ul>
+                    </section>
+
+                    <!-- 9. Hasarlı Teslimat -->
+                    <section id="hasarli-teslimat" class="content-section">
+                        <h2>9. Hasarlı, Eksik veya Yanlış Ürün Teslimi Durumları</h2>
+                        <ul>
+                            <li>Ürün tesliminde ambalajda gözle görülür hasar, ürün eksikliği veya yanlış ürün tespit ederseniz kargoyu teslim almadan önce kargoyu teslim eden personel ile durumu tutanakla tespit ettirin ve hemen bizimle iletişime geçin.</li>
+                            <li>Eğer kargo teslim aldıktan sonra hasar/eksik tespit edilirse, teslimatı takip eden 2 iş günü içinde fotoğraf ve açıklama ile info@ilisan.com.tr adresine bildirim yapın.</li>
+                            <li>Eksik/yanlış/hasarlı teslimlerde iade, değişim veya yeniden gönderim masrafları ilisan.com.tr tarafından karşılanır; idari süreç tamamlanana kadar lütfen ürünü kullanmayın veya ambalajını atmayın.</li>
+                        </ul>
+                    </section>
+
+                    <!-- 10. Cayma Hakkı -->
+                    <section id="cayma-hakki" class="content-section">
+                        <h2>10. Cayma Hakkı (14 Gün) ve İade Hakkının Kullanımı</h2>
+                        <ul>
+                            <li>Tüketici, ürün teslim tarihinden itibaren 14 takvim günü içinde herhangi bir gerekçe göstermeksizin cayma hakkını kullanabilir. Cayma hakkı süresi ve koşulları 6502 sayılı Kanun kapsamında uygulanır.</li>
+                            <li>Cayma hakkının kullanılması için müşterinin; iade talebini açıkça bildirmesi gereklidir. Bildirim e-posta / web formu aracılığıyla yapılabilir. (Örnek: info@ilisan.com.tr).</li>
+                            <li>Cayma hakkı kullanıldığında ürünü iade etme süresi en fazla 14 gün içerisinde ürünün satıcıya ulaştırılmasıdır; iade kargo süresi bildirimde belirtilir.</li>
+                        </ul>
+                    </section>
+
+                    <!-- 11. İade Edilemeyecek Ürünler -->
+                    <section id="iade-istisna" class="content-section">
+                        <h2>11. İade Edilemeyecek Ürünler (İstisnalar)</h2>
+                        <p>Aşağıdaki ürünler genelde cayma / iade hakkı kapsamı dışında olabilir:</p>
+                        <ul>
+                            <li>Açılmış ve hijyen gereği yeniden satılamayacak sağlık ve kozmetik ürünleri (kapak/ambalajı açılmış olanlar),</li>
+                            <li>Ambalajı açıldığında kolay bozulabilen gıda ürünleri ve çiğ ürünler,</li>
+                            <li>Müşteri isteğine göre hazırlanmış/özel üretim / kişiye özel ürünler,</li>
+                            <li>Dijital içerik ve anında erişilen hizmetler (onayla indirilmiş/dijitale erişim sağlanmışsa),</li>
+                            <li>Fiş/fatura olmadan iade istenen ürünler (istisnai haller değerlendirilir).</li>
+                        </ul>
+                    </section>
+
+                    <!-- 12. İade Süreci -->
+                    <section id="iade-sureci" class="content-section">
+                        <h2>12. İade Süreci — Adım Adım (Müşteri için kılavuz)</h2>
+                        <ol>
+                            <li><strong>İade Talebi Oluşturma:</strong> Destek e-posta (info@ilisan.com.tr) veya web sitesi iade formu ile sipariş numarası, iade nedeni, iade edilecek ürün(ler) ve tercihiniz (değişim/para iadesi) bildirilir.</li>
+                            <li><strong>Ön İnceleme:</strong> Talep tarafımızca kontrol edilir; hasarlı/yanlış ürün ise fotoğraf/eksik bilgi talep edilir.</li>
+                            <li><strong>RMA Onayı:</strong> İade uygun görülürse size bir RMA numarası ve iade adresi verilir. RMA olmadan iade kabul edilmeyebilir.</li>
+                            <li><strong>Paketleme ve Gönderim:</strong> Ürünü orijinal ambalajında, faturası ve aksesuarlarıyla birlikte (zorunlu belgeler ile) RMA numarası görünür şekilde paketleyin. Kargo fişi / takip numarası saklayın.</li>
+                            <li><strong>Ürünün Satıcıya Ulaşması ve İnceleme:</strong> Ürün bize ulaştıktan sonra fiziksel ve fonksiyonel kontrol yapılır. İnceleme süresi normal şartlarda 5–10 iş günü dir.</li>
+                            <li><strong>İade Sonucu ve Para İadesi:</strong> İnceleme sonucuna göre iade onaylanırsa para iadesi veya değişim işlemi başlatılır. (Bkz. 15. madde).</li>
+                        </ol>
+                    </section>
+
+                    <!-- 13. İade Koşulları -->
+                    <section id="iade-kosullari" class="content-section">
+                        <h2>13. Ürünün İade Koşulları — İnceleme Kriterleri</h2>
+                        <ul>
+                            <li>İade edilecek ürün kullanılmamış, orijinal etiketleri/ambalajı ile, aksesuarları, kullanım kılavuzu ve fatura ile eksiksiz teslim edilmelidir.</li>
+                            <li>Üründe müşteri kaynaklı koku, sigara lekesi, aşırı kir, çizik ya da fiziksel zarar varsa iade reddedilir veya değer kaybı sebebiyle ücret kesintisi yapılır.</li>
+                            <li>Elektronik ürünlerde kutu, seri numarası ve garanti belgesi olması gerekir; yazılımsal arızalar için öncelikle teknik servis prosedürleri uygulanır.</li>
+                        </ul>
+                    </section>
+
+                    <!-- 14. Değişim -->
+                    <section id="degisim" class="content-section">
+                        <h2>14. Değişim İşlemleri</h2>
+                        <ul>
+                            <li>Değişim talebi aynı ürünün farklı bir bedeni/renk/aynı fiyat aralığında başka bir ürün ile yapılabilir.</li>
+                            <li>Değişim stok durumuna bağlıdır; stokta olmaması halinde para iadesi veya kredi seçenekleri sunulur.</li>
+                            <li>Değişim gönderilerinde oluşacak kargo süreçleri 12. madde ile aynı şekilde işler; iade kargo ücreti politikamız 16. maddede açıklanmıştır.</li>
+                        </ul>
+                    </section>
+
+                    <!-- 15. Para İadesi -->
+                    <section id="para-iadesi" class="content-section">
+                        <h2>15. Para İadesi (Refund) Kuralları ve Süreler</h2>
+                        <ul>
+                            <li>İade onayının verilmesinden sonra para iadesi en geç 14 iş günü içinde gerçekleştirilecektir. (Banka/ödeme kuruluşu süreçleri nedeniyle kart/banka hesabınıza yansıma süresi 3–20 iş günü arasında değişebilir.)</li>
+                            <li>Ödeme kartına geri ödeme sağlanamaması durumunda (ör. havale ile ödenmişse), iade için müşterinin IBAN bilgileri istenir. IBAN bilgileri müşterinin adıyla uyumlu olmalıdır.</li>
+                            <li>Para iadesi, müşterinin talep ettiği orijinal ödeme yöntemine yapılır. (Kredi kartı ile ödeme yapıldıysa mümkün olduğunca kredi kartına iade yapılır.)</li>
+                            <li>İade tutarı; ürün bedeli ve kampanya koşullarına göre hesaplanır. Kargo ücreti ve işlem ücretleri iade politikasına göre farklılık gösterebilir (bkz. 16 ve 17).</li>
+                        </ul>
+                    </section>
+
+                    <!-- 16. İade Ücretleri -->
+                    <section id="iade-ucretleri" class="content-section">
+                        <h2>16. İade ve Geri Gönderim Ücretleri</h2>
+                        <ul>
+                            <li><strong>Ürün arızalı/yanlış/hasarlı gönderildiyse:</strong> Geri gönderim ve yeniden gönderim ücretleri ilisan.com.tr tarafından karşılanır.</li>
+                            <li><strong>Müşterinin cayma hakkını kullanması (fikir değişikliği):</strong> İade kargo ücreti müşteriye aittir, aksi belirtilmedikçe. (Bazı kampanyalarda satıcı kargo ücretini üstlenebilir; kampanya koşullarında bu belirtilir.)</li>
+                            <li>Kargo ücretleri iade miktarından düşülmez; yalnızca iade kargo ücreti tarafınıza faturalanacaksa veya kampanya şartı farklıysa önceden bilgilendirme yapılır.</li>
+                        </ul>
+                    </section>
+
+                    <!-- 17. İşlem Ücretleri -->
+                    <section id="islem-ucretleri" class="content-section">
+                        <h2>17. İşlem Ücretleri, İskonto ve Kampanyalı Ürünler</h2>
+                        <ul>
+                            <li>Kampanyalı ürünlerde iade tutarı, kampanya koşulları doğrultusunda hesaplanır. Örneğin "2 al 1 öde" tipi kampanyalarda iadenin hangi ürüne uygulanacağı ve hesaplama yöntemi açıklanır.</li>
+                            <li>Ödeme sağlayıcının kesintileri varsa, genel uygulama bütün ürün bedelinin müşteri adına iade edilmesidir; ancak teknik olarak ödeme kuruluşunun kesintileri iade sürecine etki edebilir. Bu tür durumlarda müşteri bilgilendirilir.</li>
+                        </ul>
+                    </section>
+
+                    <!-- 18. Garanti -->
+                    <section id="garanti" class="content-section">
+                        <h2>18. Garanti, Teknik Servis ve Yetkili Servis Yönlendirmesi</h2>
+                        <ul>
+                            <li>Ürünün garanti kapsamı varsa garanti süresi ve şartları garanti belgesinde belirtilir. Arızalı ürünlerde öncelikle yetkili servise yönlendirme yapılabilir.</li>
+                            <li>Garanti kapsamı dışı arızalar, yanlış kullanım kaynaklı hasarlar için onarım ücreti talep edilebilir.</li>
+                        </ul>
+                    </section>
+
+                    <!-- 19. Red ve Değer Kaybı -->
+                    <section id="red-degerkaybi" class="content-section">
+                        <h2>19. İade Taleplerinin Reddedilmesi ve Değer Kaybı (Eksiltme)</h2>
+                        <ul>
+                            <li>Ürün; kullanım/izde/ambalaj hasarı nedeniyle yeniden satılamaz haldeyse iade reddedilebilir veya iade bedelinden değer kaybı düşülebilir. Değer kaybı tespiti tarafımızdan yapılır ve gerekçeleri müşteriye yazılı bildirilir.</li>
+                            <li>Değer kaybı uygulanacaksa örnek hesaplama yöntemi ve kesilecek maksimum oran önceden belirlenip politikada yer almalıdır.</li>
+                        </ul>
+                    </section>
+
+                    <!-- 20. İletişim -->
+                    <section id="iletisim" class="content-section">
+                        <h2>20. İletişim, İade Formu ve RMA Numarası</h2>
+                        <div class="contact-info">
+                            <h4>İletişim kanalları:</h4>
+                            <ul>
+                                <li><strong>E-posta:</strong> info@ilisan.com.tr (iade ve teslimat bildirimleri için)</li>
+                                <li><strong>KVKK / Veri sorumlusu:</strong> info@ilisan.com.tr</li>
+                                <li><strong>Telefon:</strong> 0 537 220 69 91</li>
+                                <li><strong>Posta adresi (iade adresi):</strong> Üngüt Mahallesi 71093 sok no:14/C Onikişubat / Kahramanmaraş - RMA alındıktan sonra gönderilecek adres</li>
+                            </ul>
+                        </div>
+
+                        <div class="return-form-example">
+                            <h4>Örnek İade Formu (Müşteri dolduracak):</h4>
+                            <ul>
+                                <li>Sipariş No:</li>
+                                <li>RMA No (varsa):</li>
+                                <li>Ad Soyad:</li>
+                                <li>Telefon:</li>
+                                <li>E-posta:</li>
+                                <li>Ürün Adı / SKU:</li>
+                                <li>Adet:</li>
+                                <li>İade Nedeni (kodu ve açıklama):</li>
+                                <li>Tercih: Para iadesi / Değişim (ayrıntı):</li>
+                                <li>IBAN (iade banka havalesi için):</li>
+                                <li>Ek açıklama / Fotoğraflar (hasar/eksik için zorunlu):</li>
+                            </ul>
+                            <p><em>(RMA onayı geldikten sonra paket üzerine RMA numarası yazılmalıdır.)</em></p>
+                        </div>
+                    </section>
+
+                    <!-- 21. Uyuşmazlık -->
+                    <section id="uyusmazlik" class="content-section">
+                        <h2>21. Uyuşmazlıkların Çözümü ve Yetkili Merciler</h2>
+                        <p>İşbu şartlardan doğabilecek uyuşmazlıklarda öncelikle taraflar arası uzlaşma yolu aranacaktır. Tüketiciler için Tüketici Hakem Heyetleri ve Tüketici Mahkemeleri yetkilidir. Şirket merkezi/şube adresine göre yetkili mahkeme/heyet bilgisi ayrıca belirtilmelidir.</p>
+                    </section>
+
+                    <!-- 22. Yürürlük -->
+                    <section id="yururluk" class="content-section">
+                        <h2>22. Yürürlük ve Değişiklikler</h2>
+                        <p>Bu Teslimat ve İade Şartları ilisan.com.tr tarafından belirlenir ve yayımlandığı tarihte yürürlüğe girer. Şartlarda yapılacak değişiklikler site üzerinden duyurulur; sipariş anındaki şartlar müşteri ile olan sözleşmenin parçasıdır.</p>
+                    </section>
+
+                    <div class="contact-footer">
+                        <p><strong>Son güncelleme:</strong> 01.09.2025</p>
+                        <p>Sorularınız için: <a href="mailto:info@ilisan.com.tr">info@ilisan.com.tr</a> | <a href="tel:+905372206991">0 537 220 69 91</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .page-content {
+        padding: 40px 0;
+        background: #f8f9fa;
+    }
+
+    .page-header {
+        text-align: center;
+        margin-bottom: 40px;
+        padding: 30px 0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 10px;
+    }
+
+    .page-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .page-subtitle {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        margin: 0;
+    }
+
+    .content-wrapper {
+        background: white;
+        padding: 40px;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .intro-text {
+        font-size: 1.1rem;
+        line-height: 1.6;
+        color: #555;
+        margin-bottom: 30px;
+        padding: 20px;
+        background: #e8f4f8;
+        border-left: 4px solid #007bff;
+        border-radius: 5px;
+    }
+
+    .table-of-contents {
+        background: #f8f9fa;
+        padding: 25px;
+        border-radius: 8px;
+        margin-bottom: 40px;
+        border: 1px solid #dee2e6;
+    }
+
+    .table-of-contents h3 {
+        color: #333;
+        margin-bottom: 15px;
+        font-size: 1.3rem;
+        font-weight: 600;
+    }
+
+    .table-of-contents ol {
+        margin: 0;
+        padding-left: 20px;
+    }
+
+    .table-of-contents li {
+        margin-bottom: 8px;
+        line-height: 1.4;
+    }
+
+    .table-of-contents a {
+        color: #007bff;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .table-of-contents a:hover {
+        text-decoration: underline;
+        color: #0056b3;
+    }
+
+    .content-section {
+        margin-bottom: 40px;
+        padding-bottom: 30px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .content-section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+    }
+
+    .content-section h2 {
+        color: #333;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #007bff;
+    }
+
+    .content-section h4 {
+        color: #444;
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin: 20px 0 10px 0;
+    }
+
+    .content-section ul, .content-section ol {
+        line-height: 1.6;
+        color: #555;
+    }
+
+    .content-section li {
+        margin-bottom: 10px;
+    }
+
+    .content-section p {
+        line-height: 1.6;
+        color: #555;
+        margin-bottom: 15px;
+    }
+
+    .content-section strong {
+        color: #333;
+        font-weight: 600;
+    }
+
+    .contact-info {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 20px 0;
+    }
+
+    .return-form-example {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 20px 0;
+    }
+
+    .return-form-example h4 {
+        color: #856404;
+    }
+
+    .contact-footer {
+        text-align: center;
+        padding: 30px 20px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        margin-top: 40px;
+        border: 1px solid #dee2e6;
+    }
+
+    .contact-footer p {
+        margin: 5px 0;
+        color: #666;
+    }
+
+    .contact-footer a {
+        color: #007bff;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .contact-footer a:hover {
+        text-decoration: underline;
+    }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .page-title {
+            font-size: 2rem;
+        }
+        
+        .content-wrapper {
+            padding: 20px;
+        }
+        
+        .table-of-contents {
+            padding: 15px;
+        }
+        
+        .content-section h2 {
+            font-size: 1.3rem;
+        }
+    }
+</style>

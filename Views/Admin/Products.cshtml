@@ -1,0 +1,545 @@
+@model IEnumerable<IlisanCommerce.Models.Product>
+@{
+    ViewData["Title"] = "Ürün Yönetimi";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@Html.AntiForgeryToken()
+
+<div class="container-fluid">
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-lg-6 col-md-6 mb-3">
+            <div class="card bg-gradient-primary text-white border-0 h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="stat-label">Toplam Ürün</div>
+                            <div class="stat-value">@(ViewBag.TotalProducts ?? 0)</div>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="fas fa-cubes fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-lg-6 col-md-6 mb-3">
+            <div class="card bg-gradient-success text-white border-0 h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="stat-label">Aktif Ürün</div>
+                            <div class="stat-value">@(ViewBag.ActiveProducts ?? 0)</div>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="fas fa-check-circle fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-lg-6 col-md-6 mb-3">
+            <div class="card bg-gradient-warning text-white border-0 h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="stat-label">Düşük Stok</div>
+                            <div class="stat-value">@(ViewBag.LowStockProducts ?? 0)</div>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="fas fa-exclamation-triangle fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-lg-6 col-md-6 mb-3">
+            <div class="card bg-gradient-danger text-white border-0 h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="stat-label">Stokta Yok</div>
+                            <div class="stat-value">@(ViewBag.OutOfStockProducts ?? 0)</div>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="fas fa-times-circle fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <!-- Advanced Filters -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-light border-bottom">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 fw-semibold">
+                            <i class="fas fa-filter text-primary me-2"></i>
+                            Gelişmiş Arama ve Filtreleme
+                        </h5>
+                        <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#advancedFilters">
+                            <i class="fas fa-chevron-down me-1"></i>
+                            Filtreleri Göster/Gizle
+                        </button>
+                    </div>
+                </div>
+                <div class="collapse show" id="advancedFilters">
+                    <div class="card-body">
+                        <form method="get" class="row g-3 align-items-end">
+                            <input type="hidden" name="page" value="1" />
+                            
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold">Ürün Ara</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="fas fa-search text-muted"></i>
+                                    </span>
+                                    <input type="text" name="search" value="@ViewBag.Search" 
+                                           class="form-control border-start-0" 
+                                           placeholder="Ürün adı, kodu, açıklama...">
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-2">
+                                <label class="form-label fw-semibold">Kategori</label>
+                                <select name="categoryId" class="form-select">
+                                    <option value="">Tüm Kategoriler</option>
+                                    @if (ViewBag.Categories != null)
+                                    {
+                                        @foreach (var category in ViewBag.Categories)
+                                        {
+                                            @if (ViewBag.CategoryId != null && ViewBag.CategoryId.Equals(category.Id))
+                                            {
+                                                <option value="@category.Id" selected>@category.Name</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@category.Id">@category.Name</option>
+                                            }
+                                        }
+                                    }
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-2">
+                                <label class="form-label fw-semibold">Stok Durumu</label>
+                                <select name="inStock" class="form-select">
+                                    <option value="">Tümü</option>
+                                    @if (ViewBag.InStock == true)
+                                    {
+                                        <option value="true" selected>Stokta Var</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="true">Stokta Var</option>
+                                    }
+                                    @if (ViewBag.InStock == false)
+                                    {
+                                        <option value="false" selected>Stokta Yok</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="false">Stokta Yok</option>
+                                    }
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-2">
+                                <label class="form-label fw-semibold">Sırala</label>
+                                @Html.DropDownList("sortBy", new List<SelectListItem>
+                                {
+                                    new SelectListItem { Text = "Eklenme Tarihi", Value = "CreatedDate", Selected = ViewBag.SortBy?.ToString() == "CreatedDate" },
+                                    new SelectListItem { Text = "Ürün Adı", Value = "Name", Selected = ViewBag.SortBy?.ToString() == "Name" },
+                                    new SelectListItem { Text = "Fiyat", Value = "Price", Selected = ViewBag.SortBy?.ToString() == "Price" },
+                                    new SelectListItem { Text = "Stok Miktarı", Value = "Stock", Selected = ViewBag.SortBy?.ToString() == "Stock" },
+                                    new SelectListItem { Text = "Kategori", Value = "Category", Selected = ViewBag.SortBy?.ToString() == "Category" }
+                                }, new { @class = "form-select" })
+                            </div>
+                            
+                            <div class="col-md-1">
+                                <label class="form-label fw-semibold">Yön</label>
+                                @Html.DropDownList("sortOrder", new List<SelectListItem>
+                                {
+                                    new SelectListItem { Text = "Azalan", Value = "desc", Selected = ViewBag.SortOrder?.ToString() == "desc" },
+                                    new SelectListItem { Text = "Artan", Value = "asc", Selected = ViewBag.SortOrder?.ToString() == "asc" }
+                                }, new { @class = "form-select" })
+                            </div>
+                            
+                            <div class="col-md-2">
+                                <div class="d-grid gap-2 d-md-flex">
+                                    <button type="submit" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-search me-1"></i>
+                                        Ara
+                                    </button>
+                                    <a href="@Url.Action("Products")" class="btn btn-outline-secondary btn-sm">
+                                        <i class="fas fa-times me-1"></i>
+                                        Temizle
+                                    </a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Products Table -->
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-bottom">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-0 fw-bold text-dark">
+                                <i class="fas fa-cubes text-primary me-2"></i>
+                                Ürün Yönetimi
+                            </h4>
+                            <p class="text-muted small mb-0 mt-1">
+                                @(ViewBag.TotalCount ?? 0) ürün bulundu
+                                @if (!string.IsNullOrEmpty(ViewBag.Search?.ToString()))
+                                {
+                                    <span> - "@ViewBag.Search" için sonuçlar</span>
+                                }
+                            </p>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-outline-secondary btn-sm" onclick="location.reload()">
+                                <i class="fas fa-sync-alt me-1"></i>
+                                Yenile
+                            </button>
+                            <a href="@Url.Action("CreateProduct")" class="btn btn-primary btn-sm">
+                                <i class="fas fa-plus me-1"></i>
+                                Yeni Ürün
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body p-0">
+                    @if (Model.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th width="40%">Ürün Bilgileri</th>
+                                        <th width="15%" class="text-center">Kategori</th>
+                                        <th width="15%" class="text-center">Fiyat</th>
+                                        <th width="10%" class="text-center">Stok</th>
+                                        <th width="10%" class="text-center">Durum</th>
+                                        <th width="10%" class="text-center">İşlemler</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var product in Model)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    @if (product.ProductImages != null && product.ProductImages.Any())
+                                                    {
+                                                        var mainImage = product.ProductImages.FirstOrDefault(i => i.IsMainImage)
+                                                                       ?? product.ProductImages.First();
+                                                        <div class="me-3">
+                                                            <img src="@(mainImage.ImagePath.StartsWith("//") ? mainImage.ImagePath.Substring(1) : (mainImage.ImagePath.StartsWith("/") ? mainImage.ImagePath : "/" + mainImage.ImagePath))"
+                                                                 alt="@product.Name"
+                                                                 class="rounded"
+                                                                 style="width: 50px; height: 50px; object-fit: cover;" />
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="me-3">
+                                                            <div class="bg-light rounded d-flex align-items-center justify-content-center"
+                                                                 style="width: 50px; height: 50px;">
+                                                                <i class="fas fa-image text-muted"></i>
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                    <div>
+                                                        <div class="fw-semibold text-dark">@product.Name</div>
+                                                        <small class="text-muted">Kod: @product.ProductCode</small>
+                                                        @if (!string.IsNullOrEmpty(product.Description) && product.Description.Length > 50)
+                                                        {
+                                                            <br /><small class="text-muted">@product.Description.Substring(0, 50)...</small>
+                                                        }
+                                                        else if (!string.IsNullOrEmpty(product.Description))
+                                                        {
+                                                            <br /><small class="text-muted">@product.Description</small>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="text-center">
+                                                @if (product.Category != null)
+                                                {
+                                                    <span class="badge bg-light text-dark border">@product.Category.Name</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary">Kategori Yok</span>
+                                                }
+                                            </td>
+                                            <td class="text-center">
+                                                <div class="fw-semibold text-success">
+                                                    @product.Price.ToString("C", new System.Globalization.CultureInfo("tr-TR"))
+                                                </div>
+                                            </td>
+                                            <td class="text-center">
+                                                @if (product.StockQuantity <= 0)
+                                                {
+                                                    <span class="badge bg-danger">Stokta Yok</span>
+                                                }
+                                                else if (product.StockQuantity <= product.MinStockLevel)
+                                                {
+                                                    <span class="badge bg-warning text-dark">
+                                                        Düşük (@product.StockQuantity)
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-success">
+                                                        @product.StockQuantity adet
+                                                    </span>
+                                                }
+                                            </td>
+                                            <td class="text-center">
+                                                @if (product.IsActive)
+                                                {
+                                                    <span class="badge bg-success">
+                                                        <i class="fas fa-check-circle me-1"></i>
+                                                        Aktif
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary">
+                                                        <i class="fas fa-times-circle me-1"></i>
+                                                        Pasif
+                                                    </span>
+                                                }
+                                            </td>
+                                            <td class="text-center">
+                                                <div class="btn-group btn-group-sm" role="group">
+                                                    <a href="@Url.Action("EditProduct", new { id = product.Id })"
+                                                       class="btn btn-outline-primary"
+                                                       data-bs-toggle="tooltip"
+                                                       title="Düzenle">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <button type="button"
+                                                            class="btn btn-outline-info"
+                                                            onclick="viewProductDetails(@product.Id)"
+                                                            data-bs-toggle="tooltip"
+                                                            title="Detaylar">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                    <button type="button"
+                                                            class="btn btn-outline-danger"
+                                                            onclick="deleteSingleProduct(@product.Id)"
+                                                            data-bs-toggle="tooltip"
+                                                            title="Sil">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        @if (ViewBag.TotalPages > 1)
+                        {
+                            <div class="card-footer bg-light">
+                                <nav aria-label="Product pagination">
+                                    <ul class="pagination pagination-sm justify-content-center mb-0">
+                                        @if (ViewBag.CurrentPage > 1)
+                                        {
+                                            <li class="page-item">
+                                                <a class="page-link" href="@GetPageUrl(1)">
+                                                    <i class="fas fa-angle-double-left"></i>
+                                                </a>
+                                            </li>
+                                            <li class="page-item">
+                                                <a class="page-link" href="@GetPageUrl(ViewBag.CurrentPage - 1)">
+                                                    <i class="fas fa-angle-left"></i>
+                                                </a>
+                                            </li>
+                                        }
+
+                                        @for (int i = Math.Max(1, ViewBag.CurrentPage - 2); i <= Math.Min(ViewBag.TotalPages, ViewBag.CurrentPage + 2); i++)
+                                        {
+                                            <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                                <a class="page-link" href="@GetPageUrl(i)">@i</a>
+                                            </li>
+                                        }
+
+                                        @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                                        {
+                                            <li class="page-item">
+                                                <a class="page-link" href="@GetPageUrl(ViewBag.CurrentPage + 1)">
+                                                    <i class="fas fa-angle-right"></i>
+                                                </a>
+                                            </li>
+                                            <li class="page-item">
+                                                <a class="page-link" href="@GetPageUrl(ViewBag.TotalPages)">
+                                                    <i class="fas fa-angle-double-right"></i>
+                                                </a>
+                                            </li>
+                                        }
+                                    </ul>
+                                </nav>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <div class="mb-3">
+                                <i class="fas fa-cubes fa-3x text-muted"></i>
+                            </div>
+                            <h5 class="text-muted">Ürün Bulunamadı</h5>
+                            <p class="text-muted">
+                                @if (!string.IsNullOrEmpty(ViewBag.Search?.ToString()) || ViewBag.CategoryId != null || ViewBag.InStock != null)
+                                {
+                                    <span>Arama kriterinize uygun ürün bulunamadı.</span>
+                                }
+                                else
+                                {
+                                    <span>Henüz ürün eklenmemiş.</span>
+                                }
+                            </p>
+                            @if (!string.IsNullOrEmpty(ViewBag.Search?.ToString()) || ViewBag.CategoryId != null || ViewBag.InStock != null)
+                            {
+                                <a href="@Url.Action("Products")" class="btn btn-outline-primary">
+                                    <i class="fas fa-times me-1"></i>
+                                    Filtreleri Temizle
+                                </a>
+                            }
+                            else
+                            {
+                                <a href="@Url.Action("CreateProduct")" class="btn btn-primary">
+                                    <i class="fas fa-plus me-1"></i>
+                                    İlk Ürünü Ekle
+                                </a>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+    public string GetPageUrl(int page)
+    {
+        return Url.Action("Products", new { 
+            page = page,
+            search = ViewBag.Search,
+            categoryId = ViewBag.CategoryId,
+            inStock = ViewBag.InStock,
+            sortBy = ViewBag.SortBy,
+            sortOrder = ViewBag.SortOrder
+        });
+    }
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Initialize tooltips
+            $('[data-bs-toggle="tooltip"]').tooltip();
+        });
+
+        function viewProductDetails(productId) {
+            // Bu fonksiyon ürün detaylarını modal içinde gösterebilir
+            // Şimdilik edit sayfasına yönlendiriyoruz
+            window.open(`@Url.Action("EditProduct", "Admin")?id=${productId}`, '_blank');
+        }
+
+        function deleteSingleProduct(productId) {
+            if (!confirm("Bu ürünü silmek istediğinize emin misiniz? Bu işlem geri alınamaz.")) {
+                return;
+            }
+
+            const tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
+            if (!tokenInput) {
+                alert("Sayfada AntiForgery Token bulunamadı!");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('productId', productId);
+
+            fetch('@Url.Action("DeleteProduct", "Admin")', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'RequestVerificationToken': tokenInput.value
+                }
+            })
+                .then(res => {
+                    if (!res.ok) {
+                        throw new Error('Sunucu hatası: ' + res.status);
+                    }
+                    return res.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        showToast(data.message, 'success');
+                        setTimeout(() => window.location.reload(), 1500);
+                    } else {
+                        showToast(data.message, 'error');
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    showToast('İşlem sırasında hata oluştu.', 'error');
+                });
+        }
+    </script>
+}
+
+<style>
+    .bg-gradient-primary {
+        background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+    }
+    .bg-gradient-success {
+        background: linear-gradient(45deg, #56ab2f 0%, #a8e6cf 100%);
+    }
+    .bg-gradient-warning {
+        background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+    }
+    .bg-gradient-danger {
+        background: linear-gradient(45deg, #ff9a9e 0%, #fecfef 100%);
+    }
+    
+    .stat-label {
+        font-size: 0.9rem;
+        font-weight: 500;
+        opacity: 0.9;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-value {
+        font-size: 2rem;
+        font-weight: bold;
+        line-height: 1;
+    }
+    
+    .stat-icon {
+        opacity: 0.8;
+    }
+    
+    .table-hover tbody tr:hover {
+        background-color: rgba(0,123,255,0.05);
+    }
+    
+    .btn-group .btn:hover {
+        transform: scale(1.1);
+    }
+</style>

@@ -1,0 +1,443 @@
+@{
+    ViewData["Title"] = "Dashboard - ILISAN Admin";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <!-- Dashboard Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-0 fw-bold text-dark">
+                <i class="fas fa-tachometer-alt text-primary me-2"></i>
+                Dashboard
+            </h2>
+            <p class="text-muted mb-0">ILISAN Savunma Sanayi E-Ticaret Yönetim Paneli</p>
+        </div>
+        <div class="d-flex align-items-center">
+            <div class="me-3">
+                <span class="badge bg-primary">
+                    <i class="fas fa-clock me-1"></i>
+                    @DateTime.Now.ToString("HH:mm")
+                </span>
+            </div>
+            <div class="dropdown">
+                <button class="btn btn-outline-primary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    <i class="fas fa-cog me-1"></i>
+                    Hızlı İşlemler
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="@Url.Action("CreateProduct", "Admin")">
+                        <i class="fas fa-plus text-primary me-2"></i>Ürün Ekle</a></li>
+                    <li><a class="dropdown-item" href="@Url.Action("Orders", "Admin")">
+                        <i class="fas fa-list text-success me-2"></i>Siparişleri Gör</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="@Url.Action("Index", "Reports")">
+                        <i class="fas fa-chart-bar text-info me-2"></i>Raporlar</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <!-- Total Products -->
+        <div class="col-xl-3 col-lg-6 col-md-6 mb-4">
+            <div class="card admin-card border-0 h-100 stat-card stat-card-primary">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="stat-label">Toplam Ürün</div>
+                            <div class="stat-value">@(ViewBag.Stats?.TotalProducts ?? 0)</div>
+                            <div class="stat-change text-info">
+                                <i class="fas fa-cube me-1"></i>
+                                <span>@(ViewBag.Stats?.LowStockProducts ?? 0) düşük stok</span>
+                            </div>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="fas fa-cube"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0 pt-0">
+                    <a href="@Url.Action("Products", "Admin")" class="stat-link">
+                        Ürünleri Yönet <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Orders -->
+        <div class="col-xl-3 col-lg-6 col-md-6 mb-4">
+            <div class="card admin-card border-0 h-100 stat-card stat-card-success">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="stat-label">Toplam Sipariş</div>
+                            <div class="stat-value">@(ViewBag.Stats?.TotalOrders ?? 0)</div>
+                            <div class="stat-change text-success">
+                                <i class="fas fa-arrow-up me-1"></i>
+                                <span>@(ViewBag.Stats?.OrderGrowth ?? 0)% bu ay</span>
+                            </div>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0 pt-0">
+                    <a href="@Url.Action("Orders", "Admin")" class="stat-link">
+                        Siparişleri Gör <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Customers -->
+        <div class="col-xl-3 col-lg-6 col-md-6 mb-4">
+            <div class="card admin-card border-0 h-100 stat-card stat-card-info">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="stat-label">Kayıtlı Müşteri</div>
+                            <div class="stat-value">@(ViewBag.Stats?.TotalUsers ?? 0)</div>
+                            <div class="stat-change text-primary">
+                                <i class="fas fa-user-plus me-1"></i>
+                                <span>@(ViewBag.Stats?.NewCustomersThisMonth ?? 0) yeni bu ay</span>
+                            </div>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0 pt-0">
+                    <a href="@Url.Action("Index", "Customers")" class="stat-link">
+                        Müşterileri Gör <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Orders -->
+        <div class="col-xl-3 col-lg-6 col-md-6 mb-4">
+            <div class="card admin-card border-0 h-100 stat-card stat-card-warning">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="stat-label">Bekleyen Sipariş</div>
+                            <div class="stat-value">@(ViewBag.Stats?.PendingOrders ?? 0)</div>
+                            <div class="stat-change text-warning">
+                                <i class="fas fa-clock me-1"></i>
+                                <span>@(ViewBag.Stats?.PendingOrders > 0 ? "İşlem gerekli" : "Güncel")</span>
+                            </div>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="fas fa-hourglass-half"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0 pt-0">
+                    <a href="@Url.Action("Orders", "Admin", new { status = "pending" })" class="stat-link">
+                        Bekleyenleri Gör <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard Content -->
+    <div class="row">
+        <!-- Quick Actions -->
+        <div class="col-xl-6 col-lg-12 mb-4">
+            <div class="card admin-card border-0 h-100">
+                <div class="card-header bg-transparent border-0 pb-0">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 fw-bold">
+                            <i class="fas fa-rocket text-primary me-2"></i>
+                            Hızlı İşlemler
+                        </h5>
+                        <div class="badge bg-primary">7 Seçenek</div>
+                    </div>
+                    <p class="text-muted small mb-0">Sık kullanılan yönetim işlemleri</p>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <a href="@Url.Action("CreateProduct", "Admin")" class="quick-action-btn">
+                                <div class="quick-action-icon bg-primary">
+                                    <i class="fas fa-plus"></i>
+                                </div>
+                                <div class="quick-action-content">
+                                    <div class="quick-action-title">Ürün Ekle</div>
+                                    <div class="quick-action-desc">Yeni ürün oluştur</div>
+                                </div>
+                                <i class="fas fa-arrow-right quick-action-arrow"></i>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="@Url.Action("Orders", "Admin")" class="quick-action-btn">
+                                <div class="quick-action-icon bg-success">
+                                    <i class="fas fa-list-alt"></i>
+                                </div>
+                                <div class="quick-action-content">
+                                    <div class="quick-action-title">Sipariş Yönetimi</div>
+                                    <div class="quick-action-desc">Siparişleri incele</div>
+                                </div>
+                                <i class="fas fa-arrow-right quick-action-arrow"></i>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="@Url.Action("Index", "Categories")" class="quick-action-btn">
+                                <div class="quick-action-icon bg-info">
+                                    <i class="fas fa-tags"></i>
+                                </div>
+                                <div class="quick-action-content">
+                                    <div class="quick-action-title">Kategoriler</div>
+                                    <div class="quick-action-desc">Kategori yönetimi</div>
+                                </div>
+                                <i class="fas fa-arrow-right quick-action-arrow"></i>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="@Url.Action("Sliders", "Admin")" class="quick-action-btn">
+                                <div class="quick-action-icon bg-warning">
+                                    <i class="fas fa-images"></i>
+                                </div>
+                                <div class="quick-action-content">
+                                    <div class="quick-action-title">Slider</div>
+                                    <div class="quick-action-desc">Ana sayfa slider'ı</div>
+                                </div>
+                                <i class="fas fa-arrow-right quick-action-arrow"></i>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="@Url.Action("Index", "Reports")" class="quick-action-btn">
+                                <div class="quick-action-icon bg-purple">
+                                    <i class="fas fa-chart-bar"></i>
+                                </div>
+                                <div class="quick-action-content">
+                                    <div class="quick-action-title">Raporlar</div>
+                                    <div class="quick-action-desc">Analitik raporlar</div>
+                                </div>
+                                <i class="fas fa-arrow-right quick-action-arrow"></i>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="@Url.Action("SiteSettings", "Admin")" class="quick-action-btn">
+                                <div class="quick-action-icon bg-dark">
+                                    <i class="fas fa-cogs"></i>
+                                </div>
+                                <div class="quick-action-content">
+                                    <div class="quick-action-title">Site Ayarları</div>
+                                    <div class="quick-action-desc">Sistem ayarları</div>
+                                </div>
+                                <i class="fas fa-arrow-right quick-action-arrow"></i>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="@Url.Action("Index", "Home")" target="_blank" class="quick-action-btn">
+                                <div class="quick-action-icon bg-secondary">
+                                    <i class="fas fa-external-link-alt"></i>
+                                </div>
+                                <div class="quick-action-content">
+                                    <div class="quick-action-title">Siteyi Gör</div>
+                                    <div class="quick-action-desc">Yeni sekmede aç</div>
+                                </div>
+                                <i class="fas fa-arrow-right quick-action-arrow"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Status & Performance -->
+        <div class="col-xl-6 col-lg-12 mb-4">
+            <div class="card admin-card border-0 h-100">
+                <div class="card-header bg-transparent border-0 pb-0">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 fw-bold">
+                            <i class="fas fa-server text-success me-2"></i>
+                            Sistem Durumu
+                        </h5>
+                        <div class="badge bg-success">Çevrimiçi</div>
+                    </div>
+                    <p class="text-muted small mb-0">Platform performans göstergeleri</p>
+                </div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        <!-- Revenue Chart -->
+                        <div class="col-12">
+                            <div class="status-item">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="status-label">
+                                        <i class="fas fa-lira-sign text-success me-2"></i>
+                                        Toplam Gelir
+                                    </span>
+                                    <span class="status-value text-success fw-bold">
+                                        @((ViewBag.Stats?.TotalRevenue ?? 0).ToString("C", new System.Globalization.CultureInfo("tr-TR")))
+                                    </span>
+                                </div>
+                                <div class="progress mb-1" style="height: 8px;">
+                                    <div class="progress-bar bg-success" style="width: 85%"></div>
+                                </div>
+                                <small class="text-muted">Aylık hedefin %85'i</small>
+                            </div>
+                        </div>
+
+                        <!-- Stock Alert -->
+                        <div class="col-12">
+                            <div class="status-item">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="status-label">
+                                        <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                                        Düşük Stok Uyarısı
+                                    </span>
+                                    <span class="status-value text-warning fw-bold">
+                                        @(ViewBag.Stats?.LowStockProducts ?? 0) Ürün
+                                    </span>
+                                </div>
+                                <div class="progress mb-1" style="height: 8px;">
+                                    <div class="progress-bar bg-warning" style="width: 30%"></div>
+                                </div>
+                                <small class="text-muted">Stok ikmali gerekli</small>
+                            </div>
+                        </div>
+
+                        <!-- Performance Metrics -->
+                        <div class="col-6">
+                            <div class="metric-box text-center">
+                                <div class="metric-icon bg-info">
+                                    <i class="fas fa-tachometer-alt"></i>
+                                </div>
+                                <div class="metric-value">99.8%</div>
+                                <div class="metric-label">Uptime</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="metric-box text-center">
+                                <div class="metric-icon bg-primary">
+                                    <i class="fas fa-bolt"></i>
+                                </div>
+                                <div class="metric-value">1.2s</div>
+                                <div class="metric-label">Yükleme</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card admin-card border-0">
+                <div class="card-header bg-transparent border-0">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 fw-bold">
+                            <i class="fas fa-clock text-info me-2"></i>
+                            Son Aktiviteler
+                        </h5>
+                        <a href="#" class="btn btn-outline-light btn-sm">
+                            Tümünü Gör <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="activity-timeline">
+                        @{
+                            var hasLowStock = (ViewBag.Stats?.LowStockProducts ?? 0) > 0;
+                            var hasPendingOrders = (ViewBag.Stats?.PendingOrders ?? 0) > 0;
+                            var hasNewCustomers = (ViewBag.Stats?.NewCustomersThisMonth ?? 0) > 0;
+                        }
+                        
+                        @if (hasPendingOrders)
+                        {
+                            <div class="activity-item">
+                                <div class="activity-icon bg-warning">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">Bekleyen Siparişler</div>
+                                    <div class="activity-desc">@(ViewBag.Stats?.PendingOrders ?? 0) adet sipariş işlem bekliyor</div>
+                                    <div class="activity-time">Güncel</div>
+                                </div>
+                            </div>
+                        }
+                        
+                        @if (hasNewCustomers)
+                        {
+                            <div class="activity-item">
+                                <div class="activity-icon bg-primary">
+                                    <i class="fas fa-user-plus"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">Yeni Müşteri Kayıtları</div>
+                                    <div class="activity-desc">Bu ay @(ViewBag.Stats?.NewCustomersThisMonth ?? 0) yeni müşteri kaydoldu</div>
+                                    <div class="activity-time">Bu ay</div>
+                                </div>
+                            </div>
+                        }
+                        
+                        @if (hasLowStock)
+                        {
+                            <div class="activity-item">
+                                <div class="activity-icon bg-danger">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">Stok Uyarısı</div>
+                                    <div class="activity-desc">@(ViewBag.Stats?.LowStockProducts ?? 0) ürünün stok seviyesi kritik</div>
+                                    <div class="activity-time">Güncel</div>
+                                </div>
+                            </div>
+                        }
+                        
+                        <div class="activity-item">
+                            <div class="activity-icon bg-success">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-title">Bu Ayki Performans</div>
+                                <div class="activity-desc">
+                                    @(ViewBag.Stats?.OrdersThisMonth ?? 0) sipariş, 
+                                    @((ViewBag.Stats?.MonthlyRevenue ?? 0m).ToString("C", new System.Globalization.CultureInfo("tr-TR"))) gelir
+                                </div>
+                                <div class="activity-time">Bu ay</div>
+                            </div>
+                        </div>
+                        
+                        <div class="activity-item">
+                            <div class="activity-icon bg-info">
+                                <i class="fas fa-percentage"></i>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-title">Dönüşüm Oranı</div>
+                                <div class="activity-desc">
+                                    %@(ViewBag.Stats?.ConversionRate ?? 0) müşteri dönüşüm oranı
+                                    (Ortalama sipariş: @((ViewBag.Stats?.AverageOrderValue ?? 0m).ToString("C", new System.Globalization.CultureInfo("tr-TR"))))
+                                </div>
+                                <div class="activity-time">Genel</div>
+                            </div>
+                        </div>
+                        
+                        @if (!hasPendingOrders && !hasLowStock)
+                        {
+                            <div class="activity-item">
+                                <div class="activity-icon bg-success">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">Sistem Durumu</div>
+                                    <div class="activity-desc">Tüm sistemler normal çalışıyor, acil işlem gerekmiyor</div>
+                                    <div class="activity-time">Güncel</div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,769 @@
+@model IlisanCommerce.Models.CheckoutViewModel
+
+@{
+    ViewData["Title"] = "Ödeme";
+    ViewData["MetaDescription"] = "ILISAN güvenli ödeme - Siparişinizi tamamlayın";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/checkout.css" />
+}
+
+
+<section class="main-banner mv-wrap" style="background-color: #2c3e50;">
+    <div data-image-src="images/background/demo_bg_1920x1680.png" class="mv-banner-style-1 mv-bg-overlay-dark overlay-0-85 mv-parallax">
+        <div class="page-name mv-caption-style-6">
+            <div class="container">
+                <div class="mv-title-style-9"><span class="main">Ödeme</span></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="main-breadcrumb mv-wrap">
+    <div class="mv-breadcrumb-style-1">
+        <div class="container">
+            <ul class="breadcrumb-1-list">
+                <li><a href="/"><i class="fa fa-home"></i></a></li>
+                <li><a href="/sepet">Sepet</a></li>
+                <li><a>Ödeme</a></li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<section class="mv-main-body checkout-main mv-bg-gray mv-wrap">
+    <div class="container">
+        <!-- Error/Success Messages -->
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                <i class="fa fa-exclamation-triangle mr-2"></i>
+                <strong>Hata!</strong> @TempData["Error"]
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        }
+
+        @if (TempData["ValidationErrors"] != null)
+        {
+            var errors = TempData["ValidationErrors"] as List<string>;
+            if (errors != null && errors.Any())
+            {
+                <div class="alert alert-warning alert-dismissible fade show mb-4" role="alert">
+                    <i class="fa fa-exclamation-circle mr-2"></i>
+                    <strong>Form Hataları:</strong>
+                    <ul class="mb-0 mt-2">
+                        @foreach (var error in errors)
+                        {
+                            <li>@error</li>
+                        }
+                    </ul>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            }
+        }
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+                <i class="fa fa-check-circle mr-2"></i>
+                <strong>Başarılı!</strong> @TempData["Success"]
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        }
+
+        <form asp-controller="Order" asp-action="Checkout" method="post" id="checkoutForm">
+            @Html.AntiForgeryToken()
+            <input asp-for="Form.PaymentMethod" type="hidden" value="CreditCard" />
+            <div class="row">
+                <!-- Sol Kolon - Adres Bilgileri -->
+                <div class="col-lg-8">
+                    @if (Model.IsGuest)
+                    {
+                        <!-- Misafir Kullanıcı Bilgileri -->
+                        <div class="checkout-block block-guest-info mv-mb-50">
+                            <div class="mv-form-style-2 mv-box-shadow-gray-1">
+                                <div class="form-header">
+                                    <div class="mv-title-style-13">
+                                        <div class="text-main">Müşteri Bilgileri</div>
+                                    </div>
+                                </div>
+                                <div class="form-body">
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="mv-form-group">
+                                                <div class="mv-label"><strong class="text-uppercase">Ad <span class="mv-color-primary">*</span></strong></div>
+                                                <div class="mv-field">
+                                                    <input asp-for="Form.FirstName" type="text" class="mv-inputbox mv-inputbox-style-2" placeholder="Adınız" />
+                                                    <span asp-validation-for="Form.FirstName" class="text-danger"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="mv-form-group">
+                                                <div class="mv-label"><strong class="text-uppercase">Soyad <span class="mv-color-primary">*</span></strong></div>
+                                                <div class="mv-field">
+                                                    <input asp-for="Form.LastName" type="text" class="mv-inputbox mv-inputbox-style-2" placeholder="Soyadınız" />
+                                                    <span asp-validation-for="Form.LastName" class="text-danger"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="mv-form-group">
+                                                <div class="mv-label"><strong class="text-uppercase">E-posta <span class="mv-color-primary">*</span></strong></div>
+                                                <div class="mv-field">
+                                                    <input asp-for="Form.Email" type="email" class="mv-inputbox mv-inputbox-style-2" placeholder="ornek@email.com" />
+                                                    <span asp-validation-for="Form.Email" class="text-danger"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="mv-form-group">
+                                                <div class="mv-label"><strong class="text-uppercase">Telefon <span class="mv-color-primary">*</span></strong></div>
+                                                <div class="mv-field">
+                                                    <input asp-for="Form.Phone" type="tel" class="mv-inputbox mv-inputbox-style-2" placeholder="555 123 45 67" />
+                                                    <span asp-validation-for="Form.Phone" class="text-danger"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    <!-- Fatura Adresi -->
+                    <div class="checkout-block block-billing-address mv-mb-50">
+                        <div class="mv-form-style-2 mv-box-shadow-gray-1">
+                            <div class="form-header">
+                                <div class="mv-title-style-13">
+                                    <div class="text-main">Fatura Adresi</div>
+                                </div>
+                            </div>
+                            <div class="form-body">
+                                @if (!Model.IsGuest && Model.UserAddresses.Any())
+                                {
+                                    <div class="mv-form-group">
+                                        <div class="mv-label"><strong class="text-uppercase">Kayıtlı Adreslerim</strong></div>
+                                        <div class="mv-field">
+                                            <select asp-for="Form.BillingAddressId" class="mv-inputbox mv-inputbox-style-2" onchange="loadAddress(this.value, 'billing')">
+                                                <option value="">Yeni adres ekle</option>
+                                                @foreach (var address in Model.UserAddresses)
+                                                {
+                                                    <option value="@address.Id">@address.AddressTitle - @address.FullName</option>
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                }
+
+                                <div id="billingAddressForm">
+                                    <div class="mv-form-group">
+                                        <div class="mv-label"><strong class="text-uppercase">Ad Soyad <span class="mv-color-primary">*</span></strong></div>
+                                        <div class="mv-field">
+                                            <input asp-for="Form.BillingAddress.FullName" type="text" class="mv-inputbox mv-inputbox-style-2" placeholder="Ad Soyad" />
+                                            <span asp-validation-for="Form.BillingAddress.FullName" class="text-danger"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="mv-form-group">
+                                        <div class="mv-label"><strong class="text-uppercase">Telefon <span class="mv-color-primary">*</span></strong></div>
+                                        <div class="mv-field">
+                                            <input asp-for="Form.BillingAddress.Phone" type="tel" class="mv-inputbox mv-inputbox-style-2" placeholder="0555 123 45 67" />
+                                            <span asp-validation-for="Form.BillingAddress.Phone" class="text-danger"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="mv-form-group">
+                                                <div class="mv-label"><strong class="text-uppercase">İl <span class="mv-color-primary">*</span></strong></div>
+                                                <div class="mv-field">
+                                                    <input asp-for="Form.BillingAddress.City" type="text" class="mv-inputbox mv-inputbox-style-2" placeholder="İl" />
+                                                    <span asp-validation-for="Form.BillingAddress.City" class="text-danger"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="mv-form-group">
+                                                <div class="mv-label"><strong class="text-uppercase">İlçe <span class="mv-color-primary">*</span></strong></div>
+                                                <div class="mv-field">
+                                                    <input asp-for="Form.BillingAddress.District" type="text" class="mv-inputbox mv-inputbox-style-2" placeholder="İlçe" />
+                                                    <span asp-validation-for="Form.BillingAddress.District" class="text-danger"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="mv-form-group">
+                                        <div class="mv-label"><strong class="text-uppercase">Mahalle</strong></div>
+                                        <div class="mv-field">
+                                            <input asp-for="Form.BillingAddress.Neighborhood" type="text" class="mv-inputbox mv-inputbox-style-2" placeholder="Mahalle" />
+                                        </div>
+                                    </div>
+
+                                    <div class="mv-form-group">
+                                        <div class="mv-label"><strong class="text-uppercase">Adres <span class="mv-color-primary">*</span></strong></div>
+                                        <div class="mv-field">
+                                            <input asp-for="Form.BillingAddress.AddressLine1" type="text" class="mv-inputbox mv-inputbox-style-2" placeholder="Sokak, cadde, bina no" />
+                                            <span asp-validation-for="Form.BillingAddress.AddressLine1" class="text-danger"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="mv-form-group">
+                                        <div class="mv-label"><strong class="text-uppercase">Adres Detayı</strong></div>
+                                        <div class="mv-field">
+                                            <input asp-for="Form.BillingAddress.AddressLine2" type="text" class="mv-inputbox mv-inputbox-style-2" placeholder="Daire, kat, blok vb." />
+                                        </div>
+                                    </div>
+
+                                    <div class="mv-form-group">
+                                        <div class="mv-label"><strong class="text-uppercase">Posta Kodu</strong></div>
+                                        <div class="mv-field">
+                                            <input asp-for="Form.BillingAddress.PostalCode" type="text" class="mv-inputbox mv-inputbox-style-2" placeholder="34000" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Teslimat Adresi -->
+                    <div class="checkout-block block-shipping-address mv-mb-50">
+                        <div class="mv-form-style-2 mv-box-shadow-gray-1">
+                            <div class="form-header">
+                                <div class="mv-title-style-13">
+                                    <div class="text-main">Teslimat Adresi</div>
+                                </div>
+                            </div>
+                            <div class="form-body">
+                                <div class="mv-form-group">
+                                    <label class="mv-checkbox mv-checkbox-style-1">
+                                        <input asp-for="Form.SameAsShipping" type="checkbox" class="hidden" onchange="toggleShippingAddress()" />
+                                        <span class="checkbox-after-input">
+                                            <span class="checkbox-visual-box">
+                                                <span class="icon-checked fa fa-check"></span>
+                                            </span>
+                                            <span class="checkbox-text">
+                                                <strong>Fatura adresi ile aynı</strong>
+                                            </span>
+                                        </span>
+                                    </label>
+                                </div>
+
+                                <div id="shippingAddressForm" style="display: none;">
+                                    @if (!Model.IsGuest && Model.UserAddresses.Any())
+                                    {
+                                        <div class="mv-form-group">
+                                            <div class="mv-label"><strong class="text-uppercase">Kayıtlı Adreslerim</strong></div>
+                                            <div class="mv-field">
+                                                <select asp-for="Form.ShippingAddressId" class="mv-inputbox mv-inputbox-style-2" onchange="loadAddress(this.value, 'shipping')">
+                                                    <option value="">Yeni adres ekle</option>
+                                                    @foreach (var address in Model.UserAddresses)
+                                                    {
+                                                        <option value="@address.Id">@address.AddressTitle - @address.FullName</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                    }
+
+                                    <div class="mv-form-group">
+                                        <div class="mv-label"><strong class="text-uppercase">Ad Soyad <span class="mv-color-primary">*</span></strong></div>
+                                        <div class="mv-field">
+                                            <input asp-for="Form.ShippingAddress.FullName" type="text" class="mv-inputbox mv-inputbox-style-2" placeholder="Ad Soyad" />
+                                            <span asp-validation-for="Form.ShippingAddress.FullName" class="text-danger"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="mv-form-group">
+                                        <div class="mv-label"><strong class="text-uppercase">Telefon <span class="mv-color-primary">*</span></strong></div>
+                                        <div class="mv-field">
+                                            <input asp-for="Form.ShippingAddress.Phone" type="tel" class="mv-inputbox mv-inputbox-style-2" placeholder="0555 123 45 67" />
+                                            <span asp-validation-for="Form.ShippingAddress.Phone" class="text-danger"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="mv-form-group">
+                                                <div class="mv-label"><strong class="text-uppercase">İl <span class="mv-color-primary">*</span></strong></div>
+                                                <div class="mv-field">
+                                                    <input asp-for="Form.ShippingAddress.City" type="text" class="mv-inputbox mv-inputbox-style-2" placeholder="İl" />
+                                                    <span asp-validation-for="Form.ShippingAddress.City" class="text-danger"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="mv-form-group">
+                                                <div class="mv-label"><strong class="text-uppercase">İlçe <span class="mv-color-primary">*</span></strong></div>
+                                                <div class="mv-field">
+                                                    <input asp-for="Form.ShippingAddress.District" type="text" class="mv-inputbox mv-inputbox-style-2" placeholder="İlçe" />
+                                                    <span asp-validation-for="Form.ShippingAddress.District" class="text-danger"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="mv-form-group">
+                                        <div class="mv-label"><strong class="text-uppercase">Mahalle</strong></div>
+                                        <div class="mv-field">
+                                            <input asp-for="Form.ShippingAddress.Neighborhood" type="text" class="mv-inputbox mv-inputbox-style-2" placeholder="Mahalle" />
+                                        </div>
+                                    </div>
+
+                                    <div class="mv-form-group">
+                                        <div class="mv-label"><strong class="text-uppercase">Adres <span class="mv-color-primary">*</span></strong></div>
+                                        <div class="mv-field">
+                                            <input asp-for="Form.ShippingAddress.AddressLine1" type="text" class="mv-inputbox mv-inputbox-style-2" placeholder="Sokak, cadde, bina no" />
+                                            <span asp-validation-for="Form.ShippingAddress.AddressLine1" class="text-danger"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="mv-form-group">
+                                        <div class="mv-label"><strong class="text-uppercase">Adres Detayı</strong></div>
+                                        <div class="mv-field">
+                                            <input asp-for="Form.ShippingAddress.AddressLine2" type="text" class="mv-inputbox mv-inputbox-style-2" placeholder="Daire, kat, blok vb." />
+                                        </div>
+                                    </div>
+
+                                    <div class="mv-form-group">
+                                        <div class="mv-label"><strong class="text-uppercase">Posta Kodu</strong></div>
+                                        <div class="mv-field">
+                                            <input asp-for="Form.ShippingAddress.PostalCode" type="text" class="mv-inputbox mv-inputbox-style-2" placeholder="34000" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mv-form-group">
+                                    <div class="mv-label"><strong class="text-uppercase">Sipariş Notları</strong></div>
+                                    <div class="mv-field">
+                                        <textarea asp-for="Form.Notes" rows="3" class="mv-inputbox mv-inputbox-style-2 mv-resize-vertical" placeholder="Siparişiniz hakkında özel notlarınız..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sağ Kolon - Sipariş Özeti ve Ödeme -->
+                <div class="col-lg-4">
+                    <!-- Sipariş Özeti - Modern Design -->
+                    <div class="checkout-block block-order-summary mv-mb-50">
+                        <div class="order-summary-modern">
+                            <div class="summary-header">
+                                <h4 class="summary-title">
+                                    <i class="fa fa-shopping-cart mr-2"></i>
+                                    Sipariş Özeti
+                                </h4>
+                                <span class="item-count">@Model.Cart.CartItems.Count() ürün</span>
+                            </div>
+
+                            <div class="summary-items">
+                                        @foreach (var item in Model.Cart.CartItems)
+                                        {
+                                    <div class="summary-item">
+                                        <div class="item-image">
+                                            <img src="@(item.Product.ProductImages?.FirstOrDefault(pi => pi.IsMainImage)?.ImagePath ?? "/images/demo/demo_300x400.png")"
+                                                 alt="@item.Product.Name" />
+                                        </div>
+                                        <div class="item-details">
+                                            <div class="item-name">@item.Product.Name</div>
+                                                                @if (item.ProductVariant != null)
+                                                                {
+                                                <div class="item-variant">@item.ProductVariant.VariantName</div>
+                                                                }
+                                            <div class="item-quantity">@item.Quantity adet</div>
+                                                            </div>
+                                        <div class="item-price">
+                                            <div class="unit-price">@item.UnitPrice.ToString("C")</div>
+                                            <div class="total-price">@item.TotalPrice.ToString("C")</div>
+                                                </div>
+                                            </div>
+                                        }
+                                </div>
+
+                                <!-- Kargo Bilgileri -->
+                                <div class="shipping-info" style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 15px;">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <small class="text-muted">Toplam Desi:</small><br>
+                                            <strong>@Model.TotalDesi.ToString("F1") desi</strong>
+                                        </div>
+                                        <div class="col-6 text-right">
+                                            <small class="text-muted">Kargo Ücreti:</small><br>
+                                            <strong>@Model.ShippingCost.ToString("C")</strong>
+                                        </div>
+                                    </div>
+                                    @if (Model.ShippingCost == 0)
+                                    {
+                                        <div class="text-center mt-2">
+                                            <span class="badge badge-success">Ücretsiz Kargo</span>
+                                        </div>
+                                    }
+                                </div>
+
+                                <div class="mv-table-style-1">
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td class="text-uppercase">Ara Toplam</td>
+                                                <td class="text-right">@Model.CartTotal.ToString("C")</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-uppercase">Kargo</td>
+                                                <td class="text-right">@Model.ShippingCost.ToString("C")</td>
+                                            </tr>
+                                            <tr class="total-row">
+                                                <td class="text-uppercase"><strong>Toplam</strong></td>
+                                                <td class="text-right"><strong style="font-size: 18px;">@Model.GrandTotal.ToString("C")</strong></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ödeme Yöntemi -->
+                    <div class="checkout-block block-payment-method mv-mb-50">
+                        <div class="mv-well-style-2 mv-box-shadow-gray-1 mv-bg-white">
+                            <div class="well-2-header">
+                                <div class="mv-title-style-13">
+                                    <div class="text-main">Ödeme Yöntemi</div>
+                                </div>
+                            </div>
+                            <div class="well-2-body">
+                                <div class="payment-method-single">
+                                    <!-- Tek Ödeme Seçeneği: Kredi Kartı -->
+                                    <div class="payment-method-card-single">
+                                        <input type="hidden" name="Form.PaymentMethod" value="CreditCard">
+                                        <div class="payment-method-header">
+                                            <div class="payment-method-icon">
+                                                <i class="fa fa-credit-card"></i>
+                                                    </div>
+                                            <div class="payment-method-title">
+                                                <strong>Güvenli Kredi Kartı Ödemesi</strong>
+                                                <small class="d-block text-muted">İyzico güvenli ödeme sistemi</small>
+                                                                </div>
+                                            <div class="payment-method-logos">
+                                                <img src="images/icon/icon_visa_2.png" alt="Visa" style="height: 28px; margin: 0 3px;">
+                                                <img src="images/icon/icon_master_card_2.png" alt="Mastercard" style="height: 28px; margin: 0 3px;">
+                                                                </div>
+                                                            </div>
+                                        <div class="payment-method-details mt-2">
+                                            <div class="payment-security text-center">
+                                                <div class="security-badges mb-3">
+                                                    <span class="badge badge-success mr-1">
+                                                        <i class="fa fa-shield"></i> SSL
+                                                    </span>
+                                                    <span class="badge badge-success mr-1">
+                                                        <i class="fa fa-lock"></i> 3D Secure
+                                                    </span>
+                                                    <span class="badge badge-success">
+                                                        <i class="fa fa-check"></i> PCI DSS
+                                                    </span>
+                                                </div>
+                                                <!-- Iyzico Logo -->
+                                                <div class="iyzico-logo-container">
+                                                    <img src="~/iyzico-logo-pack/checkout_iyzico_ile_ode/TR/Tr_Colored_Horizontal/iyzico_ile_ode_colored_horizontal.png" 
+                                                         alt="İyzico ile Öde" 
+                                                         style="height: 40px; max-width: 200px;" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Kullanım Koşulları ve Sipariş Ver Butonu -->
+                    <div class="checkout-block block-place-order">
+                        <!-- Kullanım Koşulları -->
+                        <div class="terms-agreement mb-4">
+                            <div class="mv-well-style-2 mv-box-shadow-gray-1 mv-bg-white">
+                                <div class="well-2-body p-3">
+                                    <label class="mv-checkbox mv-checkbox-style-6 w-100">
+                                        <input type="checkbox" name="acceptTerms" required class="hidden terms-checkbox" />
+                                        <div class="checkbox-after-input d-flex align-items-start">
+                                            <div class="checkbox-visual-box mt-1">
+                                                <span class="icon-checked fa fa-check"></span>
+                                            </div>
+                                            <div class="checkbox-text ml-2" style="white-space: nowrap;">
+                                                <a href="/Home/Privacy" target="_blank" class="text-primary" style="display: inline;">Kullanım Şartları</a>,
+                                                <a href="/Home/ShippingReturns" target="_blank" class="text-primary" style="display: inline;">Teslimat ve İade Koşulları</a>
+                                                ile 
+                                                <a href="/Home/CookiePolicy" target="_blank" class="text-primary" style="display: inline;">Gizlilik Politikası</a>'nı
+                                                okudum ve kabul ediyorum.
+                                            </div>
+                                        </div>
+                                    </label>
+                                    <div class="terms-error text-danger mt-2" style="display: none;">
+                                        <i class="fa fa-exclamation-triangle"></i> Lütfen kullanım koşullarını kabul edin.
+                                    </div>
+                            </div>
+                            </div>
+                        </div>
+
+                        <!-- Sipariş Ver Butonu -->
+                        <div class="place-order-button">
+                            <button type="submit" class="btn btn-success btn-lg btn-block payment-submit-btn" id="placeOrderBtn">
+                                <div class="btn-content">
+                                    <i class="fa fa-lock mr-2"></i>
+                                    <span class="btn-text">Güvenli Ödeme Yap</span>
+                                    <span class="btn-loading" style="display: none;">
+                                        <i class="fa fa-spinner fa-spin mr-2"></i>
+                                        İşleniyor...
+                                    </span>
+                                </div>
+                                <div class="btn-total mt-1">
+                                    <small>Toplam: @Model.GrandTotal.ToString("C")</small>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+        </form>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        function toggleShippingAddress() {
+            const checkbox = document.querySelector('input[name="Form.SameAsShipping"]');
+            const shippingForm = document.getElementById('shippingAddressForm');
+            
+            if (checkbox.checked) {
+                shippingForm.style.display = 'none';
+                copyBillingToShipping();
+            } else {
+                shippingForm.style.display = 'block';
+            }
+        }
+
+        function copyBillingToShipping() {
+            const billingFields = {
+                'Form.BillingAddress.FullName': 'Form.ShippingAddress.FullName',
+                'Form.BillingAddress.Phone': 'Form.ShippingAddress.Phone',
+                'Form.BillingAddress.City': 'Form.ShippingAddress.City',
+                'Form.BillingAddress.District': 'Form.ShippingAddress.District',
+                'Form.BillingAddress.Neighborhood': 'Form.ShippingAddress.Neighborhood',
+                'Form.BillingAddress.AddressLine1': 'Form.ShippingAddress.AddressLine1',
+                'Form.BillingAddress.AddressLine2': 'Form.ShippingAddress.AddressLine2',
+                'Form.BillingAddress.PostalCode': 'Form.ShippingAddress.PostalCode'
+            };
+
+            for (const [billingField, shippingField] of Object.entries(billingFields)) {
+                const billingInput = document.querySelector(`input[name="${billingField}"]`);
+                const shippingInput = document.querySelector(`input[name="${shippingField}"]`);
+                
+                if (billingInput && shippingInput) {
+                    shippingInput.value = billingInput.value;
+                }
+            }
+        }
+
+        function loadAddress(addressId, type) {
+            if (!addressId) return;
+            
+            fetch(`/api/address/${addressId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (type === 'billing') {
+                        document.querySelector('input[name="Form.BillingAddress.FullName"]').value = data.fullName || '';
+                        document.querySelector('input[name="Form.BillingAddress.Phone"]').value = data.phone || '';
+                        document.querySelector('input[name="Form.BillingAddress.City"]').value = data.city || '';
+                        document.querySelector('input[name="Form.BillingAddress.District"]').value = data.district || '';
+                        document.querySelector('input[name="Form.BillingAddress.Neighborhood"]').value = data.neighborhood || '';
+                        document.querySelector('input[name="Form.BillingAddress.AddressLine1"]').value = data.addressLine1 || '';
+                        document.querySelector('input[name="Form.BillingAddress.AddressLine2"]').value = data.addressLine2 || '';
+                        document.querySelector('input[name="Form.BillingAddress.PostalCode"]').value = data.postalCode || '';
+                    } else if (type === 'shipping') {
+                        document.querySelector('input[name="Form.ShippingAddress.FullName"]').value = data.fullName || '';
+                        document.querySelector('input[name="Form.ShippingAddress.Phone"]').value = data.phone || '';
+                        document.querySelector('input[name="Form.ShippingAddress.City"]').value = data.city || '';
+                        document.querySelector('input[name="Form.ShippingAddress.District"]').value = data.district || '';
+                        document.querySelector('input[name="Form.ShippingAddress.Neighborhood"]').value = data.neighborhood || '';
+                        document.querySelector('input[name="Form.ShippingAddress.AddressLine1"]').value = data.addressLine1 || '';
+                        document.querySelector('input[name="Form.ShippingAddress.AddressLine2"]').value = data.addressLine2 || '';
+                        document.querySelector('input[name="Form.ShippingAddress.PostalCode"]').value = data.postalCode || '';
+                    }
+                })
+                .catch(error => {
+                    console.error('Adres yüklenirken hata:', error);
+                });
+        }
+
+        // Tek ödeme yöntemi - JavaScript gerekmez
+        function handlePaymentMethodChange() {
+            // Artık tek ödeme yöntemi olduğu için bu fonksiyon boş kalabilir
+            console.log('Tek ödeme yöntemi: Kredi Kartı');
+        }
+
+        // Form validation ve submit
+        function initializeFormSubmit() {
+            const form = document.getElementById('checkoutForm');
+            const submitBtn = document.getElementById('placeOrderBtn');
+            const termsCheckbox = document.querySelector('.terms-checkbox');
+            const termsError = document.querySelector('.terms-error');
+
+            form.addEventListener('submit', function(e) {
+                // Kullanım koşulları kontrolü
+                if (!termsCheckbox.checked) {
+                e.preventDefault();
+                    termsError.style.display = 'block';
+                    termsCheckbox.focus();
+                return false;
+            }
+
+                termsError.style.display = 'none';
+
+                // Submit button'u disable et ve loading göster
+                submitBtn.disabled = true;
+                submitBtn.querySelector('.btn-text').style.display = 'none';
+                submitBtn.querySelector('.btn-loading').style.display = 'inline';
+
+                return true;
+            });
+
+            // Kullanım koşulları checkbox değişimi
+            termsCheckbox.addEventListener('change', function() {
+                if (this.checked) {
+                    termsError.style.display = 'none';
+                }
+            });
+        }
+
+        // Telefon numarası formatlaması
+        function formatPhoneNumber(input) {
+            let value = input.value.replace(/\D/g, '');
+            if (value.startsWith('90')) {
+                value = value.substring(2);
+            }
+            if (value.startsWith('0')) {
+                value = value.substring(1);
+            }
+
+            if (value.length >= 3) {
+                value = value.replace(/(\d{3})(\d{3})(\d{2})(\d{2})/, '0$1 $2 $3 $4');
+            }
+
+            input.value = value;
+        }
+
+        // Posta kodu validasyonu
+        function validatePostalCode(input) {
+            const value = input.value.replace(/\D/g, '');
+            if (value.length > 5) {
+                input.value = value.substring(0, 5);
+            } else {
+                input.value = value;
+            }
+        }
+
+        // Form alanı focus/blur efektleri
+        function addInputEffects() {
+            const inputs = document.querySelectorAll('.mv-inputbox');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.parentElement.classList.add('focused');
+                });
+
+                input.addEventListener('blur', function() {
+                    this.parentElement.classList.remove('focused');
+                    if (!this.value) {
+                        this.parentElement.classList.remove('has-value');
+                    } else {
+                        this.parentElement.classList.add('has-value');
+                    }
+                });
+
+                // Başlangıç durumu
+                if (input.value) {
+                    input.parentElement.classList.add('has-value');
+                }
+            });
+        }
+
+        // Real-time validation feedback
+        function addValidationFeedback() {
+            const requiredInputs = document.querySelectorAll('input[required], input[asp-for*="City"], input[asp-for*="District"], input[asp-for*="AddressLine1"]');
+            requiredInputs.forEach(input => {
+                input.addEventListener('blur', function() {
+                    const errorSpan = this.parentElement.querySelector('.text-danger');
+                    if (this.value.trim() === '') {
+                        if (errorSpan && !errorSpan.textContent) {
+                            errorSpan.textContent = 'Bu alan zorunludur.';
+                            this.classList.add('is-invalid');
+                        }
+                    } else {
+                        if (errorSpan && errorSpan.textContent === 'Bu alan zorunludur.') {
+                            errorSpan.textContent = '';
+                            this.classList.remove('is-invalid');
+                        }
+                    }
+                });
+
+                input.addEventListener('input', function() {
+                    if (this.value.trim() !== '') {
+                        this.classList.remove('is-invalid');
+                        const errorSpan = this.parentElement.querySelector('.text-danger');
+                        if (errorSpan && errorSpan.textContent === 'Bu alan zorunludur.') {
+                            errorSpan.textContent = '';
+                        }
+                    }
+                });
+            });
+        }
+
+
+        // Sayfa yüklendiğinde
+        document.addEventListener('DOMContentLoaded', function() {
+            // Misafir kullanıcı için zorunlu alanlar
+            @if (Model.IsGuest)
+            {
+                <text>
+                const emailInput = document.querySelector('input[name="Form.Email"]');
+                const phoneInput = document.querySelector('input[name="Form.Phone"]');
+                if (emailInput) emailInput.required = true;
+                if (phoneInput) phoneInput.required = true;
+                </text>
+            }
+
+            // Telefon formatlaması
+            const phoneInputs = document.querySelectorAll('input[type="tel"]');
+            phoneInputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    formatPhoneNumber(this);
+                });
+            });
+
+            // Posta kodu formatlaması
+            const postalInputs = document.querySelectorAll('input[asp-for*="PostalCode"]');
+            postalInputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    validatePostalCode(this);
+                });
+            });
+
+            // Input efektleri
+            addInputEffects();
+
+            // Validation feedback
+            addValidationFeedback();
+
+
+            // Form submit işlemleri
+            initializeFormSubmit();
+        });
+    </script>
+}

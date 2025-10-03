@@ -1,0 +1,569 @@
+@model IlisanCommerce.Models.ProductListViewModel
+
+@{
+    ViewData["Title"] = Model.CurrentCategory?.Name ?? "Ürünler";
+    ViewData["MetaDescription"] = Model.CurrentCategory?.Name != null ? $"{Model.CurrentCategory.Name} kategorisindeki ürünler" : "ILISAN ürün kataloğu - Balistik yelekler, Anti-rad ürünleri, Askeri tekstil";
+}
+
+<section class="main-banner mv-wrap" style="background-color: #2c3e50;">
+    <div class="mv-banner-style-1 mv-bg-overlay-dark overlay-0-85 mv-parallax">
+        <div class="page-name mv-caption-style-6">
+            <div class="container">
+                <div class="mv-title-style-9"><span class="main">@(Model.CurrentCategory?.Name ?? "Ürünlerimiz")</span></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="main-breadcrumb mv-wrap">
+    <div class="mv-breadcrumb-style-1">
+        <div class="container">
+            <ul class="breadcrumb-1-list">
+                <li><a asp-controller="Home" asp-action="Index"><i class="fa fa-home"></i></a></li>
+                <li><a asp-controller="Product" asp-action="Index">Ürünler</a></li>
+                @if (Model.CurrentCategory != null)
+                {
+                    <li><a>@Model.CurrentCategory.Name</a></li>
+                }
+            </ul>
+        </div>
+    </div>
+</section>
+
+<section class="mv-main-body product-grid-3-main mv-bg-gray mv-wrap">
+    <div class="container">
+        <div class="row mv-content-sidebar">
+            <div class="mv-c-s-content col-xs-12 col-md-8 col-lg-9">
+                <!-- Toolbar -->
+                <div class="mv-toolbar-style-1 mv-wrap">
+                    <div class="row toolbar-1-inner">
+                        <div class="col-xs-12 col-md-6">
+                            <div class="toolbar-1-left">
+                                <div class="mv-title-style-13">
+                                    <span class="main" id="product-count">@Model.TotalProducts ürün bulundu</span>
+                                    <span class="sub" id="filter-info">
+                                        @if (!string.IsNullOrEmpty(Model.SearchQuery))
+                                        {
+                                            <text>"@Model.SearchQuery" için arama sonuçları</text>
+                                        }
+                                        else if (Model.CurrentCategory != null)
+                                        {
+                                            <text>@Model.CurrentCategory.Name kategorisi</text>
+                                        }
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-md-6">
+                            <div class="toolbar-1-right">
+                                <div class="mv-dp-table">
+                                    <div class="mv-dp-table-cell toolbar-1-sort-by">
+                                        <div class="mv-select mv-select-style-1">
+                                            <select id="sort-select" class="mv-inputbox mv-inputbox-style-2">
+                                                <option value="">Sıralama</option>
+                                                <option value="newest" selected="@(Model.SortBy == "newest")">En Yeniler</option>
+                                                <option value="oldest" selected="@(Model.SortBy == "oldest")">En Eskiler</option>
+                                                <option value="price-low" selected="@(Model.SortBy == "price-low")">Fiyat (Düşük-Yüksek)</option>
+                                                <option value="price-high" selected="@(Model.SortBy == "price-high")">Fiyat (Yüksek-Düşük)</option>
+                                                <option value="name" selected="@(Model.SortBy == "name")">İsim (A-Z)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Products Grid -->
+                <div class="row mv-list-product-wrapper mv-block-style-9">
+                    <div class="block-9-list mv-list-product" id="products-container">
+                        @if (Model.Products != null && Model.Products.Any())
+                        {
+                            @foreach (var product in Model.Products)
+                            {
+                                <article class="col-xs-6 col-sm-4 col-md-6 col-lg-4 item item-product-grid-3 post">
+                                    <div class="item-inner mv-effect-translate-1 mv-box-shadow-gray-1">
+                                        <div style="background-color: #fff;" class="content-thumb">
+                                            <div class="thumb-inner mv-effect-relative">
+                                                <a asp-controller="Product" asp-action="Details" asp-route-slug="@product.Slug" title="@product.Name">
+                                                    <img src="@(product.ProductImages?.FirstOrDefault(pi => pi.IsMainImage)?.ImagePath ?? "/images/demo/demo_300x400.png")" alt="@product.Name" class="mv-effect-item" />
+                                                </a>
+                                                <a asp-controller="Product" asp-action="Details" asp-route-slug="@product.Slug" title="@product.Name" class="mv-btn mv-btn-style-25 btn-readmore-plus hidden-xs">
+                                                    <span class="btn-inner"></span>
+                                                </a>
+
+                                                <div class="content-message mv-message-style-1">
+                                                    <div class="message-inner"></div>
+                                                </div>
+
+                                                @if (product.ComparePrice.HasValue && product.ComparePrice > product.Price)
+                                                {
+                                                    var discountPercent = (int)((product.ComparePrice.Value - product.Price) / product.ComparePrice.Value * 100);
+                                                    <div class="content-sale-off mv-label-style-2 text-center">
+                                                        <div class="label-2-inner">
+
+                                                        </div>
+                                                    </div>
+                                                }
+                                                else if (product.IsSpecialProduct)
+                                                {
+                                                    <div class="content-sale-off mv-label-style-2 text-center" style="background: #d4af37;">
+                                                        <div class="label-2-inner">
+                                                            <ul class="label-2-ul">
+                
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+
+                                        <div class="content-default">
+                                            <div class="content-price">
+                                                <span class="new-price">@product.Price.ToString("C", new System.Globalization.CultureInfo("tr-TR"))</span>
+                                                @if (product.ComparePrice.HasValue && product.ComparePrice > product.Price)
+                                                {
+                                                    <span class="old-price">@product.ComparePrice.Value.ToString("C", new System.Globalization.CultureInfo("tr-TR"))</span>
+                                                }
+                                            </div>
+                                            <div class="content-desc">
+                                                <a asp-controller="Product" asp-action="Details" asp-route-slug="@product.Slug" title="@product.Name" class="mv-overflow-ellipsis">@product.Name</a>
+                                            </div>
+                                            
+                                            @if (product.StockQuantity <= 0)
+                                            {
+                                                <div class="content-stock-status text-danger">
+                                                    <small><i class="fa fa-times-circle"></i> Stokta Yok</small>
+                                                </div>
+                                            }
+                                            else if (product.StockQuantity <= product.MinStockLevel)
+                                            {
+                                                <div class="content-stock-status text-warning">
+                                                    <small><i class="fa fa-exclamation-triangle"></i> Son @product.StockQuantity Adet</small>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="content-stock-status text-success">
+                                                    <small><i class="fa fa-check-circle"></i> Stokta Var</small>
+                                                </div>
+                                            }
+
+                                            @if (!string.IsNullOrEmpty(product.CertificateType))
+                                            {
+                                                <div class="content-certificate">
+                                                    <small class="text-info"><i class="fa fa-certificate"></i> @product.CertificateType</small>
+                                                </div>
+                                            }
+                                        </div>
+
+                                        <div class="content-hover">
+                                            <div class="content-button mv-btn-group text-center">
+                                                <div class="group-inner">
+                                                    <a asp-controller="Product" asp-action="Details" asp-route-slug="@product.Slug" class="mv-btn mv-btn-style-1 btn-1-h-40 responsive-btn-1-type-1" title="Detayları Gör">
+                                                        <span class="btn-inner">
+                                                            <i class="btn-icon fa fa-eye"></i>
+                                                            <span class="btn-text">detay</span>
+                                                        </span>
+                                                    </a>
+                                                    <button type="button" class="mv-btn mv-btn-style-3 btn-3-h-40 responsive-btn-3-type-1 btn-add-to-cart" data-product-id="@product.Id" title="Sepete Ekle">
+                                                        <i class="fa fa-cart-plus"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </article>
+                            }
+                        }
+                        else
+                        {
+                            <div class="col-12 text-center">
+                                <div class="no-products-found" style="padding: 50px 0;">
+                                    <i class="fa fa-search" style="font-size: 48px; color: #ccc; margin-bottom: 20px;"></i>
+                                    <h3>Ürün Bulunamadı</h3>
+                                    <p>Aradığınız kriterlere uygun ürün bulunmamaktadır.</p>
+                                    @if (!string.IsNullOrEmpty(Model.SearchQuery) || Model.CurrentCategory != null || Model.MinPrice.HasValue || Model.MaxPrice.HasValue)
+                                    {
+                                        <a asp-controller="Product" asp-action="Index" class="mv-btn mv-btn-style-1">
+                                            <span class="btn-inner">
+                                                <span class="btn-text">Tüm Ürünleri Gör</span>
+                                            </span>
+                                        </a>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <div class="mv-pagination-wrapper" id="pagination-container">
+                    @if (Model.TotalPages > 1)
+                    {
+                        <div class="mv-pagination-style-1 has-count-post">
+                            <div class="count-post mv-title-style-10">
+                                <span class="number" id="total-products">@Model.TotalProducts</span> ürün, 
+                                <span class="number" id="total-pages">@Model.TotalPages</span> sayfa
+                            </div>
+                            <ul class="pagination" id="pagination-list">
+                                @if (Model.CurrentPage > 1)
+                                {
+                                    <li class="prev">
+                                        <a href="#" data-page="@(Model.CurrentPage - 1)" class="pagination-link">önceki</a>
+                                    </li>
+                                }
+
+                                @for (int i = Math.Max(1, Model.CurrentPage - 2); i <= Math.Min(Model.TotalPages, Model.CurrentPage + 2); i++)
+                                {
+                                    <li class="@(i == Model.CurrentPage ? "active" : "")">
+                                        @if (i == Model.CurrentPage)
+                                        {
+                                            <a>@i</a>
+                                        }
+                                        else
+                                        {
+                                            <a href="#" data-page="@i" class="pagination-link">@i</a>
+                                        }
+                                    </li>
+                                }
+
+                                @if (Model.CurrentPage < Model.TotalPages)
+                                {
+                                    <li class="next">
+                                        <a href="#" data-page="@(Model.CurrentPage + 1)" class="pagination-link">sonraki</a>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="mv-c-s-sidebar col-xs-12 col-md-4 col-lg-3 hidden-xs hidden-sm">
+                <div class="mv-c-s-sidebar-inner">
+                    <!-- Search -->
+                    <div class="mv-aside mv-aside-search">
+                        <div class="aside-title mv-title-style-11">arama</div>
+                        <div class="aside-body">
+                            <div class="form-aside-search">
+                                <div class="mv-inputbox-icon right">
+                                    <input type="text" id="search-input" value="@Model.SearchQuery" placeholder="Ürün ara..." class="mv-inputbox mv-inputbox-style-2" />
+                                    <button type="button" id="search-btn" class="icon mv-btn mv-btn-style-4 fa fa-search"></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Price Filter -->
+                    <div class="mv-aside mv-aside-filter-by-price">
+                        <div class="aside-title mv-title-style-11">fiyat aralığı</div>
+                        <div class="aside-body">
+                            <div class="form-aside-filter-by-price">
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <input type="number" id="min-price" value="@Model.MinPrice" placeholder="Min ₺" class="form-control" />
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <input type="number" id="max-price" value="@Model.MaxPrice" placeholder="Max ₺" class="form-control" />
+                                    </div>
+                                </div>
+                                <div class="text-center" style="margin-top: 10px;">
+                                    <button type="button" id="price-filter-btn" class="mv-btn mv-btn-style-5 btn-5-h-30">filtrele</button>
+                                    <button type="button" id="clear-price-filter-btn" class="mv-btn mv-btn-style-5 btn-5-h-30" style="margin-left: 10px; background-color: #6c757d; border-color: #6c757d;">temizle</button>
+                                </div>
+                            </div>
+
+                            <nav class="filter-by-price-menu mv-menu-style-1" style="margin-top: 15px;">
+                                <ul>
+                                    <li><a href="#" class="mv-icon-left-style-5 price-range-link" data-min="0" data-max="1000">₺0 - ₺1.000</a></li>
+                                    <li><a href="#" class="mv-icon-left-style-5 price-range-link" data-min="1000" data-max="5000">₺1.000 - ₺5.000</a></li>
+                                    <li><a href="#" class="mv-icon-left-style-5 price-range-link" data-min="5000" data-max="10000">₺5.000 - ₺10.000</a></li>
+                                    <li><a href="#" class="mv-icon-left-style-5 price-range-link" data-min="10000" data-max="">₺10.000+</a></li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+
+                    <!-- Categories -->
+                    <div class="mv-aside mv-aside-product-type">
+                        <div class="aside-title mv-title-style-11">kategoriler</div>
+                        <div class="aside-body">
+                            <nav class="product-type-menu mv-menu-style-1">
+                                <ul>
+                                    <li class="@(Model.CurrentCategory == null ? "active" : "")">
+                                        <a href="#" class="mv-icon-left-style-5 category-link" data-category="">Tüm Ürünler</a>
+                                    </li>
+                                    @if (Model.Categories != null && Model.Categories.Any())
+                                    {
+                                        @foreach (var category in Model.Categories)
+                                        {
+                                            var productCount = category.Products?.Count(p => p.IsActive) ?? 0;
+                                            <li class="@(Model.CurrentCategory?.Id == category.Id ? "active" : "")">
+                                                <a href="#" class="mv-icon-left-style-5 category-link" data-category="@category.Slug">
+                                                    @category.Name<span class="sub-text">&nbsp; (@productCount)</span>
+                                                </a>
+                                            </li>
+                                        }
+                                    }
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Global filter state
+            var currentFilters = {
+                page: @Model.CurrentPage,
+                sortBy: '@Model.SortBy',
+                category: '@Model.CategorySlug',
+                search: '@Model.SearchQuery',
+                minPrice: @(Model.MinPrice?.ToString() ?? "null"),
+                maxPrice: @(Model.MaxPrice?.ToString() ?? "null")
+            };
+
+            // Loading state
+            function showLoading() {
+                $('#products-container').html('<div class="col-12 text-center" style="padding: 50px 0;"><i class="fa fa-spinner fa-spin" style="font-size: 48px; color: #007bff;"></i><br><br><p>Yükleniyor...</p></div>');
+            }
+
+            // Update filters and reload products
+            function updateProducts() {
+                showLoading();
+                
+                $.ajax({
+                    url: '@Url.Action("FilterProducts", "Product")',
+                    type: 'POST',
+                    data: currentFilters,
+                    success: function(data) {
+                        // FilterProducts returns only the _ProductGrid partial view
+                        $('#products-container').html(data);
+                        
+                        // Update pagination and other info from current page state
+                        updatePaginationInfo();
+                        
+                        // Re-bind add to cart events
+                        bindAddToCartEvents();
+                    },
+                    error: function(xhr, status, error) {
+                        console.log('Error:', xhr.responseText);
+                        $('#products-container').html('<div class="col-12 text-center" style="padding: 50px 0;"><i class="fa fa-exclamation-triangle" style="font-size: 48px; color: #dc3545;"></i><br><br><p>Bir hata oluştu. Lütfen tekrar deneyin.</p></div>');
+                    }
+                });
+            }
+
+            // Update pagination info from current filters
+            function updatePaginationInfo() {
+                // Update filter info based on current filters
+                var filterInfo = '';
+                if (currentFilters.search) {
+                    filterInfo = '"' + currentFilters.search + '" için arama sonuçları';
+                } else if (currentFilters.category) {
+                    // We need to get category name, for now just show category slug
+                    filterInfo = currentFilters.category + ' kategorisi';
+                }
+                $('#filter-info').text(filterInfo);
+            }
+
+            // Update pagination
+            function updatePagination(html) {
+                $('#pagination-container').html(html);
+                bindPaginationEvents();
+            }
+
+            // Update product count
+            function updateProductCount(count) {
+                $('#product-count').text(count);
+            }
+
+            // Update filter info
+            function updateFilterInfo(html) {
+                $('#filter-info').html(html);
+            }
+
+            // Bind pagination events
+            function bindPaginationEvents() {
+                $('.pagination-link').off('click').on('click', function(e) {
+                    e.preventDefault();
+                    currentFilters.page = parseInt($(this).data('page'));
+                    updateProducts();
+                });
+            }
+
+            // Bind add to cart events
+            function bindAddToCartEvents() {
+                $('.btn-add-to-cart').off('click').on('click', function() {
+                    var productId = $(this).data('product-id');
+                    var button = $(this);
+                    
+                    // Disable button during request
+                    button.prop('disabled', true);
+                    
+                    $.ajax({
+                        url: '@Url.Action("AddToCart", "Cart")',
+                        type: 'POST',
+                        data: {
+                            productId: productId,
+                            quantity: 1
+                        },
+                        dataType: 'json',
+                        success: function(result) {
+                            if (result.success) {
+                                // Update cart count with animation
+                                if (result.cartCount !== undefined) {
+                                    $('#cart-count').addClass('cart-update-animation').text(result.cartCount);
+                                    setTimeout(() => $('#cart-count').removeClass('cart-update-animation'), 600);
+                                }
+                                
+                                // Show professional notification
+                                if (window.cartManager) {
+                                    window.cartManager.showToast({
+                                        type: 'success',
+                                        title: 'Sepete Eklendi!',
+                                        message: 'Ürün başarıyla sepete eklendi.',
+                                        duration: 3000
+                                    });
+                                    
+                                    // Update cart preview
+                                    window.cartManager.updateCartPreview();
+                                }
+                            } else {
+                                // Show error notification
+                                if (window.cartManager) {
+                                    window.cartManager.showToast({
+                                        type: 'error',
+                                        title: 'Hata!',
+                                        message: result.message || 'Ürün sepete eklenemedi.',
+                                        duration: 4000
+                                    });
+                                }
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.log('Error:', xhr.responseText);
+                            if (window.cartManager) {
+                                window.cartManager.showToast({
+                                    type: 'error',
+                                    title: 'Bağlantı Hatası!',
+                                    message: 'Bir hata oluştu. Lütfen tekrar deneyin.',
+                                    duration: 4000
+                                });
+                            }
+                        },
+                        complete: function() {
+                            // Re-enable button
+                            button.prop('disabled', false);
+                        }
+                    });
+                });
+            }
+
+            // Sort change event
+            $('#sort-select').on('change', function() {
+                currentFilters.sortBy = $(this).val();
+                currentFilters.page = 1; // Reset to first page
+                updateProducts();
+            });
+
+            // Search functionality
+            $('#search-btn').on('click', function() {
+                currentFilters.search = $('#search-input').val();
+                currentFilters.page = 1;
+                updateProducts();
+            });
+
+            // Search on Enter key
+            $('#search-input').on('keypress', function(e) {
+                if (e.which === 13) {
+                    currentFilters.search = $(this).val();
+                    currentFilters.page = 1;
+                    updateProducts();
+                }
+            });
+
+            // Price filter
+            $('#price-filter-btn').on('click', function() {
+                currentFilters.minPrice = $('#min-price').val() || null;
+                currentFilters.maxPrice = $('#max-price').val() || null;
+                currentFilters.page = 1;
+                updateProducts();
+            });
+
+            // Clear price filter
+            $('#clear-price-filter-btn').on('click', function() {
+                $('#min-price').val('');
+                $('#max-price').val('');
+                currentFilters.minPrice = null;
+                currentFilters.maxPrice = null;
+                currentFilters.page = 1;
+                updateProducts();
+            });
+
+            // Price range links
+            $('.price-range-link').on('click', function(e) {
+                e.preventDefault();
+                var minPrice = $(this).data('min');
+                var maxPrice = $(this).data('max');
+                
+                $('#min-price').val(minPrice);
+                $('#max-price').val(maxPrice);
+                
+                currentFilters.minPrice = minPrice || null;
+                currentFilters.maxPrice = maxPrice || null;
+                currentFilters.page = 1;
+                updateProducts();
+            });
+
+            // Category links
+            $('.category-link').on('click', function(e) {
+                e.preventDefault();
+                var category = $(this).data('category');
+                
+                // Update active state
+                $('.category-link').parent().removeClass('active');
+                $(this).parent().addClass('active');
+                
+                currentFilters.category = category;
+                currentFilters.page = 1;
+                updateProducts();
+            });
+
+            // Clear all filters function
+            window.clearAllFilters = function() {
+                currentFilters = {
+                    page: 1,
+                    sortBy: '',
+                    category: '',
+                    search: '',
+                    minPrice: null,
+                    maxPrice: null
+                };
+                
+                // Reset form values
+                $('#search-input').val('');
+                $('#min-price').val('');
+                $('#max-price').val('');
+                $('#sort-select').val('');
+                
+                // Reset active states
+                $('.category-link').parent().removeClass('active');
+                $('.category-link[data-category=""]').parent().addClass('active');
+                
+                updateProducts();
+            };
+
+            // Initialize events
+            bindPaginationEvents();
+            bindAddToCartEvents();
+        });
+    </script>
+}

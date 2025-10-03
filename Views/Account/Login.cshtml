@@ -1,0 +1,272 @@
+@model IlisanCommerce.Models.LoginViewModel
+
+@{
+    ViewData["Title"] = "Giriş Yap";
+    ViewData["MetaDescription"] = "ILISAN hesabınıza giriş yapın. Hızlı alışveriş ve özel tekliflerden yararlanın.";
+}
+
+
+<section class="main-banner mv-wrap" style="background-color: #2c3e50;">
+    <div data-image-src="images/background/demo_bg_1920x1680.png" class="mv-banner-style-1 mv-bg-overlay-dark overlay-0-85 mv-parallax">
+        <div class="page-name mv-caption-style-6">
+            <div class="container">
+                <div class="mv-title-style-9"><span class="main">Giriş Yap - Kayıt Ol</span></div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- .main-banner-->
+
+<section class="main-breadcrumb mv-wrap">
+    <div class="mv-breadcrumb-style-1">
+        <div class="container">
+            <ul class="breadcrumb-1-list">
+                <li><a asp-controller="Home" asp-action="Index"><i class="fa fa-home"></i></a></li>
+                <li><a>Giriş/Kayıt</a></li>
+            </ul>
+        </div>
+    </div>
+</section>
+<!-- .main-breadcrumb-->
+
+<section class="mv-main-body login-main mv-bg-gray mv-wrap">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-6 col-login">
+                <div class="mv-form-style-1 mv-box-shadow-gray-1">
+                    <form asp-controller="Account" asp-action="Login" method="post" class="form-login">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
+                        
+                        <div class="form-header">
+                            <div class="mv-title-style-13">
+                                <div class="text-main">Giriş Yap</div>
+                                <div class="text-sub">ILISAN hesabınıza giriş yapın</div>
+                            </div>
+                        </div>
+                        <!-- .form-header-->
+
+                        <!-- Mesajlar sadece toast olarak gösterilecek -->
+
+                        <div class="form-body">
+                            <div class="mv-form-group">
+                                <div class="mv-label"> <strong class="text-uppercase">E-posta</strong></div>
+                                <div class="mv-field">
+                                    <input asp-for="Email" type="email" class="mv-inputbox mv-inputbox-style-1" placeholder="E-posta adresinizi giriniz" />
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="mv-form-group">
+                                <div class="mv-label"> <strong class="text-uppercase">Şifre</strong></div>
+                                <div class="mv-field">
+                                    <input asp-for="Password" type="password" class="mv-inputbox mv-inputbox-style-1" placeholder="Şifrenizi giriniz" />
+                                    <span asp-validation-for="Password" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="mv-form-group submit-button mv-mt-30">
+                                <button type="submit" class="mv-btn mv-btn-style-5 btn-login">Giriş Yap</button>
+                                <label class="mv-checkbox mv-checkbox-style-1 checkbox-remember">
+                                    <input asp-for="RememberMe" type="checkbox" class="hidden" />
+                                    <span class="checkbox-after-input">
+                                        <span class="checkbox-visual-box">
+                                            <span class="icon-checked fa fa-check"></span>
+                                        </span>
+                                        <span class="checkbox-text">Beni hatırla</span>
+                                    </span>
+                                </label>
+                            </div>
+
+                            <div class="mv-form-group">
+                                <a asp-controller="Account" asp-action="ForgotPassword" class="btn-forgot-pass">Şifremi unuttum?</a>
+                            </div>
+                        </div>
+                        <!-- .form-body-->
+                    </form>
+                    <!-- .form-login-->
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-register">
+                <div class="mv-form-style-1 mv-box-shadow-gray-1">
+                    <div class="form-header">
+                        <div class="mv-title-style-13">
+                            <div class="text-main">Yeni Hesap Oluştur</div>
+                            <div class="text-sub">Siparişlerinizi takip etmek, favori listesi oluşturmak ve daha fazlası için hesap oluşturun</div>
+                        </div>
+                    </div>
+                    <!-- .form-header-->
+
+                    <div class="form-body">
+                        <div class="mv-form-group">
+                            <p class="text-center" style="margin: 20px 0;">
+                                <strong>Henüz hesabınız yok mu?</strong><br>""
+                                Hızlı ve kolay kayıt olmak için aşağıdaki butona tıklayın.
+                            </p>
+                        </div>
+
+                        <div class="mv-form-group submit-button mv-mt-30">
+                            <a asp-controller="Account" asp-action="Register" class="mv-btn mv-btn-style-5 btn-signup" style="width: 100%; text-align: center; display: block;">
+                                Kayıt Ol
+                            </a>
+                        </div>
+
+                        <div class="mv-form-group">
+                            <div class="text-center" style="margin-top: 20px;">
+                                <p style="color: #666; font-size: 14px;">
+                                    Kayıt olarak aşağıdaki avantajlardan yararlanabilirsiniz:
+                                </p>
+                                <ul style="text-align: left; color: #666; font-size: 13px; margin-top: 10px;">
+                                    <li>✓ Siparişlerinizi takip edin</li>
+                                    <li>✓ Favori ürünlerinizi kaydedin</li>
+                                    <li>✓ Hızlı ödeme seçenekleri</li>
+                                    <li>✓ Özel indirimler ve kampanyalar</li>
+                                    <li>✓ Adres defteri yönetimi</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- .form-body-->
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- .mv-main-body-->
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+    
+    <style>
+        .mv-inputbox.error {
+            border-color: #dc3545 !important;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+        }
+        
+        .text-danger {
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: 5px;
+            display: block;
+        }
+        
+        .alert {
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        .alert-success {
+            color: #155724;
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+        
+        .alert-danger {
+            color: #721c24;
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+
+        @@keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Toast bildirimleri için */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+
+        .toast {
+            min-width: 300px;
+            margin-bottom: 10px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            animation: slideInRight 0.3s ease-out;
+        }
+
+        .toast-success {
+            background-color: #28a745;
+        }
+
+        .toast-error {
+            background-color: #dc3545;
+        }
+
+        @@keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+    </style>
+
+    <script>
+        // Toast bildirimleri için JavaScript
+        function showToast(message, type = 'success') {
+            const toastContainer = document.getElementById('toast-container') || createToastContainer();
+            
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            
+            toastContainer.appendChild(toast);
+            
+            // 5 saniye sonra toast'ı kaldır
+            setTimeout(() => {
+                toast.style.animation = 'slideInRight 0.3s ease-out reverse';
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.parentNode.removeChild(toast);
+                    }
+                }, 300);
+            }, 5000);
+        }
+
+        function createToastContainer() {
+            const container = document.createElement('div');
+            container.id = 'toast-container';
+            container.className = 'toast-container';
+            document.body.appendChild(container);
+            return container;
+        }
+
+        // Sayfa yüklendiğinde TempData mesajlarını kontrol et
+        document.addEventListener('DOMContentLoaded', function() {
+            @if (!string.IsNullOrEmpty(TempData["SuccessMessage"] as string))
+            {
+                <text>
+                showToast('@Html.Raw(TempData["SuccessMessage"])', 'success');
+                </text>
+            }
+            
+            @if (!string.IsNullOrEmpty(TempData["ErrorMessage"] as string))
+            {
+                <text>
+                showToast('@Html.Raw(TempData["ErrorMessage"])', 'error');
+                </text>
+            }
+        });
+    </script>
+}

@@ -1,0 +1,432 @@
+@model IEnumerable<IlisanCommerce.Models.SiteSetting>
+@{
+    ViewData["Title"] = "Site Ayarları";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <!-- Settings Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-0 fw-bold text-dark">
+                <i class="fas fa-cogs text-primary me-2"></i>
+                Site Ayarları
+            </h2>
+            <p class="text-muted mb-0">Sistem ayarları ve yapılandırma seçenekleri</p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <a href="@Url.Action("Index", "Admin")" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i>
+                Geri Dön
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["Info"] != null)
+    {
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+            <i class="fas fa-info-circle me-2"></i>
+            @TempData["Info"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+    }
+
+    @if (Model != null && Model.Any())
+    {
+        <!-- Settings Form -->
+        <form asp-action="UpdateSiteSettings" asp-controller="Admin" method="post" id="settingsForm">
+            @Html.AntiForgeryToken()
+            
+            @{
+                var groupedSettings = Model.GroupBy(s => s.Category).OrderBy(g => g.Key);
+            }
+
+            @foreach (var categoryGroup in groupedSettings)
+            {
+                <div class="card admin-card border-0 mb-4">
+                    <div class="card-header bg-light border-0">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0 fw-bold text-dark">
+                                @Html.Raw(GetCategoryIcon(categoryGroup.Key)) @GetCategoryDisplayName(categoryGroup.Key)
+                            </h5>
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" 
+                                        onclick="resetCategory('@categoryGroup.Key')">
+                                    <i class="fas fa-undo me-1"></i>
+                                    Sıfırla
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-primary" 
+                                        data-bs-toggle="collapse" data-bs-target="#category-@categoryGroup.Key.Replace(" ", "-")" 
+                                        aria-expanded="true">
+                                    <i class="fas fa-chevron-down"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="collapse show" id="category-@categoryGroup.Key.Replace(" ", "-")">
+                                <div class="card-body">
+                            <div class="row g-3">
+                                @foreach (var setting in categoryGroup.OrderBy(s => s.SortOrder))
+                                {
+                                    <div class="col-md-6 col-lg-4">
+                                        <div class="form-group">
+                                            <label for="setting_@setting.Key" class="form-label fw-semibold">
+                                                @(setting.DisplayName ?? setting.Key)
+                                                @if (setting.IsRequired)
+                                                {
+                                                    <span class="text-danger">*</span>
+                                                }
+                                            </label>
+                                            
+                                            @if (setting.DataType == "textarea")
+                                            {
+                                                <textarea class="form-control" 
+                                                          id="setting_@setting.Key" 
+                                                          name="settings[@setting.Key]" 
+                                                          rows="3"
+                                                          placeholder="@setting.Key">@setting.Value</textarea>
+                                            }
+                                            else if (setting.DataType == "checkbox")
+                                            {
+                                                <div class="form-check form-switch">
+                                                    <input class="form-check-input" 
+                                                           type="checkbox" 
+                                                           id="setting_@setting.Key" 
+                                                           name="settings[@setting.Key]" 
+                                                           value="true"
+                                                           @(setting.Value.ToLower() == "true" ? "checked" : "")>
+                                                    <label class="form-check-label" for="setting_@setting.Key">
+                                                        @(setting.Value.ToLower() == "true" ? "Aktif" : "Pasif")
+                                                    </label>
+                                                </div>
+                                            }
+                                            else if (setting.DataType == "email")
+                                            {
+                                                <input type="email" 
+                                                       class="form-control" 
+                                                       id="setting_@setting.Key" 
+                                                       name="settings[@setting.Key]" 
+                                                       value="@setting.Value"
+                                                       placeholder="ornek@email.com">
+                                            }
+                                            else if (setting.DataType == "url")
+                                            {
+                                                <input type="url" 
+                                                       class="form-control" 
+                                                       id="setting_@setting.Key" 
+                                                       name="settings[@setting.Key]" 
+                                                       value="@setting.Value"
+                                                       placeholder="https://www.ornek.com">
+                                            }
+                                            else if (setting.DataType == "number")
+                                            {
+                                                <input type="number" 
+                                                       class="form-control" 
+                                                       id="setting_@setting.Key" 
+                                                       name="settings[@setting.Key]" 
+                                                       value="@setting.Value"
+                                                       step="0.01">
+                                            }
+                                            else
+                                            {
+                                                <input type="text" 
+                                                       class="form-control" 
+                                                       id="setting_@setting.Key" 
+                                                       name="settings[@setting.Key]" 
+                                                       value="@setting.Value"
+                                                       placeholder="@setting.Key">
+                                            }
+                                            
+                                            <small class="form-text text-muted">
+                                                Son güncelleme: @setting.UpdatedDate.ToString("dd.MM.yyyy HH:mm")
+                                                @if (!string.IsNullOrEmpty(setting.UpdatedBy))
+                                                {
+                                                    <span> - @setting.UpdatedBy</span>
+                                                }
+                                            </small>
+                            </div>
+                        </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Save Button -->
+            <div class="d-flex justify-content-end gap-3 mb-4">
+                <button type="button" class="btn btn-outline-secondary" onclick="resetAllSettings()">
+                    <i class="fas fa-undo me-1"></i>
+                    Tümünü Sıfırla
+                </button>
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="fas fa-save me-1"></i>
+                    Ayarları Kaydet
+                </button>
+                        </div>
+        </form>
+    }
+    else
+    {
+        <!-- No Settings Found -->
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card admin-card border-0 text-center">
+                    <div class="card-body p-5">
+                        <div class="mb-4">
+                            <i class="fas fa-cogs text-muted" style="font-size: 4rem;"></i>
+                        </div>
+                        <h3 class="fw-bold mb-3">Site Ayarları Bulunamadı</h3>
+                        <p class="text-muted mb-4">
+                            Henüz hiç site ayarı tanımlanmamış. Lütfen veritabanında SiteSettings tablosuna ayarları ekleyin.
+                        </p>
+                        <a href="@Url.Action("Index", "Admin")" class="btn btn-primary">
+                            <i class="fas fa-arrow-left me-1"></i>
+                            Ana Sayfaya Dön
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Reset Category Modal -->
+<div class="modal fade" id="resetCategoryModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Kategori Ayarlarını Sıfırla</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bu kategorideki tüm ayarları varsayılan değerlere sıfırlamak istediğinizden emin misiniz?</p>
+                <p class="text-muted small">Bu işlem geri alınamaz.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-danger" id="confirmResetCategory">Sıfırla</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reset All Modal -->
+<div class="modal fade" id="resetAllModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Tüm Ayarları Sıfırla</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-danger fw-bold">DİKKAT!</p>
+                <p>Tüm site ayarlarını varsayılan değerlere sıfırlamak istediğinizden emin misiniz?</p>
+                <p class="text-muted small">Bu işlem geri alınamaz ve tüm özel ayarlarınız kaybolacaktır.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-danger" id="confirmResetAll">Tümünü Sıfırla</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.admin-card {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border-radius: 12px;
+}
+
+.form-control:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25);
+}
+
+.form-check-input:checked {
+    background-color: #6366f1;
+    border-color: #6366f1;
+}
+
+.btn-primary {
+    background-color: #6366f1;
+    border-color: #6366f1;
+}
+
+.btn-primary:hover {
+    background-color: #4f46e5;
+    border-color: #4f46e5;
+}
+
+.card-header {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+}
+</style>
+
+<script>
+let currentCategory = '';
+
+function resetCategory(category) {
+    currentCategory = category;
+    const modal = document.getElementById('resetCategoryModal');
+    if (modal) {
+        const bootstrapModal = new bootstrap.Modal(modal);
+        bootstrapModal.show();
+    }
+}
+
+function resetAllSettings() {
+    const modal = document.getElementById('resetAllModal');
+    if (modal) {
+        const bootstrapModal = new bootstrap.Modal(modal);
+        bootstrapModal.show();
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Confirm reset category
+    const confirmResetCategoryBtn = document.getElementById('confirmResetCategory');
+    if (confirmResetCategoryBtn) {
+        confirmResetCategoryBtn.addEventListener('click', function() {
+        if (currentCategory) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '@Url.Action("ResetSiteSettings", "Admin")';
+            
+            const tokenInput = document.createElement('input');
+            tokenInput.type = 'hidden';
+            tokenInput.name = '__RequestVerificationToken';
+            tokenInput.value = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            form.appendChild(tokenInput);
+            
+            const categoryInput = document.createElement('input');
+            categoryInput.type = 'hidden';
+            categoryInput.name = 'category';
+            categoryInput.value = currentCategory;
+            form.appendChild(categoryInput);
+            
+            document.body.appendChild(form);
+            form.submit();
+        }
+        });
+    }
+    
+    // Confirm reset all
+    const confirmResetAllBtn = document.getElementById('confirmResetAll');
+    if (confirmResetAllBtn) {
+        confirmResetAllBtn.addEventListener('click', function() {
+        // Reset all categories one by one
+        const categories = @Html.Raw(Json.Serialize(Model?.Select(s => s.Category).Distinct().ToList() ?? new List<string>()));
+        
+        categories.forEach(function(category, index) {
+            setTimeout(function() {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '@Url.Action("ResetSiteSettings", "Admin")';
+                
+                const tokenInput = document.createElement('input');
+                tokenInput.type = 'hidden';
+                tokenInput.name = '__RequestVerificationToken';
+                tokenInput.value = document.querySelector('input[name="__RequestVerificationToken"]').value;
+                form.appendChild(tokenInput);
+                
+                const categoryInput = document.createElement('input');
+                categoryInput.type = 'hidden';
+                categoryInput.name = 'category';
+                categoryInput.value = category;
+                form.appendChild(categoryInput);
+                
+                document.body.appendChild(form);
+                form.submit();
+            }, index * 100);
+        });
+        });
+    }
+    
+    // Form validation
+    const settingsForm = document.getElementById('settingsForm');
+    if (settingsForm) {
+        settingsForm.addEventListener('submit', function(e) {
+        let hasErrors = false;
+        
+        const requiredFields = document.querySelectorAll('input[required], textarea[required]');
+        requiredFields.forEach(function(field) {
+            if (!field.value.trim()) {
+                field.classList.add('is-invalid');
+                hasErrors = true;
+            } else {
+                field.classList.remove('is-invalid');
+            }
+        });
+        
+        if (hasErrors) {
+            e.preventDefault();
+            alert('Lütfen tüm zorunlu alanları doldurun.');
+        }
+        });
+    }
+    
+    // Auto-save draft (optional)
+    let saveTimeout;
+    const inputs = document.querySelectorAll('input, textarea');
+    inputs.forEach(function(input) {
+        input.addEventListener('input', function() {
+            clearTimeout(saveTimeout);
+            saveTimeout = setTimeout(function() {
+                // Auto-save logic can be implemented here
+            }, 2000);
+        });
+    });
+});
+</script>
+
+@functions {
+    string GetCategoryIcon(string category)
+    {
+        return category.ToLower() switch
+        {
+            "general" => "<i class='fas fa-globe text-primary'></i>",
+            "contact" => "<i class='fas fa-address-book text-success'></i>",
+            "features" => "<i class='fas fa-star text-warning'></i>",
+            "security" => "<i class='fas fa-shield-alt text-danger'></i>",
+            "email" => "<i class='fas fa-envelope text-primary'></i>",
+            "payment" => "<i class='fas fa-credit-card text-success'></i>",
+            "shipping" => "<i class='fas fa-truck text-info'></i>",
+            _ => "<i class='fas fa-cog text-secondary'></i>"
+        };
+    }
+    
+    string GetCategoryDisplayName(string category)
+    {
+        return category.ToLower() switch
+        {
+            "general" => "Genel Ayarlar",
+            "contact" => "İletişim Bilgileri",
+            "features" => "Özellik Ayarları",
+            "security" => "Güvenlik Ayarları",
+            "email" => "E-posta Ayarları",
+            "payment" => "Ödeme Ayarları",
+            "shipping" => "Kargo Ayarları",
+            _ => category
+        };
+    }
+}

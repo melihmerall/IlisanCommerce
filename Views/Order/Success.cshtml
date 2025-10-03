@@ -1,0 +1,395 @@
+@model IlisanCommerce.Models.Order
+
+@{
+    ViewData["Title"] = "Sipariş Başarılı";
+    ViewData["Description"] = "Sipariş onay sayfası";
+}
+
+<section class="success-hero" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); padding: 80px 0; position: relative; overflow: hidden;">
+    <div class="success-animation" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.1; font-size: 20rem; color: white;">
+        <i class="fas fa-check-circle"></i>
+    </div>
+    <div class="container" style="position: relative; z-index: 2;">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <div class="success-icon" style="font-size: 5rem; color: white; margin-bottom: 30px; animation: checkmark 1s ease-in-out;">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h1 style="color: white; font-size: 3rem; font-weight: 700; margin-bottom: 20px; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+                    Siparişiniz Başarıyla Alındı!
+                </h1>
+                <p style="color: white; font-size: 1.3rem; margin-bottom: 30px; opacity: 0.95;">
+                    Sipariş numaranız: <strong style="background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 25px; font-family: monospace;">#@Model.OrderNumber</strong>
+                </p>
+                <div class="success-details" style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 20px; padding: 30px; margin: 30px auto; max-width: 500px;">
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <div style="color: white; font-size: 2rem; font-weight: 700;">@Model.TotalItems</div>
+                            <div style="color: white; opacity: 0.8; font-size: 0.9rem;">Ürün</div>
+                        </div>
+                        <div class="col-6">
+                            <div style="color: white; font-size: 2rem; font-weight: 700;">@Model.TotalAmount.ToString("C", new System.Globalization.CultureInfo("tr-TR"))</div>
+                            <div style="color: white; opacity: 0.8; font-size: 0.9rem;">Toplam</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section style="padding: 60px 0; background: #f8f9fa;">
+    <div class="container">
+        <div class="row">
+            
+            <!-- Sol Kolon - Sipariş Detayları -->
+            <div class="col-lg-8">
+                
+                <!-- Sipariş Bilgileri Kartı -->
+                <div class="order-info-card" style="background: white; border-radius: 20px; padding: 30px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                    <h5 style="color: #333; font-weight: 600; margin-bottom: 25px; border-left: 4px solid #28a745; padding-left: 15px;">
+                        <i class="fas fa-info-circle" style="color: #28a745; margin-right: 10px;"></i>
+                        Sipariş Bilgileri
+                    </h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="info-item" style="margin-bottom: 20px;">
+                                <div style="color: #666; font-size: 0.9rem; margin-bottom: 5px;">Sipariş Numarası</div>
+                                <div style="color: #333; font-weight: 600; font-size: 1.1rem;">#@Model.OrderNumber</div>
+                            </div>
+                            <div class="info-item" style="margin-bottom: 20px;">
+                                <div style="color: #666; font-size: 0.9rem; margin-bottom: 5px;">Sipariş Tarihi</div>
+                                <div style="color: #333; font-weight: 600;">@Model.OrderDate.ToString("dd MMMM yyyy - HH:mm", new System.Globalization.CultureInfo("tr-TR"))</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item" style="margin-bottom: 20px;">
+                                <div style="color: #666; font-size: 0.9rem; margin-bottom: 5px;">Ödeme Yöntemi</div>
+                                <div style="color: #333; font-weight: 600;">
+                                    @if (Model.PaymentMethod == PaymentMethod.CreditCard)
+                                    {
+                                        <div class="d-flex align-items-center">
+                                            <span class="mr-2">Kredi Kartı</span>
+                                            <img src="~/iyzico-logo-pack/checkout_iyzico_ile_ode/TR/Tr_Colored/iyzico_ile_ode_colored.png" 
+                                                 alt="İyzico ile Öde" 
+                                                 style="height: 20px; max-width: 80px;" />
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        @(Model.PaymentMethod switch
+                                        {
+                                            PaymentMethod.BankTransfer => "Havale/EFT",
+                                            PaymentMethod.OnDelivery => "Kapıda Ödeme",
+                                            _ => "Bilinmiyor"
+                                        })
+                                    }
+                                </div>
+                            </div>
+                            <div class="info-item" style="margin-bottom: 20px;">
+                                <div style="color: #666; font-size: 0.9rem; margin-bottom: 5px;">Ödeme Durumu</div>
+                                <div>
+                                    <span style="@(Model.PaymentStatus switch
+                                    {
+                                        PaymentStatus.Paid => "background: #28a745; color: white;",
+                                        PaymentStatus.Completed => "background: #28a745; color: white;",
+                                        PaymentStatus.Processing => "background: #17a2b8; color: white;",
+                                        PaymentStatus.Pending => "background: #ffc107; color: white;",
+                                        PaymentStatus.Failed => "background: #dc3545; color: white;",
+                                        _ => "background: #6c757d; color: white;"
+                                    }) padding: 6px 12px; border-radius: 15px; font-size: 0.85rem; font-weight: 600;">
+                                        @(Model.PaymentStatus switch
+                                        {
+                                            PaymentStatus.Paid => "Ödeme Alındı",
+                                            PaymentStatus.Completed => "Tamamlandı",
+                                            PaymentStatus.Processing => "İşleniyor",
+                                            PaymentStatus.Pending => "Beklemede",
+                                            PaymentStatus.Failed => "Başarısız",
+                                            PaymentStatus.Refunded => "İade Edildi",
+                                            _ => "Bilinmiyor"
+                                        })
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sipariş Edilen Ürünler -->
+                <div class="order-products-card" style="background: white; border-radius: 20px; padding: 30px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                    <h5 style="color: #333; font-weight: 600; margin-bottom: 25px; border-left: 4px solid #ffb535; padding-left: 15px;">
+                        <i class="fas fa-shopping-bag" style="color: #ffb535; margin-right: 10px;"></i>
+                        Sipariş Edilen Ürünler
+                    </h5>
+                    <div class="products-list">
+                        @foreach (var item in Model.OrderItems)
+                        {
+                            <div class="product-item" style="border-bottom: 1px solid #e9ecef; padding: 20px 0; display: flex; align-items: center;">
+                                <div class="product-image" style="margin-right: 20px;">
+                                    @if (item.Product.ProductImages.Any())
+                                    {
+                                        <img src="@item.Product.ProductImages.First().ImagePath" alt="@item.ProductName" 
+                                             style="width: 80px; height: 80px; object-fit: cover; border-radius: 12px;">
+                                    }
+                                    else
+                                    {
+                                        <div style="width: 80px; height: 80px; background: #f8f9fa; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fas fa-image" style="color: #ccc; font-size: 1.5rem;"></i>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="product-details" style="flex: 1;">
+                                    <h6 style="color: #333; font-weight: 600; margin-bottom: 8px;">@item.ProductName</h6>
+                                    @if (!string.IsNullOrEmpty(item.ProductCode))
+                                    {
+                                        <div style="color: #666; font-size: 0.85rem; margin-bottom: 5px;">
+                                            Ürün Kodu: @item.ProductCode
+                                        </div>
+                                    }
+                                    @if (!string.IsNullOrEmpty(item.VariantName))
+                                    {
+                                        <div style="color: #666; font-size: 0.85rem; margin-bottom: 5px;">
+                                            Varyant: @item.VariantName
+                                        </div>
+                                    }
+                                    <div style="color: #ffb535; font-weight: 600;">
+                                        @item.Quantity adet × @item.UnitPrice.ToString("C", new System.Globalization.CultureInfo("tr-TR"))
+                                    </div>
+                                </div>
+                                <div class="product-total" style="text-align: right; margin-left: 20px;">
+                                    <div style="color: #333; font-size: 1.2rem; font-weight: 700;">
+                                        @item.TotalPrice.ToString("C", new System.Globalization.CultureInfo("tr-TR"))
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Sonraki Adımlar -->
+                <div class="next-steps-card" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 20px; padding: 30px; margin-bottom: 30px; border-left: 5px solid #ffb535;">
+                    <h5 style="color: #333; font-weight: 600; margin-bottom: 20px;">
+                        <i class="fas fa-tasks" style="color: #ffb535; margin-right: 10px;"></i>
+                        Sonraki Adımlar
+                    </h5>
+                    <div class="steps">
+                        <div class="step-item" style="display: flex; align-items: start; margin-bottom: 20px;">
+                            <div style="width: 30px; height: 30px; background: #28a745; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px; flex-shrink: 0;">
+                                <i class="fas fa-check" style="color: white; font-size: 0.8rem;"></i>
+                            </div>
+                            <div>
+                                <div style="font-weight: 600; color: #333; margin-bottom: 5px;">Sipariş Alındı</div>
+                                <div style="color: #666; font-size: 0.9rem;">Siparişiniz başarıyla sisteme kaydedildi.</div>
+                            </div>
+                        </div>
+                        <div class="step-item" style="display: flex; align-items: start; margin-bottom: 20px;">
+                            <div style="width: 30px; height: 30px; background: #ffc107; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px; flex-shrink: 0;">
+                                <i class="fas fa-clock" style="color: white; font-size: 0.8rem;"></i>
+                            </div>
+                            <div>
+                                <div style="font-weight: 600; color: #333; margin-bottom: 5px;">Sipariş Onayı</div>
+                                <div style="color: #666; font-size: 0.9rem;">Size e-posta ile sipariş onay bilgisi gönderilecek.</div>
+                            </div>
+                        </div>
+                        <div class="step-item" style="display: flex; align-items: start; margin-bottom: 20px;">
+                            <div style="width: 30px; height: 30px; background: #17a2b8; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px; flex-shrink: 0;">
+                                <i class="fas fa-box" style="color: white; font-size: 0.8rem;"></i>
+                            </div>
+                            <div>
+                                <div style="font-weight: 600; color: #333; margin-bottom: 5px;">Hazırlık Süreci</div>
+                                <div style="color: #666; font-size: 0.9rem;">Siparişiniz hazırlanmaya başlayacak.</div>
+                            </div>
+                        </div>
+                        <div class="step-item" style="display: flex; align-items: start;">
+                            <div style="width: 30px; height: 30px; background: #6c757d; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px; flex-shrink: 0;">
+                                <i class="fas fa-truck" style="color: white; font-size: 0.8rem;"></i>
+                            </div>
+                            <div>
+                                <div style="font-weight: 600; color: #333; margin-bottom: 5px;">Kargo Süreci</div>
+                                <div style="color: #666; font-size: 0.9rem;">Siparişiniz kargoya verilecek ve takip numarası gönderilecek.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sağ Kolon - Hızlı İşlemler ve Bilgiler -->
+            <div class="col-lg-4">
+                
+                <!-- Hızlı İşlemler -->
+                <div class="quick-actions-card" style="background: white; border-radius: 20px; padding: 30px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                    <h6 style="color: #333; font-weight: 600; margin-bottom: 20px; border-left: 4px solid #ffb535; padding-left: 15px;">
+                        Hızlı İşlemler
+                    </h6>
+                    <div class="action-buttons" style="display: flex; flex-direction: column; gap: 12px;">
+                        <a href="@Url.Action("Details", new { id = Model.Id })" class="action-btn" style="background: linear-gradient(45deg, #ffb535, #e6a635); color: white; text-decoration: none; padding: 12px 20px; border-radius: 10px; font-weight: 600; text-align: center; transition: transform 0.2s ease;">
+                            <i class="fas fa-eye" style="margin-right: 8px;"></i>
+                            Sipariş Detayları
+                        </a>
+                        <a href="@Url.Action("Index")" class="action-btn" style="border: 2px solid #17a2b8; color: #17a2b8; background: white; text-decoration: none; padding: 12px 20px; border-radius: 10px; font-weight: 600; text-align: center; transition: all 0.2s ease;">
+                            <i class="fas fa-list" style="margin-right: 8px;"></i>
+                            Tüm Siparişlerim
+                        </a>
+                        <a href="@Url.Action("Index", "Product")" class="action-btn" style="border: 2px solid #28a745; color: #28a745; background: white; text-decoration: none; padding: 12px 20px; border-radius: 10px; font-weight: 600; text-align: center; transition: all 0.2s ease;">
+                            <i class="fas fa-shopping-cart" style="margin-right: 8px;"></i>
+                            Alışverişe Devam Et
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Sipariş Özeti -->
+                <div class="order-summary-card" style="background: white; border-radius: 20px; padding: 30px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                    <h6 style="color: #333; font-weight: 600; margin-bottom: 20px; border-left: 4px solid #ffb535; padding-left: 15px;">
+                        Sipariş Özeti
+                    </h6>
+                    <div class="summary-row" style="display: flex; justify-content: space-between; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px dotted #e9ecef;">
+                        <span style="color: #666;">Ara Toplam:</span>
+                        <span style="color: #333; font-weight: 600;">@Model.SubTotal.ToString("C", new System.Globalization.CultureInfo("tr-TR"))</span>
+                    </div>
+                    @if (Model.ShippingCost > 0)
+                    {
+                        <div class="summary-row" style="display: flex; justify-content: space-between; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px dotted #e9ecef;">
+                            <span style="color: #666;">Kargo:</span>
+                            <span style="color: #333; font-weight: 600;">@Model.ShippingCost.ToString("C", new System.Globalization.CultureInfo("tr-TR"))</span>
+                        </div>
+                    }
+                    @if (Model.TaxAmount > 0)
+                    {
+                        <div class="summary-row" style="display: flex; justify-content: space-between; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px dotted #e9ecef;">
+                            <span style="color: #666;">KDV:</span>
+                            <span style="color: #333; font-weight: 600;">@Model.TaxAmount.ToString("C", new System.Globalization.CultureInfo("tr-TR"))</span>
+                        </div>
+                    }
+                    @if (Model.DiscountAmount > 0)
+                    {
+                        <div class="summary-row" style="display: flex; justify-content: space-between; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px dotted #e9ecef; color: #28a745;">
+                            <span>İndirim:</span>
+                            <span style="font-weight: 600;">-@Model.DiscountAmount.ToString("C", new System.Globalization.CultureInfo("tr-TR"))</span>
+                        </div>
+                    }
+                    <div class="summary-row" style="display: flex; justify-content: space-between; margin-top: 15px; padding-top: 15px; border-top: 2px solid #28a745;">
+                        <span style="color: #333; font-weight: 700; font-size: 1.1rem;">TOPLAM:</span>
+                        <span style="color: #28a745; font-weight: 700; font-size: 1.3rem;">@Model.TotalAmount.ToString("C", new System.Globalization.CultureInfo("tr-TR"))</span>
+                    </div>
+                </div>
+
+                <!-- Teslimat Adresi -->
+                <div class="delivery-address-card" style="background: white; border-radius: 20px; padding: 30px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                    <h6 style="color: #333; font-weight: 600; margin-bottom: 20px; border-left: 4px solid #17a2b8; padding-left: 15px;">
+                        <i class="fas fa-map-marker-alt" style="color: #17a2b8; margin-right: 10px;"></i>
+                        Teslimat Adresi
+                    </h6>
+                    <div style="background: #f8f9fa; border-radius: 10px; padding: 15px; color: #666; line-height: 1.5;">
+                        @Model.ShippingAddress.FullName<br>
+                        @Model.ShippingAddress.AddressLine1<br>
+                        @if (!string.IsNullOrEmpty(Model.ShippingAddress.AddressLine2))
+                        {
+                            <text>@Model.ShippingAddress.AddressLine2<br></text>
+                        }
+                        @Model.ShippingAddress.District / @Model.ShippingAddress.City<br>
+                        @if (!string.IsNullOrEmpty(Model.ShippingAddress.PostalCode))
+                        {
+                            <text>@Model.ShippingAddress.PostalCode<br></text>
+                        }
+                        Tel: @Model.ShippingAddress.Phone
+                    </div>
+                </div>
+
+                <!-- İletişim ve Yardım -->
+                <div class="help-card" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); border-radius: 20px; padding: 25px; text-align: center; color: white;">
+                    <i class="fas fa-headset" style="font-size: 2rem; margin-bottom: 15px;"></i>
+                    <h6 style="font-weight: 600; margin-bottom: 10px;">Sorularınız mı var?</h6>
+                    <p style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 20px;">
+                        Siparişiniz hakkında herhangi bir sorunuz varsa bizimle iletişime geçebilirsiniz.
+                    </p>
+                    <a href="@Url.Action("Contact", "Home")" class="btn btn-light" style="background: white; color: #28a745; border: none; border-radius: 25px; padding: 10px 20px; font-weight: 600; text-decoration: none;">
+                        <i class="fas fa-phone"></i> İletişim
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@if (!string.IsNullOrEmpty(Model.Notes))
+{
+    <section style="padding: 30px 0; background: white;">
+        <div class="container">
+            <div class="order-notes" style="background: #f8f9fa; border-radius: 15px; padding: 25px; border-left: 4px solid #ffb535;">
+                <h6 style="color: #333; font-weight: 600; margin-bottom: 15px;">
+                    <i class="fas fa-sticky-note" style="color: #ffb535; margin-right: 10px;"></i>
+                    Sipariş Notlarınız
+                </h6>
+                <p style="color: #666; margin: 0; line-height: 1.6;">@Model.Notes</p>
+            </div>
+        </div>
+    </section>
+}
+
+<style>
+@@keyframes checkmark {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.product-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+@@media (max-width: 768px) {
+    .success-hero {
+        padding: 60px 0;
+    }
+    
+    .success-hero h1 {
+        font-size: 2.2rem !important;
+    }
+    
+    .success-hero p {
+        font-size: 1.1rem !important;
+    }
+    
+    .success-icon {
+        font-size: 4rem !important;
+    }
+    
+    .product-item {
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: center;
+    }
+    
+    .product-image {
+        margin: 0 auto 15px auto;
+    }
+    
+    .product-total {
+        margin: 15px auto 0 auto;
+        text-align: center;
+    }
+    
+    .step-item {
+        margin-bottom: 15px !important;
+    }
+    
+    .action-buttons {
+        gap: 10px !important;
+    }
+}
+</style>

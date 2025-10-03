@@ -1,0 +1,123 @@
+@model IlisanCommerce.Models.ProductListViewModel
+
+@if (Model.Products != null && Model.Products.Any())
+{
+    @foreach (var product in Model.Products)
+    {
+        <article class="col-xs-6 col-sm-4 col-md-6 col-lg-4 item item-product-grid-3 post">
+            <div class="item-inner mv-effect-translate-1 mv-box-shadow-gray-1">
+                <div style="background-color: #fff;" class="content-thumb">
+                    <div class="thumb-inner mv-effect-relative">
+                        <a asp-controller="Product" asp-action="Details" asp-route-slug="@product.Slug" title="@product.Name">
+                            <img src="@(product.ProductImages?.FirstOrDefault(pi => pi.IsMainImage)?.ImagePath ?? "/images/demo/demo_300x400.png")" alt="@product.Name" class="mv-effect-item" />
+                        </a>
+                        <a asp-controller="Product" asp-action="Details" asp-route-slug="@product.Slug" title="@product.Name" class="mv-btn mv-btn-style-25 btn-readmore-plus hidden-xs">
+                            <span class="btn-inner"></span>
+                        </a>
+
+                        <div class="content-message mv-message-style-1">
+                            <div class="message-inner"></div>
+                        </div>
+
+                        @if (product.ComparePrice.HasValue && product.ComparePrice > product.Price)
+                        {
+                            var discountPercent = (int)((product.ComparePrice.Value - product.Price) / product.ComparePrice.Value * 100);
+                            <div class="content-sale-off mv-label-style-2 text-center">
+                                <div class="label-2-inner">
+                                    <ul class="label-2-ul">
+                                        <li class="number">-%@discountPercent</li>
+                                        <li class="text">indirim</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        }
+                        else if (product.IsSpecialProduct)
+                        {
+                            <div class="content-sale-off mv-label-style-2 text-center" style="background: #d4af37;">
+                                <div class="label-2-inner">
+                                    <ul class="label-2-ul">
+                                        <li class="number">ÖZEL</li>
+                                        <li class="text">ürün</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="content-default">
+                    <div class="content-price">
+                        <span class="new-price">@product.Price.ToString("C", new System.Globalization.CultureInfo("tr-TR"))</span>
+                        @if (product.ComparePrice.HasValue && product.ComparePrice > product.Price)
+                        {
+                            <span class="old-price">@product.ComparePrice.Value.ToString("C", new System.Globalization.CultureInfo("tr-TR"))</span>
+                        }
+                    </div>
+                    <div class="content-desc">
+                        <a asp-controller="Product" asp-action="Details" asp-route-slug="@product.Slug" title="@product.Name" class="mv-overflow-ellipsis">@product.Name</a>
+                    </div>
+                    
+                    @if (product.StockQuantity <= 0)
+                    {
+                        <div class="content-stock-status text-danger">
+                            <small><i class="fa fa-times-circle"></i> Stokta Yok</small>
+                        </div>
+                    }
+                    else if (product.StockQuantity <= product.MinStockLevel)
+                    {
+                        <div class="content-stock-status text-warning">
+                            <small><i class="fa fa-exclamation-triangle"></i> Son @product.StockQuantity Adet</small>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="content-stock-status text-success">
+                            <small><i class="fa fa-check-circle"></i> Stokta Var</small>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(product.CertificateType))
+                    {
+                        <div class="content-certificate">
+                            <small class="text-info"><i class="fa fa-certificate"></i> @product.CertificateType</small>
+                        </div>
+                    }
+                </div>
+
+                <div class="content-hover">
+                    <div class="content-button mv-btn-group text-center">
+                        <div class="group-inner">
+                            <a asp-controller="Product" asp-action="Details" asp-route-slug="@product.Slug" class="mv-btn mv-btn-style-1 btn-1-h-40 responsive-btn-1-type-1" title="Detayları Gör">
+                                <span class="btn-inner">
+                                    <i class="btn-icon fa fa-eye"></i>
+                                    <span class="btn-text">detay</span>
+                                </span>
+                            </a>
+                            <button type="button" class="mv-btn mv-btn-style-3 btn-3-h-40 responsive-btn-3-type-1 btn-add-to-cart" data-product-id="@product.Id" title="Sepete Ekle">
+                                <i class="fa fa-cart-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </article>
+    }
+}
+else
+{
+    <div class="col-12 text-center">
+        <div class="no-products-found" style="padding: 50px 0;">
+            <i class="fa fa-search" style="font-size: 48px; color: #ccc; margin-bottom: 20px;"></i>
+            <h3>Ürün Bulunamadı</h3>
+            <p>Aradığınız kriterlere uygun ürün bulunmamaktadır.</p>
+            @if (!string.IsNullOrEmpty(Model.SearchQuery) || Model.CurrentCategory != null || Model.MinPrice.HasValue || Model.MaxPrice.HasValue)
+            {
+                <a href="#" class="mv-btn mv-btn-style-1" onclick="clearAllFilters()">
+                    <span class="btn-inner">
+                        <span class="btn-text">Tüm Ürünleri Gör</span>
+                    </span>
+                </a>
+            }
+        </div>
+    </div>
+}

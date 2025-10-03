@@ -1,0 +1,111 @@
+@model IlisanCommerce.ViewComponents.FooterViewModel
+
+<div style="background-color: #2c3e50;" class="footer-bg">
+    <div class="container">
+        <div class="footer-inner">
+            <div id="footerNav" role="tablist" aria-multiselectable="true" class="footer-nav panel-group">
+                <div class="row">
+                    <div class="col-md-3 footer-nav-col footer-contact">
+                        <a data-toggle="collapse" data-parent="#footerNav" href="#footerContact" aria-expanded="true" class="footer-title collapsed">İletişim Bilgileri</a>
+                        <div id="footerContact" role="tabpanel" class="footer-main collapse">
+                            <ul class="mv-ul footer-main-inner list">
+                                <li class="mv-icon-left-style-1 item">
+                                    <div class="mv-dp-table align-middle">
+                                        <div class="mv-dp-table-cell icon"><i class="icon-fa fa fa-map-marker mv-f-22 mv-color-primary"></i></div>
+                                        <div class="mv-dp-table-cell text">@Model.CompanyAddress</div>
+                                    </div>
+                                </li>
+                                <li class="mv-icon-left-style-1 item">
+                                    <div class="mv-dp-table align-middle">
+                                        <div class="mv-dp-table-cell icon"><i class="icon-fa fa fa-mobile mv-f-26 mv-color-primary"></i></div>
+                                        <div class="mv-dp-table-cell text">TELEFON: @Model.SitePhone</div>
+                                    </div>
+                                </li>
+                                <li class="mv-icon-left-style-1 item">
+                                    <div class="mv-dp-table align-middle">
+                                        <div class="mv-dp-table-cell icon"><i class="icon-fa fa fa-envelope-o mv-f-20 mv-color-primary"></i></div>
+                                        <div class="mv-dp-table-cell text">E-POSTA: <a href="mailto:@Model.SiteEmail">@Model.SiteEmail</a></div>
+                                    </div>
+                                </li>
+                                <li class="mv-icon-left-style-1 item">
+                                    <div class="mv-dp-table align-middle">
+                                        <div class="mv-dp-table-cell icon"><i class="icon-fa fa fa-clock-o mv-f-20 mv-color-primary"></i></div>
+                                        <div class="mv-dp-table-cell text">ÇALIŞMA SAATLERİ: @Model.CompanyWorkingHours</div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 footer-nav-col footer-about-us">
+                        <a data-toggle="collapse" data-parent="#footerNav" href="#footerAboutUs" aria-expanded="false" class="footer-title collapsed">Hakkımızda</a>
+                        <div id="footerAboutUs" role="tabpanel" class="footer-main collapse">
+                            <div class="footer-main-inner">
+                                <div class="about-us-content">
+                                    <p>@Model.CompanyMission</p>
+                                    <p>@Model.CompanyVision</p>
+                                    <p><strong>Kuruluş Yılı:</strong> @Model.CompanyFoundedYear</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 footer-nav-col footer-faqs">
+                        <a data-toggle="collapse" data-parent="#footerNav" href="#footerFaqs" aria-expanded="false" class="footer-title collapsed">Hızlı Linkler</a>
+                        <div id="footerFaqs" role="tabpanel" class="footer-main collapse">
+                            <ul class="mv-ul footer-main-inner list">
+                                <li class="item mv-icon-left-style-2"><a asp-controller="Home" asp-action="Contact"><span class="text"><span class="icon"><i class="fa fa-angle-right"></i></span>İletişim</span></a></li>
+                                <li class="item mv-icon-left-style-2"><a asp-controller="Home" asp-action="ShippingReturns"><span class="text"><span class="icon"><i class="fa fa-angle-right"></i></span>Teslimat ve İade Şartları</span></a></li>
+                                <li class="item mv-icon-left-style-2"><a asp-controller="Product" asp-action="Index"><span class="text"><span class="icon"><i class="fa fa-angle-right"></i></span>Ürünler</span></a></li>
+                                <li class="item mv-icon-left-style-2"><a asp-controller="Home" asp-action="About"><span class="text"><span class="icon"><i class="fa fa-angle-right"></i></span>Hakkımızda</span></a></li>
+                                <li class="item mv-icon-left-style-2"><a asp-controller="Home" asp-action="CookiePolicy"><span class="text"><span class="icon"><i class="fa fa-angle-right"></i></span>Çerez Politikası</span></a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 footer-nav-col footer-order-tracking">
+                        <a data-toggle="collapse" data-parent="#footerNav" href="#footerOrderTracking" aria-expanded="false" class="footer-title collapsed">Sipariş Takibi</a>
+                        <div id="footerOrderTracking" role="tabpanel" class="footer-main collapse">
+                            <ul class="mv-ul footer-main-inner list">
+                                <li class="item mv-icon-left-style-2"><a asp-controller="Home" asp-action="About"><span class="text"><span class="icon"><i class="fa fa-angle-right"></i></span>Hakkımızda</span></a></li>
+                                <li class="item mv-icon-left-style-2"><a asp-controller="Home" asp-action="ShippingReturns"><span class="text"><span class="icon"><i class="fa fa-angle-right"></i></span>Teslimat ve İade Şartları</span></a></li>
+                                <li class="item mv-icon-left-style-2"><a asp-controller="Home" asp-action="Contact"><span class="text"><span class="icon"><i class="fa fa-angle-right"></i></span>İletişim</span></a></li>
+                                <li class="item mv-icon-left-style-2"><a asp-controller="Home" asp-action="Privacy"><span class="text"><span class="icon"><i class="fa fa-angle-right"></i></span>Gizlilik Politikası</span></a></li>
+                                <li class="item mv-icon-left-style-2"><a asp-controller="Home" asp-action="CookiePolicy"><span class="text"><span class="icon"><i class="fa fa-angle-right"></i></span>Çerez Politikası</span></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- .footer-nav-->
+
+            <div class="footer-bottom mv-col-wrapper">
+                <div style=" width: 40%; " class="mv-col-right text-right">
+                    <div class="footer-payment">
+                        <!-- Iyzico Logo Band -->
+                        <div class="iyzico-footer-logo mb-2">
+                            <img src="~/iyzico-logo-pack/footer_iyzico_ile_ode/White/logo_band_white@2x.png" 
+                                 alt="İyzico ile Öde" 
+                                 style="height: 30px; max-width: 150px;" />
+                        </div>
+                        <ul class="mv-ul list">
+                            <li class="item"><a href="#"><img src="images/icon/icon_master_card.png" alt="MasterCard" /></a></li>
+                            <li class="item"><a href="#"><img src="images/icon/icon_visa.png" alt="Visa" /></a></li>
+                        </ul>
+                    </div>
+                    <!-- .footer-payment-->
+                </div>
+
+                <div style=" width: 60%; " class="mv-col-left text-left">
+                    <div class="footer-copyright">
+                        Copyright &copy; @DateTime.Now.Year @Model.SiteName. Tüm hakları saklıdır.
+                    </div>
+                    <!-- .footer-copyright-->
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<button type="button" class="mv-btn mv-btn-style-17 mv-back-to-top fixed-right-bottom"><i class="btn-icon fa fa-long-arrow-up"></i></button>

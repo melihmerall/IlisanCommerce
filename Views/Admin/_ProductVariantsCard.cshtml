@@ -1,0 +1,168 @@
+﻿@using System.Linq
+@model IEnumerable<IlisanCommerce.Models.ProductVariant>
+@{
+    var productId = ViewData["ProductId"] as int? ?? 0;
+    var variants = (Model ?? new List<IlisanCommerce.Models.ProductVariant>()).OrderBy(v => v.SortOrder).ThenBy(v => v.Id).ToList();
+}
+
+<div class="card shadow mb-4 admin-card" data-variant-manager data-variant-count="@variants.Count">
+    <div class="card-header py-3 d-flex justify-content-between align-items-center">
+        <h6 class="m-0 font-weight-bold text-primary">Ürün Varyantları</h6>
+        <button type="button" class="btn btn-sm btn-primary" data-variant-add>
+            <i class="fas fa-plus"></i> Varyant Ekle
+        </button>
+    </div>
+    <div class="card-body">
+        <p class="text-muted small mb-3">
+            Farklı renk, beden, paket veya fiyat varyasyonlarını burada yönetin. Varsayılan varyant müşterilere ilk gösterilecek seçenektir.
+        </p>
+        <div class="table-responsive">
+            <table class="table table-sm align-middle" data-variant-table>
+                <thead class="table-light">
+                    <tr>
+                        <th style="min-width:160px;">Varyant</th>
+                        <th style="min-width:130px;">SKU</th>
+                        <th style="min-width:140px;">Fiyat Farkı (₺)</th>
+                        <th style="min-width:160px;">Stok / Minimum</th>
+                        <th style="min-width:180px;">Renk</th>
+                        <th style="min-width:110px;">Beden</th>
+                        <th class="text-center">Varsayılan</th>
+                        <th class="text-center">Aktif</th>
+                        <th class="text-end">İşlem</th>
+                    </tr>
+                </thead>
+                <tbody data-variant-table-body>
+                    @if (variants.Any())
+                    {
+                        for (var i = 0; i < variants.Count; i++)
+                        {
+                            var variant = variants[i];
+                            <tr class="variant-row" data-variant-index="@i" data-existing="true">
+                                <td>
+                                    <input type="hidden" name="ProductVariants[@i].Id" value="@variant.Id" />
+                                    <input type="hidden" name="ProductVariants[@i].ProductId" value="@productId" />
+                                    <input type="hidden" name="ProductVariants[@i].SortOrder" class="variant-sort" value="@variant.SortOrder" />
+                                    <input type="hidden" name="ProductVariants[@i].IsDeleted" class="variant-deleted" value="false" />
+                                    <input type="text" name="ProductVariants[@i].VariantName" class="form-control form-control-sm" value="@variant.VariantName" placeholder="Örn. Siyah - L" />
+                                </td>
+                                <td>
+                                    <input type="text" name="ProductVariants[@i].SKU" class="form-control form-control-sm" value="@variant.SKU" placeholder="Otomatik üretilecek" />
+                                </td>
+                                <td>
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text">₺</span>
+                                        <input type="number" step="0.01" name="ProductVariants[@i].PriceAdjustment" class="form-control form-control-sm" value="@(variant.PriceAdjustment?.ToString(System.Globalization.CultureInfo.InvariantCulture))" placeholder="0,00" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        <input type="number" name="ProductVariants[@i].StockQuantity" class="form-control form-control-sm" value="@variant.StockQuantity" min="0" />
+                                        <input type="number" name="ProductVariants[@i].MinStockLevel" class="form-control form-control-sm" value="@variant.MinStockLevel" min="0" title="Minimum stok" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text p-0">
+                                            <input type="color" class="form-control form-control-color variant-color-code" name="ProductVariants[@i].ColorCode" value="@(string.IsNullOrWhiteSpace(variant.ColorCode) ? "#ffffff" : variant.ColorCode)" title="Renk kodu" />
+                                        </span>
+                                        <input type="text" class="form-control form-control-sm variant-color-name" name="ProductVariants[@i].Color" value="@variant.Color" placeholder="Renk adı" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <input type="text" name="ProductVariants[@i].Size" class="form-control form-control-sm" value="@variant.Size" placeholder="Beden" />
+                                </td>
+                                <td class="text-center">
+                                    <input type="hidden" name="ProductVariants[@i].IsDefault" value="false" data-variant-default-hidden />
+                                    <div class="form-check form-switch d-flex justify-content-center">
+                                        <input class="form-check-input variant-default" type="checkbox" name="ProductVariants[@i].IsDefault" value="true" @(variant.IsDefault ? "checked" : null) />
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <input type="hidden" name="ProductVariants[@i].IsActive" value="false" data-variant-active-hidden />
+                                    <div class="form-check form-switch d-flex justify-content-center">
+                                        <input class="form-check-input variant-active" type="checkbox" name="ProductVariants[@i].IsActive" value="true" @(variant.IsActive ? "checked" : null) />
+                                    </div>
+                                </td>
+                                <td class="text-end">
+                                    <button type="button" class="btn btn-outline-danger btn-sm" data-variant-remove title="Varyantı kaldır">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                    <input type="hidden" name="ProductVariants[@i].Material" value="@variant.Material" />
+                                    <input type="hidden" name="ProductVariants[@i].Weight" value="@variant.Weight" />
+                                    <input type="hidden" name="ProductVariants[@i].Dimensions" value="@variant.Dimensions" />
+                                    <input type="hidden" name="ProductVariants[@i].Desi" value="@(variant.Desi?.ToString(System.Globalization.CultureInfo.InvariantCulture))" />
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr class="variant-empty">
+                            <td colspan="9" class="text-muted text-center">Henüz varyant eklenmedi.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <input type="hidden" data-variant-index value="@variants.Count" />
+    </div>
+</div>
+
+<template id="variant-row-template">
+    <tr class="variant-row" data-variant-index="__index__" data-existing="false">
+        <td>
+            <input type="hidden" name="ProductVariants[__index__].Id" value="0" />
+            <input type="hidden" name="ProductVariants[__index__].ProductId" value="@productId" />
+            <input type="hidden" name="ProductVariants[__index__].SortOrder" class="variant-sort" value="__index__" />
+            <input type="hidden" name="ProductVariants[__index__].IsDeleted" class="variant-deleted" value="false" />
+            <input type="text" name="ProductVariants[__index__].VariantName" class="form-control form-control-sm" placeholder="Örn. Siyah - L" />
+        </td>
+        <td>
+            <input type="text" name="ProductVariants[__index__].SKU" class="form-control form-control-sm" placeholder="Otomatik üretilecek" />
+        </td>
+        <td>
+            <div class="input-group input-group-sm">
+                <span class="input-group-text">₺</span>
+                <input type="number" step="0.01" name="ProductVariants[__index__].PriceAdjustment" class="form-control form-control-sm" placeholder="0,00" />
+            </div>
+        </td>
+        <td>
+            <div class="d-flex gap-2">
+                <input type="number" name="ProductVariants[__index__].StockQuantity" class="form-control form-control-sm" min="0" value="0" />
+                <input type="number" name="ProductVariants[__index__].MinStockLevel" class="form-control form-control-sm" min="0" value="0" title="Minimum stok" />
+            </div>
+        </td>
+        <td>
+            <div class="input-group input-group-sm">
+                <span class="input-group-text p-0">
+                    <input type="color" class="form-control form-control-color variant-color-code" name="ProductVariants[__index__].ColorCode" value="#ffffff" title="Renk kodu" />
+                </span>
+                <input type="text" class="form-control form-control-sm variant-color-name" name="ProductVariants[__index__].Color" placeholder="Renk adı" />
+            </div>
+        </td>
+        <td>
+            <input type="text" name="ProductVariants[__index__].Size" class="form-control form-control-sm" placeholder="Beden" />
+        </td>
+        <td class="text-center">
+            <input type="hidden" name="ProductVariants[__index__].IsDefault" value="false" data-variant-default-hidden />
+            <div class="form-check form-switch d-flex justify-content-center">
+                <input class="form-check-input variant-default" type="checkbox" name="ProductVariants[__index__].IsDefault" value="true" />
+            </div>
+        </td>
+        <td class="text-center">
+            <input type="hidden" name="ProductVariants[__index__].IsActive" value="false" data-variant-active-hidden />
+            <div class="form-check form-switch d-flex justify-content-center">
+                <input class="form-check-input variant-active" type="checkbox" name="ProductVariants[__index__].IsActive" value="true" checked />
+            </div>
+        </td>
+        <td class="text-end">
+            <button type="button" class="btn btn-outline-danger btn-sm" data-variant-remove title="Varyantı kaldır">
+                <i class="fas fa-trash-alt"></i>
+            </button>
+            <input type="hidden" name="ProductVariants[__index__].Material" value="" />
+            <input type="hidden" name="ProductVariants[__index__].Weight" value="" />
+            <input type="hidden" name="ProductVariants[__index__].Dimensions" value="" />
+            <input type="hidden" name="ProductVariants[__index__].Desi" value="" />
+        </td>
+    </tr>
+</template>

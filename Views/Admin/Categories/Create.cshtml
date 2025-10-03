@@ -1,0 +1,312 @@
+@model IlisanCommerce.Models.Category
+
+@{
+    ViewData["Title"] = "Yeni Kategori Oluştur";
+    Layout = "_AdminLayout";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h4 class="mb-0 fw-bold text-dark">
+                        <i class="fas fa-plus-circle text-success me-2"></i>
+                        Yeni Kategori Oluştur
+                    </h4>
+                    <p class="text-muted small mb-0 mt-1">Yeni bir ürün kategorisi oluşturun</p>
+                </div>
+                <div>
+                    <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>
+                        Kategorilere Dön
+                    </a>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8">
+                    <!-- Main Form Card -->
+                    <div class="card shadow-sm border-0 admin-card">
+                        <div class="card-header bg-white border-bottom">
+                            <h5 class="mb-0">
+                                <i class="fas fa-edit text-primary me-2"></i>
+                                Kategori Bilgileri
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="categoryForm" method="post" action="@Url.Action("Create")">
+                                @Html.AntiForgeryToken()
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="Name" class="form-label fw-semibold">
+                                            <i class="fas fa-tag me-1"></i>
+                                            Kategori Adı *
+                                        </label>
+                                        <input type="text" class="form-control" id="Name" name="Name" 
+                                               value="@Model?.Name" required maxlength="100"
+                                               placeholder="Kategori adını girin">
+                                        <div class="invalid-feedback">
+                                            Kategori adı zorunludur.
+                                        </div>
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>
+                                            En az 2, en fazla 100 karakter
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label for="ParentCategoryId" class="form-label fw-semibold">
+                                            <i class="fas fa-folder me-1"></i>
+                                            Ana Kategori
+                                        </label>
+                                        <select class="form-select" id="ParentCategoryId" name="ParentCategoryId">
+                                            <option value="" selected="@(Model?.ParentCategoryId == null || Model?.ParentCategoryId == 0)">Ana Kategori Olarak Oluştur</option>
+                                            @if (ViewBag.Categories != null)
+                                            {
+                                                @foreach (var category in (List<dynamic>)ViewBag.Categories)
+                                                {
+                                                    <option value="@category.Id" selected="@(Model?.ParentCategoryId == category.Id)">
+                                                        @category.Name
+                                                    </option>
+                                                }
+                                            }
+                                        </select>
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>
+                                            Boş bırakılırsa ana kategori olarak oluşturulur
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="Description" class="form-label fw-semibold">
+                                        <i class="fas fa-align-left me-1"></i>
+                                        Açıklama
+                                    </label>
+                                    <textarea class="form-control" id="Description" name="Description" 
+                                              rows="4" maxlength="500"
+                                              placeholder="Kategori açıklamasını girin (isteğe bağlı)">@Model?.Description</textarea>
+                                    <div class="form-text">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        En fazla 500 karakter (isteğe bağlı)
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="IsActive" name="IsActive" 
+                                                   @(Model?.IsActive != false ? "checked" : "") value="true">
+                                            <input type="hidden" name="IsActive" value="false">
+                                            <label class="form-check-label fw-semibold" for="IsActive">
+                                                <i class="fas fa-eye me-1"></i>
+                                                Kategori Aktif
+                                            </label>
+                                        </div>
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>
+                                            Aktif kategoriler ürün ekleme sırasında görünür
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Form Actions -->
+                                <div class="d-flex gap-2 pt-3 border-top">
+                                    <button type="submit" class="btn btn-success" id="saveButton">
+                                        <span class="button-text">
+                                            <i class="fas fa-save me-1"></i>
+                                            Kategori Oluştur
+                                        </span>
+                                        <span class="button-loading d-none">
+                                            <i class="fas fa-spinner fa-spin me-1"></i>
+                                            Kaydediliyor...
+                                        </span>
+                                    </button>
+                                    <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+                                        <i class="fas fa-times me-1"></i>
+                                        İptal
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <!-- Help Card -->
+                    <div class="card border-primary">
+                        <div class="card-header bg-primary text-white">
+                            <h6 class="mb-0">
+                                <i class="fas fa-question-circle me-2"></i>
+                                Kategori Oluşturma Rehberi
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <h6 class="text-primary">
+                                    <i class="fas fa-lightbulb me-1"></i>
+                                    İpuçları
+                                </h6>
+                                <ul class="list-unstyled small">
+                                    <li class="mb-2">
+                                        <i class="fas fa-check text-success me-1"></i>
+                                        Kategori adları benzersiz olmalıdır
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="fas fa-check text-success me-1"></i>
+                                        Ana kategori seçerek hiyerarşi oluşturabilirsiniz
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="fas fa-check text-success me-1"></i>
+                                        Açıklama SEO için önemlidir
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="mb-3">
+                                <h6 class="text-warning">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    Önemli Notlar
+                                </h6>
+                                <ul class="list-unstyled small">
+                                    <li class="mb-2">
+                                        <i class="fas fa-info text-info me-1"></i>
+                                        Pasif kategoriler ürün eklerken görünmez
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="fas fa-info text-info me-1"></i>
+                                        Alt kategori silinirse ürünler ana kategoriye taşınır
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <small>
+                                    Kategori oluşturduktan sonra ürün ekleme sayfasında görünecektir.
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Stats Card -->
+                    <div class="card mt-3 border-info">
+                        <div class="card-header bg-info text-white">
+                            <h6 class="mb-0">
+                                <i class="fas fa-chart-pie me-2"></i>
+                                Kategori İstatistikleri
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <div class="border-end">
+                                        <h4 class="text-primary mb-0">@ViewBag.TotalCategories</h4>
+                                        <small class="text-muted">Toplam</small>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <h4 class="text-success mb-0">@ViewBag.ActiveCategories</h4>
+                                    <small class="text-muted">Aktif</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Form validation
+            $('#categoryForm').on('submit', function(e) {
+                if (!validateCategoryForm(this)) {
+                    e.preventDefault();
+                    return false;
+                }
+                
+                // Show loading state
+                const submitBtn = $(this).find('button[type="submit"]');
+                const originalText = submitBtn.html();
+                submitBtn.html('<i class="fas fa-spinner fa-spin me-1"></i>Kaydediliyor...').prop('disabled', true);
+                
+                return true;
+            });
+
+            // Real-time validation
+            $('input[name="Name"]').on('input', function() {
+                const value = $(this).val().trim();
+                const feedback = $(this).siblings('.invalid-feedback');
+                
+                if (value.length === 0) {
+                    $(this).removeClass('is-valid').addClass('is-invalid');
+                    feedback.text('Kategori adı zorunludur.');
+                } else if (value.length < 2) {
+                    $(this).removeClass('is-valid').addClass('is-invalid');
+                    feedback.text('Kategori adı en az 2 karakter olmalıdır.');
+                } else {
+                    $(this).removeClass('is-invalid').addClass('is-valid');
+                }
+            });
+        });
+
+        function validateCategoryForm(form) {
+            let isValid = true;
+            const name = $(form).find('input[name="Name"]').val().trim();
+            
+            if (!name) {
+                showToast('Kategori adı zorunludur!', 'error');
+                isValid = false;
+            }
+            
+            if (name.length < 2) {
+                showToast('Kategori adı en az 2 karakter olmalıdır!', 'error');
+                isValid = false;
+            }
+            
+            return isValid;
+        }
+
+        // Toast notification system
+        function showToast(message, type = 'info') {
+            const toastId = 'toast-' + Date.now();
+            const bgClass = type === 'success' ? 'bg-success' : type === 'error' ? 'bg-danger' : 'bg-info';
+            
+            const toastHtml = `
+                <div id="${toastId}" class="toast align-items-center text-white ${bgClass} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'} me-2"></i>
+                            ${message}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    </div>
+                </div>
+            `;
+            
+            let toastContainer = $('#toast-container');
+            if (toastContainer.length === 0) {
+                toastContainer = $('<div id="toast-container" class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1055;"></div>');
+                $('body').append(toastContainer);
+            }
+            
+            toastContainer.append(toastHtml);
+            const toastElement = new bootstrap.Toast(document.getElementById(toastId), {
+                autohide: true,
+                delay: 4000
+            });
+            toastElement.show();
+            
+            // Remove toast element after it's hidden
+            $(`#${toastId}`).on('hidden.bs.toast', function() {
+                $(this).remove();
+            });
+        }
+    </script>
+}

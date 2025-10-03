@@ -1,0 +1,336 @@
+@model List<IlisanCommerce.Models.Category>
+
+@{
+    ViewData["Title"] = "Kategori Yönetimi";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-bottom">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-0 fw-bold text-dark">
+                                <i class="fas fa-tags text-primary me-2"></i>
+                                Kategori Yönetimi
+                            </h4>
+                            <p class="text-muted small mb-0 mt-1">Ürün kategorilerini yönetin ve düzenleyin</p>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-outline-secondary btn-sm" onclick="location.reload()">
+                                <i class="fas fa-sync-alt me-1"></i>
+                                Yenile
+                            </button>
+                            <a href="@Url.Action("Create")" class="btn btn-primary btn-sm">
+                                <i class="fas fa-plus me-1"></i>
+                                Yeni Kategori
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <!-- Search and Filter -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0">
+                                    <i class="fas fa-search text-muted"></i>
+                                </span>
+                                <input type="text" class="form-control border-start-0" id="categorySearch" 
+                                       placeholder="Kategori ara..." />
+                            </div>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <small class="text-muted">
+                                Toplam <strong>@Model.Count</strong> kategori
+                            </small>
+                        </div>
+                    </div>
+
+                    <!-- Categories Table -->
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle" id="categoriesTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th width="5%">
+                                        <input type="checkbox" class="form-check-input" onchange="selectAllCategories(this)" />
+                                    </th>
+                                    <th width="25%">Kategori Adı</th>
+                                    <th width="25%">Ana Kategori</th>
+                                    <th width="15%" class="text-center">Durum</th>
+                                    <th width="15%" class="text-center">Oluşturma</th>
+                                    <th width="15%" class="text-center">İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.Any())
+                                {
+                                    @foreach (var category in Model)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <input type="checkbox" class="form-check-input category-checkbox" value="@category.Id" />
+                                            </td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="category-icon me-2">
+                                                        <i class="fas fa-tag text-primary"></i>
+                                                    </div>
+                                                    <div>
+                                                        <div class="fw-semibold text-dark">@category.Name</div>
+                                                        @if (!string.IsNullOrEmpty(category.Description))
+                                                        {
+                                                            <small class="text-muted">@category.Description</small>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                @if (category.ParentCategory != null)
+                                                {
+                                                    <span class="badge bg-light text-dark border">
+                                                        <i class="fas fa-folder me-1"></i>
+                                                        @category.ParentCategory.Name
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-primary">
+                                                        <i class="fas fa-home me-1"></i>
+                                                        Ana Kategori
+                                                    </span>
+                                                }
+                                            </td>
+                                            <td class="text-center">
+                                                @if (category.IsActive)
+                                                {
+                                                    <span class="badge bg-success">
+                                                        <i class="fas fa-check-circle me-1"></i>
+                                                        Aktif
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary">
+                                                        <i class="fas fa-times-circle me-1"></i>
+                                                        Pasif
+                                                    </span>
+                                                }
+                                            </td>
+                                            <td class="text-center">
+                                                <small class="text-muted">
+                                                    @category.CreatedDate.ToString("dd.MM.yyyy")
+                                                </small>
+                                            </td>
+                                            <td class="text-center">
+                                                <div class="btn-group btn-group-sm" role="group">
+                                                    <a href="@Url.Action("Edit", new { id = category.Id })" 
+                                                       class="btn btn-outline-primary btn-sm" 
+                                                       data-bs-toggle="tooltip" title="Düzenle">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <button type="button" 
+                                                            class="btn btn-outline-@(category.IsActive ? "warning" : "success") btn-sm"
+                                                            onclick="toggleStatus(@category.Id)"
+                                                            data-bs-toggle="tooltip" 
+                                                            title="@(category.IsActive ? "Pasif Yap" : "Aktif Yap")">
+                                                        <i class="fas fa-@(category.IsActive ? "eye-slash" : "eye")"></i>
+                                                    </button>
+                                                    <button type="button" 
+                                                            class="btn btn-outline-danger btn-sm"
+                                                            onclick="confirmDelete(@category.Id, '@category.Name')"
+                                                            data-bs-toggle="tooltip" title="Sil">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="6" class="text-center py-4">
+                                            <div class="text-muted">
+                                                <i class="fas fa-inbox fa-2x mb-2"></i>
+                                                <p class="mb-0">Henüz kategori eklenmemiş.</p>
+                                                <a href="@Url.Action("Create")" class="btn btn-primary btn-sm mt-2">
+                                                    <i class="fas fa-plus me-1"></i>
+                                                    İlk Kategoriyi Ekle
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Bulk Actions -->
+                    <div id="bulkActions" class="d-none mt-3">
+                        <div class="card bg-light">
+                            <div class="card-body py-2">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-muted">
+                                        <i class="fas fa-check-square me-1"></i>
+                                        <span id="selectedCount">0</span> kategori seçildi
+                                    </span>
+                                    <div class="btn-group btn-group-sm">
+                                        <button class="btn btn-outline-success" onclick="bulkActivate()">
+                                            <i class="fas fa-eye me-1"></i>
+                                            Aktif Yap
+                                        </button>
+                                        <button class="btn btn-outline-warning" onclick="bulkDeactivate()">
+                                            <i class="fas fa-eye-slash me-1"></i>
+                                            Pasif Yap
+                                        </button>
+                                        <button class="btn btn-outline-danger" onclick="bulkDelete()">
+                                            <i class="fas fa-trash me-1"></i>
+                                            Sil
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                    Kategori Sil
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-3">
+                    <strong id="deleteCategoryName"></strong> kategorisini silmek istediğinizden emin misiniz?
+                </p>
+                <div class="alert alert-warning">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Bu işlem geri alınamaz ve kategoriye ait ürünler etkilenebilir.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>
+                    İptal
+                </button>
+                <form method="post" action="@Url.Action("Delete")" class="d-inline">
+                    <input type="hidden" name="id" id="deleteCategoryId" />
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-1"></i>
+                        Evet, Sil
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Initialize tooltips
+            $('[data-bs-toggle="tooltip"]').tooltip();
+        });
+
+        // Delete confirmation
+        function confirmDelete(id, name) {
+            $('#deleteCategoryId').val(id);
+            $('#deleteCategoryName').text(name);
+            $('#deleteModal').modal('show');
+        }
+
+        // Toggle status with loading state
+        function toggleStatus(id) {
+            const button = $(`button[onclick="toggleStatus(${id})"]`);
+            const originalHtml = button.html();
+            
+            button.html('<i class="fas fa-spinner fa-spin"></i>').prop('disabled', true);
+            
+            $.post('@Url.Action("ToggleStatus")', { id: id })
+                .done(function() {
+                    showToast('Kategori durumu başarıyla güncellendi!', 'success');
+                    setTimeout(() => location.reload(), 1000);
+                })
+                .fail(function() {
+                    showToast('Durum değiştirilemedi!', 'error');
+                    button.html(originalHtml).prop('disabled', false);
+                });
+        }
+
+        // Search functionality
+        $('#categorySearch').on('keyup', function() {
+            var value = $(this).val().toLowerCase();
+            $('#categoriesTable tbody tr').filter(function() {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+        });
+
+        // Toast notification system
+        function showToast(message, type = 'info') {
+            const toastId = 'toast-' + Date.now();
+            const bgClass = type === 'success' ? 'bg-success' : type === 'error' ? 'bg-danger' : 'bg-info';
+            
+            const toastHtml = `
+                <div id="${toastId}" class="toast align-items-center text-white ${bgClass} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'} me-2"></i>
+                            ${message}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    </div>
+                </div>
+            `;
+            
+            let toastContainer = $('#toast-container');
+            if (toastContainer.length === 0) {
+                toastContainer = $('<div id="toast-container" class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1055;"></div>');
+                $('body').append(toastContainer);
+            }
+            
+            toastContainer.append(toastHtml);
+            const toastElement = new bootstrap.Toast(document.getElementById(toastId), {
+                autohide: true,
+                delay: 4000
+            });
+            toastElement.show();
+            
+            // Remove toast element after it's hidden
+            $(`#${toastId}`).on('hidden.bs.toast', function() {
+                $(this).remove();
+            });
+        }
+
+        // Bulk operations
+        function selectAllCategories(checkbox) {
+            $('.category-checkbox').prop('checked', checkbox.checked);
+            updateBulkActions();
+        }
+
+        function updateBulkActions() {
+            const checkedCount = $('.category-checkbox:checked').length;
+            if (checkedCount > 0) {
+                $('#bulkActions').removeClass('d-none');
+                $('#selectedCount').text(checkedCount);
+            } else {
+                $('#bulkActions').addClass('d-none');
+            }
+        }
+
+        // Initialize bulk actions
+        $(document).on('change', '.category-checkbox', updateBulkActions);
+    </script>
+}

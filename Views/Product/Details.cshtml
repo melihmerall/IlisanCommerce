@@ -1,0 +1,742 @@
+@model IlisanCommerce.Models.ProductDetailViewModel
+
+@{
+    ViewData["Title"] = Model.Product.Name;
+    ViewData["MetaDescription"] = Model.Product.ShortDescription ?? Model.Product.Name;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/product-detail.css" />
+    <link rel="stylesheet" href="~/css/product-options.css" />
+}
+
+<section class="main-banner mv-wrap" style="background-color: #2c3e50;">
+    <div data-image-src="/images/background/demo_bg_1920x1680.png" class="mv-banner-style-1 mv-bg-overlay-dark overlay-0-85 mv-parallax">
+        <div class="page-name mv-caption-style-6">
+            <div class="container">
+                <div class="mv-title-style-9"><span class="main">Ürün Detayı</span></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="main-breadcrumb mv-wrap">
+    <div class="mv-breadcrumb-style-1">
+        <div class="container">
+            <ul class="breadcrumb-1-list">
+                <li><a asp-controller="Home" asp-action="Index"><i class="fa fa-home"></i></a></li>
+                <li><a asp-controller="Product" asp-action="Index">Ürünler</a></li>
+                @if (Model.Product.Category != null)
+                {
+                    <li><a asp-controller="Product" asp-action="Category" asp-route-slug="@Model.Product.Category.Slug">@Model.Product.Category.Name</a></li>
+                }
+                <li><a>@Model.Product.Name</a></li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<section class="mv-main-body product-detail-main mv-bg-gray mv-wrap">
+    <div class="container">
+        <div class="post">
+            <div class="block-info mv-box-shadow-gray-1">
+                <div class="mv-block-style-27">
+                    <div class="mv-col-wrapper">
+                        <div class="mv-col-left block-27-col-slider">
+                            <div class="mv-block-style-26">
+                                <div class="product-detail-slider mv-slick-slide mv-lightbox-style-1">
+                                    <div class="block-26-gallery-main">
+                                        <div class="slider gallery-main">
+                                            @if (Model.Product.ProductImages != null && Model.Product.ProductImages.Any())
+                                            {
+                                                @foreach (var image in Model.Product.ProductImages.OrderBy(pi => !pi.IsMainImage))
+                                                {
+                                                    <div class="slick-slide">
+                                                        <div class="slick-slide-inner">
+                                                            <a href="@(image.ImagePath.StartsWith("/") ? image.ImagePath : "/" + image.ImagePath)" title="@image.AltText" class="mv-lightbox-item">
+                                                                <img src="@(image.ImagePath.StartsWith("/") ? image.ImagePath : "/" + image.ImagePath)" alt="@image.AltText" class="block-26-main-img" />
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <div class="slick-slide">
+                                                    <div class="slick-slide-inner">
+                                                        <a href="/images/demo/demo_370x530.png" title="@Model.Product.Name" class="mv-lightbox-item">
+                                                            <img src="/images/demo/demo_370x530.png" alt="@Model.Product.Name" class="block-26-main-img" />
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+
+                                    @if (Model.Product.ProductImages != null && Model.Product.ProductImages.Count() > 1)
+                                    {
+                                        <div class="block-26-gallery-thumbs">
+                                            <div class="block-26-gallery-thumbs-inner">
+                                                <div class="slider gallery-thumbs">
+                                                    @foreach (var image in Model.Product.ProductImages.OrderBy(pi => !pi.IsMainImage))
+                                                    {
+                                                        <div class="slick-slide">
+                                                            <div class="slick-slide-inner mv-box-shadow-gray-2">
+                                                                <img src="@(image.ImagePath.StartsWith("/") ? image.ImagePath : "/" + image.ImagePath)" alt="@image.AltText" class="block-26-thumbs-img" />
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                </div>
+                                                <div class="slick-slide-control"></div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+
+                            @if (Model.Product.ComparePrice.HasValue && Model.Product.ComparePrice > Model.Product.Price)
+                            {
+                                var discountPercent = (int)((Model.Product.ComparePrice.Value - Model.Product.Price) / Model.Product.ComparePrice.Value * 100);
+                                <div class="block-27-sale-off mv-label-style-2 text-center">
+                                    <div class="label-2-inner">
+                                        <ul class="label-2-ul">
+                                            <li class="number">-%@discountPercent</li>
+                                            <li class="text">indirim</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            }
+                            else if (Model.Product.IsSpecialProduct)
+                            {
+                                <div class="block-27-sale-off mv-label-style-2 text-center" style="background: #d4af37;">
+                                    <div class="label-2-inner">
+                                        <ul class="label-2-ul">
+                                            <li class="number">ÖZEL</li>
+                                            <li class="text">ürün</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="mv-col-right block-27-col-info">
+                            <div class="col-info-inner">
+                                <div class="block-27-info">
+                                    <div class="block-27-title">@Model.Product.Name</div>
+
+                                    <div class="block-27-code-brand" style="margin: 10px 0;">
+                                        <strong>Ürün Kodu:</strong> @Model.Product.ProductCode
+                                        @if (!string.IsNullOrEmpty(Model.Product.Brand))
+                                        {
+                                            <br><strong>Marka:</strong> @Model.Product.Brand
+                                        }
+                                    </div>
+
+                                    <div class="block-27-price">
+                                        <div class="new-price" id="current-price">@Model.Product.Price.ToString("C", new System.Globalization.CultureInfo("tr-TR"))</div>
+                                        @if (Model.Product.ComparePrice.HasValue && Model.Product.ComparePrice > Model.Product.Price)
+                                        {
+                                            <div class="old-price">@Model.Product.ComparePrice.Value.ToString("C", new System.Globalization.CultureInfo("tr-TR"))</div>
+                                        }
+                                    </div>
+
+                                    <div class="block-27-stock-status" style="margin: 15px 0;">
+                                        @if (Model.Product.StockQuantity <= 0)
+                                        {
+                                            <div class="text-danger"><i class="fa fa-times-circle"></i> <strong>Stokta Yok</strong></div>
+                                        }
+                                        else if (Model.Product.StockQuantity <= Model.Product.MinStockLevel)
+                                        {
+                                            <div class="text-warning"><i class="fa fa-exclamation-triangle"></i> <strong>Son @Model.Product.StockQuantity Adet</strong></div>
+                                        }
+                                        else
+                                        {
+                                            <div class="text-success"><i class="fa fa-check-circle"></i> <strong>Stokta Var</strong></div>
+                                        }
+                                    </div>
+
+                                    @if (!string.IsNullOrEmpty(Model.Product.CertificateType) || Model.Product.ProtectionLevel.HasValue)
+                                    {
+                                        <div class="block-27-special-props" style="margin: 15px 0; padding: 10px; background: #f8f9fa; border-left: 4px solid #007bff;">
+                                            @if (!string.IsNullOrEmpty(Model.Product.CertificateType))
+                                            {
+                                                <div><i class="fa fa-certificate text-info"></i> <strong>Sertifika:</strong> @Model.Product.CertificateType</div>
+                                            }
+                                            @if (Model.Product.ProtectionLevel.HasValue)
+                                            {
+                                                <div><i class="fa fa-shield text-info"></i> <strong>Koruma Seviyesi:</strong> Level @Model.Product.ProtectionLevel</div>
+                                            }
+                                        </div>
+                                    }
+
+                                    <div class="block-27-desc">@Model.Product.ShortDescription</div>
+
+                                    <div class="block-27-table-info">
+                                        <form id="product-detail-form">
+                                            <input type="hidden" id="product-id" value="@Model.Product.Id" />
+                                            <input type="hidden" id="selected-variant-id" value="@Model.SelectedVariantId" />
+                                            
+                                            <table>
+                                                @if (Model.OptionGroups != null && Model.OptionGroups.Any())
+                                                {
+                                                    @foreach (var optionGroup in Model.OptionGroups)
+                                                    {
+                                                        <tr>
+                                                            <td>@optionGroup.DisplayName:</td>
+                                                            <td>
+                                                                <div class="option-group" data-group-name="@optionGroup.Name">
+                                                                    @if (optionGroup.OptionType == "color")
+                                                                    {
+                                                                        <div class="color-options">
+                                                                            @foreach (var option in optionGroup.Options)
+                                                                            {
+                                                                                <div class="color-option @(option.IsAvailable ? "" : "unavailable")" 
+                                                                                     data-value="@option.Value" 
+                                                                                     data-price-adjustment="@option.PriceAdjustment"
+                                                                                     data-stock="@option.StockQuantity"
+                                                                                     title="@option.DisplayName">
+                                                                                    @if (!string.IsNullOrEmpty(option.ColorCode))
+                                                                                    {
+                                                                                        <span class="color-swatch" style="background-color: @option.ColorCode;"></span>
+                                                                                    }
+                                                                                    <span class="color-name">@option.DisplayName</span>
+                                                                                    @if (option.PriceAdjustment != 0)
+                                                                                    {
+                                                                                        <span class="price-adjustment">
+                                                                                            (@(option.PriceAdjustment > 0 ? "+" : "")@(option.PriceAdjustment.ToString("C", new System.Globalization.CultureInfo("tr-TR"))))
+                                                                                        </span>
+                                                                                    }
+                                                                                </div>
+                                                                            }
+                                                                        </div>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <div class="radio-options">
+                                                                            @foreach (var option in optionGroup.Options)
+                                                                            {
+                                                                                <div class="mv-list-inline-style-1 @(option.IsAvailable ? "" : "unavailable")" style="margin-bottom: 5px;">
+                                                                                    <label>
+                                                                                        <input type="radio" 
+                                                                                               name="option-@optionGroup.Name" 
+                                                                                               value="@option.Value" 
+                                                                                               data-price-adjustment="@option.PriceAdjustment"
+                                                                                               data-stock="@option.StockQuantity"
+                                                                                               @(!option.IsAvailable ? "disabled" : "") />
+                                                                                        @option.DisplayName
+                                                                                        @if (option.PriceAdjustment != 0)
+                                                                                        {
+                                                                                            <span class="price-adjustment">
+                                                                                                (@(option.PriceAdjustment > 0 ? "+" : "")@(option.PriceAdjustment.ToString("C", new System.Globalization.CultureInfo("tr-TR"))))
+                                                                                            </span>
+                                                                                        }
+                                                                                        @if (!option.IsAvailable)
+                                                                                        {
+                                                                                            <span class="text-muted">(Stokta yok)</span>
+                                                                                        }
+                                                                                    </label>
+                                                                                </div>
+                                                                            }
+                                                                        </div>
+                                                                    }
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                }
+                                                else if (Model.Variants != null && Model.Variants.Any())
+                                                {
+                                                    <tr>
+                                                        <td>Seçenekler:</td>
+                                                        <td>
+                                                            <div class="variant-options">
+                                                                @foreach (var variant in Model.Variants)
+                                                                {
+                                                                    <div class="mv-list-inline-style-1" style="margin-bottom: 5px;">
+                                                                        <label>
+                                                                            <input type="radio" 
+                                                                                   name="selectedVariant" 
+                                                                                   value="@variant.Id" 
+                                                                                   data-price="@variant.FinalPrice"
+                                                                                   data-stock="@variant.StockQuantity"
+                                                                                   @(variant.IsDefault ? "checked" : "") />
+                                                                            @variant.VariantName
+                                                                            @if (variant.PriceAdjustment != 0)
+                                                                            {
+                                                                                <span class="price-adjustment">
+                                                                                    (@(variant.PriceAdjustment > 0 ? "+" : "")@(variant.PriceAdjustment?.ToString("C", new System.Globalization.CultureInfo("tr-TR")) ?? "₺0,00"))
+                                                                                </span>
+                                                                            }
+                                                                        </label>
+                                                                    </div>
+                                                                }
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                }
+
+                                                <tr>
+                                                    <td>Miktar:</td>
+                                                    <td>
+                                                        <div class="mv-spinner-style-1 input-quantity-wrapper">
+                                                            <input type="number" 
+                                                                   id="quantity-input" 
+                                                                   value="@Model.Quantity" 
+                                                                   min="1" 
+                                                                   max="@Model.Product.StockQuantity" 
+                                                                   class="mv-inputbox mv-only-numeric input-quantity-product-detail" />
+                                                        </div>
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>Kategori:</td>
+                                                    <td>
+                                                        <div class="mv-list-inline-style-2">
+                                                            <ul class="list-inline-2">
+                                                                <li><a asp-controller="Product" asp-action="Category" asp-route-slug="@Model.Product.Category.Slug" class="mv-btn">@Model.Product.Category.Name</a></li>
+                                                            </ul>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+
+                                                @if (!string.IsNullOrEmpty(Model.Product.Material) || !string.IsNullOrEmpty(Model.Product.Color) || !string.IsNullOrEmpty(Model.Product.Weight))
+                                                {
+                                                    <tr>
+                                                        <td>Özellikler:</td>
+                                                        <td>
+                                                            <div style="font-size: 13px;">
+                                                                @if (!string.IsNullOrEmpty(Model.Product.Material))
+                                                                {
+                                                                    <div><strong>Malzeme:</strong> @Model.Product.Material</div>
+                                                                }
+                                                                @if (!string.IsNullOrEmpty(Model.Product.Color))
+                                                                {
+                                                                    <div><strong>Renk:</strong> @Model.Product.Color</div>
+                                                                }
+                                                                @if (!string.IsNullOrEmpty(Model.Product.Weight))
+                                                                {
+                                                                    <div><strong>Ağırlık:</strong> @Model.Product.Weight</div>
+                                                                }
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </table>
+                                        </form>
+                                    </div>
+                                </div>
+
+                                <div class="block-27-message content-message mv-message-style-1">
+                                    <div class="message-inner"></div>
+                                </div>
+                            </div>
+
+                            <div class="block-27-button">
+                                <div class="mv-dp-table align-middle">
+                                    <div class="mv-dp-table-cell">
+                                        <div class="mv-btn-group text-left">
+                                            <div class="group-inner">
+                                                <button type="button" 
+                                                        id="add-to-cart-btn" 
+                                                        class="mv-btn mv-btn-style-1 btn-1-h-50 responsive-btn-1-type-3 btn-add-to-cart" 
+                                                        data-product-id="@Model.Product.Id"
+                                                        @(Model.Product.StockQuantity <= 0 ? "disabled" : "")>
+                                                    <span class="btn-inner">
+                                                        <i class="btn-icon fa fa-cart-plus"></i>
+                                                        <span class="btn-text">sepete ekle</span>
+                                                    </span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Description & Specifications -->
+            @if (!string.IsNullOrEmpty(Model.Product.LongDescription) || (Model.Product.ProductSpecifications != null && Model.Product.ProductSpecifications.Any()))
+            {
+                <div class="row block-info-more">
+                    <div class="col-xs-12 col-specification">
+                        <div class="specification-main mv-tab-style-3 mv-box-shadow-gray-1 mv-bg-white">
+                            <ul role="tablist" class="tab-list nav nav-tabs">
+                                @if (!string.IsNullOrEmpty(Model.Product.LongDescription))
+                                {
+                                    <li role="presentation" class="active"><a href="#tab31" aria-controls="tab31" role="tab" data-toggle="tab">Açıklama</a></li>
+                                }
+                                @if (Model.Product.ProductSpecifications != null && Model.Product.ProductSpecifications.Any())
+                                {
+                                    <li role="presentation" class="@(string.IsNullOrEmpty(Model.Product.LongDescription) ? "active" : "")">
+                                        <a href="#tab32" aria-controls="tab32" role="tab" data-toggle="tab">Teknik Özellikler</a>
+                                    </li>
+                                }
+                            </ul>
+
+                            <div class="tab-content">
+                                @if (!string.IsNullOrEmpty(Model.Product.LongDescription))
+                                {
+                                    <div id="tab31" role="tabpanel" class="tab-pane active">
+                                        @Html.Raw(Model.Product.LongDescription)
+                                    </div>
+                                }
+                                
+                                @if (Model.Product.ProductSpecifications != null && Model.Product.ProductSpecifications.Any())
+                                {
+                                    <div id="tab32" role="tabpanel" class="tab-pane @(string.IsNullOrEmpty(Model.Product.LongDescription) ? "active" : "")">
+                                        <table class="table table-bordered">
+                                            <tbody>
+                                                @foreach (var spec in Model.Product.ProductSpecifications.OrderBy(s => s.SpecificationName))
+                                                {
+                                                    <tr>
+                                                        <td style="background: #f8f9fa; font-weight: bold; width: 30%;"><strong>@spec.SpecificationName</strong></td>
+                                                        <td>@spec.SpecificationValue</td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- Related Products -->
+@if (Model.RelatedProducts != null && Model.RelatedProducts.Any())
+{
+    <section class="product-detail-related mv-wrap">
+        <div class="container">
+            <div class="related-title mv-title-style-3">
+                <div class="title-3-text"><span class="behind">benzer ürünler</span><span class="main">benzer ürünler</span></div>
+            </div>
+
+            <div class="related-main">
+                <div class="related-list mv-block-style-9">
+                    <div class="block-9-list">
+                        @foreach (var relatedProduct in Model.RelatedProducts)
+                        {
+                            <article class="col-xs-6 col-sm-4 col-md-3 item post">
+                                <div class="item-inner mv-effect-translate-1">
+                                    <div class="content-thumb">
+                                        <div class="thumb-inner mv-effect-relative">
+                                            <a asp-controller="Product" asp-action="Details" asp-route-slug="@relatedProduct.Slug" title="@relatedProduct.Name">
+                                                <img src="@(relatedProduct.ProductImages?.FirstOrDefault(pi => pi.IsMainImage)?.ImagePath ?? "/images/demo/demo_300x400.png")" alt="@relatedProduct.Name" class="mv-effect-item" />
+                                            </a>
+
+                                            @if (relatedProduct.ComparePrice.HasValue && relatedProduct.ComparePrice > relatedProduct.Price)
+                                            {
+                                                var discountPercent = (int)((relatedProduct.ComparePrice.Value - relatedProduct.Price) / relatedProduct.ComparePrice.Value * 100);
+                                                <div class="content-sale-off mv-label-style-2 text-center">
+                                                    <div class="label-2-inner">
+                                                        <ul class="label-2-ul">
+                                                            <li class="number">-%@discountPercent</li>
+                                                            <li class="text">indirim</li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            }
+
+                                            <div class="content-message mv-message-style-1">
+                                                <div class="message-inner"></div>
+                                            </div>
+                                        </div>
+
+                                        <div class="content-hover">
+                                            <div class="content-button mv-btn-group text-center">
+                                                <div class="group-inner">
+                                                    <a asp-controller="Product" asp-action="Details" asp-route-slug="@relatedProduct.Slug" class="mv-btn mv-btn-style-1 btn-1-h-40 responsive-btn-1-type-1">
+                                                        <span class="btn-inner">
+                                                            <i class="btn-icon fa fa-eye"></i>
+                                                            <span class="btn-text">detay</span>
+                                                        </span>
+                                                    </a>
+                                                    <button type="button" class="mv-btn mv-btn-style-3 btn-3-h-40 responsive-btn-3-type-1 btn-add-to-cart" data-product-id="@relatedProduct.Id">
+                                                        <i class="fa fa-cart-plus"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="content-default">
+                                        <div class="content-price">
+                                            <span class="new-price">@relatedProduct.Price.ToString("C", new System.Globalization.CultureInfo("tr-TR"))</span>
+                                            @if (relatedProduct.ComparePrice.HasValue && relatedProduct.ComparePrice > relatedProduct.Price)
+                                            {
+                                                <span class="old-price">@relatedProduct.ComparePrice.Value.ToString("C", new System.Globalization.CultureInfo("tr-TR"))</span>
+                                            }
+                                        </div>
+                                        <div class="content-desc">
+                                            <a asp-controller="Product" asp-action="Details" asp-route-slug="@relatedProduct.Slug" title="@relatedProduct.Name" class="mv-overflow-ellipsis">@relatedProduct.Name</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </article>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Seçilen özellikleri takip et
+            var selectedOptions = {};
+            var currentVariant = null;
+
+            // Renk seçimi
+            $('.color-option').click(function() {
+                if ($(this).hasClass('unavailable')) return;
+                
+                var groupName = $(this).closest('.option-group').data('group-name');
+                var value = $(this).data('value');
+                
+                // Diğer seçimleri kaldır
+                $(this).siblings('.color-option').removeClass('selected');
+                $(this).addClass('selected');
+                
+                selectedOptions[groupName] = value;
+                updateVariant();
+            });
+
+            // Radio button seçimi
+            $('input[type="radio"][name^="option-"]').change(function() {
+                var name = $(this).attr('name');
+                var groupName = name.replace('option-', '');
+                var value = $(this).val();
+                
+                selectedOptions[groupName] = value;
+                updateVariant();
+            });
+
+            // Eski varyant seçimi (geriye uyumluluk)
+            $('input[name="selectedVariant"]').change(function() {
+                var selectedPrice = $(this).data('price');
+                var selectedStock = $(this).data('stock');
+                var selectedId = $(this).val();
+                
+                // Update price
+                $('#current-price').text('₺' + selectedPrice.toFixed(2).replace('.', ','));
+                
+                // Update quantity max
+                $('#quantity-input').attr('max', selectedStock);
+                
+                // Update add to cart button
+                var addToCartBtn = $('#add-to-cart-btn');
+                if (selectedStock <= 0) {
+                    addToCartBtn.prop('disabled', true).find('.btn-text').text('stokta yok');
+                } else {
+                    addToCartBtn.prop('disabled', false).find('.btn-text').text('sepete ekle');
+                }
+            });
+
+            // Varyant güncelleme fonksiyonu
+            function updateVariant() {
+                var productId = $('#product-id').val();
+                
+                if (Object.keys(selectedOptions).length === 0) {
+                    return;
+                }
+                
+                $.ajax({
+                    url: '@Url.Action("GetVariantByOptions", "Product")',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        productId: parseInt(productId),
+                        selectedOptions: selectedOptions
+                    }),
+                    success: function(result) {
+                        if (result.success) {
+                            currentVariant = result.variant;
+                            
+                            // Fiyatı güncelle
+                            $('#current-price').text('₺' + result.variant.price.toFixed(2).replace('.', ','));
+                            
+                            // Stok durumunu güncelle
+                            $('#quantity-input').attr('max', result.variant.stock);
+                            
+                            // Sepete ekle butonunu güncelle
+                            var addToCartBtn = $('#add-to-cart-btn');
+                            if (result.variant.stock <= 0) {
+                                addToCartBtn.prop('disabled', true).find('.btn-text').text('stokta yok');
+                            } else {
+                                addToCartBtn.prop('disabled', false).find('.btn-text').text('sepete ekle');
+                            }
+                            
+                            // Seçilen varyant ID'sini güncelle
+                            $('#selected-variant-id').val(result.variant.id);
+                            
+                            // Stok durumu mesajını güncelle
+                            updateStockStatus(result.variant.stock);
+                        }
+                    },
+                    error: function() {
+                        console.log('Varyant güncelleme hatası');
+                    }
+                });
+            }
+
+            // Stok durumu güncelleme
+            function updateStockStatus(stock) {
+                var stockStatus = $('.block-27-stock-status');
+                if (stock <= 0) {
+                    stockStatus.html('<div class="text-danger"><i class="fa fa-times-circle"></i> <strong>Stokta Yok</strong></div>');
+                } else if (stock <= 5) {
+                    stockStatus.html('<div class="text-warning"><i class="fa fa-exclamation-triangle"></i> <strong>Son ' + stock + ' Adet</strong></div>');
+                } else {
+                    stockStatus.html('<div class="text-success"><i class="fa fa-check-circle"></i> <strong>Stokta Var</strong></div>');
+                }
+            }
+
+            // Add to cart button click
+            $('#add-to-cart-btn').click(function() {
+                var productId = $(this).data('product-id');
+                var selectedVariantId = $('#selected-variant-id').val() || $('input[name="selectedVariant"]:checked').val();
+                var quantity = $('#quantity-input').val();
+                var button = $(this);
+                var messageDiv = $('.content-message .message-inner');
+                
+                // Disable button during request
+                button.prop('disabled', true).find('.btn-text').text('ekleniyor...');
+                
+                $.ajax({
+                    url: '@Url.Action("AddToCart", "Cart")',
+                    type: 'POST',
+                    data: {
+                        productId: productId,
+                        variantId: selectedVariantId || null,
+                        quantity: quantity
+                    },
+                    dataType: 'json',
+                    success: function(result) {
+                        if (result.success) {
+                            // Update cart count with animation
+                            if (result.cartCount !== undefined) {
+                                $('#cart-count').addClass('cart-update-animation').text(result.cartCount);
+                                setTimeout(() => $('#cart-count').removeClass('cart-update-animation'), 600);
+                            }
+                            
+                            // Show professional notification
+                            if (window.cartManager) {
+                                window.cartManager.showToast({
+                                    type: 'success',
+                                    title: 'Sepete Eklendi!',
+                                    message: 'Ürün başarıyla sepete eklendi.',
+                                    duration: 3000
+                                });
+                                
+                                // Update cart preview
+                                window.cartManager.updateCartPreview();
+                            }
+                        } else {
+                            // Show error notification
+                            if (window.cartManager) {
+                                window.cartManager.showToast({
+                                    type: 'error',
+                                    title: 'Hata!',
+                                    message: result.message || 'Ürün sepete eklenemedi.',
+                                    duration: 4000
+                                });
+                            }
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.log('Error:', xhr.responseText);
+                        if (window.cartManager) {
+                            window.cartManager.showToast({
+                                type: 'error',
+                                title: 'Bağlantı Hatası!',
+                                message: 'Bir hata oluştu. Lütfen tekrar deneyin.',
+                                duration: 4000
+                            });
+                        }
+                    },
+                    complete: function() {
+                        // Re-enable button
+                        var currentStock = currentVariant ? currentVariant.stock : ($('input[name="selectedVariant"]:checked').data('stock') || @Model.Product.StockQuantity);
+                        if (currentStock > 0) {
+                            button.prop('disabled', false).find('.btn-text').text('sepete ekle');
+                        }
+                    }
+                });
+            });
+
+            // Related products add to cart
+            $('.related-list .btn-add-to-cart').click(function() {
+                var productId = $(this).data('product-id');
+                var button = $(this);
+                var messageDiv = $('.content-message .message-inner', $(this).closest('.item-inner'));
+                
+                // Disable button during request
+                button.prop('disabled', true);
+                
+                $.ajax({
+                    url: '@Url.Action("AddToCart", "Cart")',
+                    type: 'POST',
+                    data: {
+                        productId: productId,
+                        quantity: 1
+                    },
+                    success: function(result) {
+                        if (result.success) {
+                            // Update cart count with animation
+                            if (result.cartCount !== undefined) {
+                                $('#cart-count').addClass('cart-update-animation').text(result.cartCount);
+                                setTimeout(() => $('#cart-count').removeClass('cart-update-animation'), 600);
+                            }
+                            
+                            // Show professional notification
+                            if (window.cartManager) {
+                                window.cartManager.showToast({
+                                    type: 'success',
+                                    title: 'Sepete Eklendi!',
+                                    message: 'Ürün başarıyla sepete eklendi.',
+                                    duration: 3000
+                                });
+                                
+                                // Update cart preview
+                                window.cartManager.updateCartPreview();
+                            }
+                        } else {
+                            // Show error notification
+                            if (window.cartManager) {
+                                window.cartManager.showToast({
+                                    type: 'error',
+                                    title: 'Hata!',
+                                    message: result.message || 'Ürün sepete eklenemedi.',
+                                    duration: 4000
+                                });
+                            }
+                        }
+                    },
+                    error: function() {
+                        if (window.cartManager) {
+                            window.cartManager.showToast({
+                                type: 'error',
+                                title: 'Bağlantı Hatası!',
+                                message: 'Bir hata oluştu. Lütfen tekrar deneyin.',
+                                duration: 4000
+                            });
+                        }
+                    },
+                    complete: function() {
+                        // Re-enable button
+                        button.prop('disabled', false);
+                    }
+                });
+            });
+        });
+    </script>
+}

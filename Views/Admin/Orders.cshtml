@@ -1,0 +1,728 @@
+@model IEnumerable<IlisanCommerce.Models.Order>
+@{
+    ViewData["Title"] = "Sipariş Yönetimi";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-shopping-cart text-primary me-2"></i>
+                        Sipariş Yönetimi
+                    </h1>
+                    <p class="text-muted mb-0">Siparişleri yönetin ve toplu işlemler yapın</p>
+                </div>
+                <div class="btn-group" role="group">
+                    <a href="@Url.Action("GenerateSalesReportPdf")" class="btn btn-success">
+                        <i class="fas fa-chart-line me-1"></i> Satış Raporu
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtreler -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-3">
+                            <select name="status" class="form-control">
+                                <option value="">Tüm Durumlar</option>
+                                <option value="1" selected="@(ViewBag.Status == 1)">Beklemede</option>
+                                <option value="2" selected="@(ViewBag.Status == 2)">Onaylandı</option>
+                                <option value="3" selected="@(ViewBag.Status == 3)">Hazırlanıyor</option>
+                                <option value="4" selected="@(ViewBag.Status == 4)">Kargoya Verildi</option>
+                                <option value="5" selected="@(ViewBag.Status == 5)">Teslim Edildi</option>
+                                <option value="6" selected="@(ViewBag.Status == 6)">Tamamlandı</option>
+                                <option value="7" selected="@(ViewBag.Status == 7)">İptal Edildi</option>
+                                <option value="8" selected="@(ViewBag.Status == 8)">İade Edildi</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <select name="pageSize" class="form-control">
+                                <option value="20" selected="@(ViewBag.PageSize == 20)">20</option>
+                                <option value="50" selected="@(ViewBag.PageSize == 50)">50</option>
+                                <option value="100" selected="@(ViewBag.PageSize == 100)">100</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-filter"></i> Filtrele
+                            </button>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="@Url.Action("Orders", "Admin")" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Temizle
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Sipariş Listesi</h6>
+                </div>
+                <div class="card-body">
+                    @if (Model.Any())
+                    {
+                        <!-- Bulk Operations Toolbar -->
+                        <div class="bulk-operations-toolbar mb-3" style="display: none;">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span id="selectedCount" class="fw-bold">0</span> sipariş seçildi
+                                </div>
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-primary btn-sm" onclick="showBulkStatusModal()">
+                                        <i class="fas fa-edit me-1"></i> Durumu Güncelle
+                                    </button>
+                                    <button type="button" class="btn btn-success btn-sm" onclick="bulkGenerateInvoices()">
+                                        <i class="fas fa-file-pdf me-1"></i> Faturalar (ZIP)
+                                    </button>
+                                    <button type="button" class="btn btn-info btn-sm" onclick="bulkGenerateShippingLabels()">
+                                        <i class="fas fa-shipping-fast me-1"></i> Kargo Etiketleri
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-sm" onclick="bulkDeleteOrders()">
+                                        <i class="fas fa-trash me-1"></i> Sil
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="ordersTable" width="100%" cellspacing="0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th width="30">
+                                            <input type="checkbox" id="selectAll" class="form-check-input">
+                                        </th>
+                                        <th>Sipariş No</th>
+                                        <th>Müşteri</th>
+                                        <th>Tarih</th>
+                                        <th>Ürünler</th>
+                                        <th>Tutar</th>
+                                        <th>Durum</th>
+                                        <th>Ödeme</th>
+                                        <th width="200">İşlemler</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var order in Model)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <input type="checkbox" class="form-check-input order-checkbox" value="@order.Id">
+                                            </td>
+                                            <td>
+                                                <strong>#@order.OrderNumber</strong>
+                                            </td>
+                                            <td>
+                                                @if (order.User != null)
+                                                {
+                                                    <strong>@order.User.FullName</strong><br>
+                                                    <small class="text-muted">@order.User.Email</small>
+                                                }
+                                                else
+                                                {
+                                                    <strong>@($"{order.GuestFirstName} {order.GuestLastName}".Trim())</strong><br>
+                                                    <small class="text-muted">@order.GuestEmail</small>
+                                                }
+                                            </td>
+                                            <td>
+                                                @order.OrderDate.ToString("dd.MM.yyyy")<br>
+                                                <small class="text-muted">@order.OrderDate.ToString("HH:mm")</small>
+                                            </td>
+                                            <td>
+                                                @order.TotalItems ürün
+                                                @if (order.OrderItems.Any())
+                                                {
+                                                    <br><small class="text-muted">@order.OrderItems.First().ProductName</small>
+                                                    @if (order.OrderItems.Count > 1)
+                                                    {
+                                                        <br><small class="text-muted">+@(order.OrderItems.Count - 1) ürün daha</small>
+                                                    }
+                                                }
+                                            </td>
+                                            <td>
+                                                <strong>@order.TotalAmount.ToString("C")</strong>
+                                                @if (order.ShippingCost > 0)
+                                                {
+                                                    <br><small class="text-muted">Kargo: @order.ShippingCost.ToString("C")</small>
+                                                }
+                                            </td>
+                                            <td>
+                                                @switch (order.Status)
+                                                {
+                                                    case IlisanCommerce.Models.OrderStatus.Pending:
+                                                        <span class="badge bg-warning">Beklemede</span>
+                                                        break;
+                                                    case IlisanCommerce.Models.OrderStatus.Confirmed:
+                                                        <span class="badge bg-info">Onaylandı</span>
+                                                        break;
+                                                    case IlisanCommerce.Models.OrderStatus.Processing:
+                                                        <span class="badge bg-primary">Hazırlanıyor</span>
+                                                        break;
+                                                    case IlisanCommerce.Models.OrderStatus.Shipped:
+                                                        <span class="badge bg-secondary">Kargoya Verildi</span>
+                                                        break;
+                                                    case IlisanCommerce.Models.OrderStatus.Delivered:
+                                                        <span class="badge bg-success">Teslim Edildi</span>
+                                                        break;
+                                                    case IlisanCommerce.Models.OrderStatus.Completed:
+                                                        <span class="badge bg-success">Tamamlandı</span>
+                                                        break;
+                                                    case IlisanCommerce.Models.OrderStatus.Cancelled:
+                                                        <span class="badge bg-danger">İptal Edildi</span>
+                                                        break;
+                                                    case IlisanCommerce.Models.OrderStatus.Returned:
+                                                        <span class="badge bg-dark">İade Edildi</span>
+                                                        break;
+                                                }
+                                            </td>
+                                            <td>
+                                                @switch (order.PaymentStatus)
+                                                {
+                                                    case IlisanCommerce.Models.PaymentStatus.Pending:
+                                                        <span class="badge bg-warning">Beklemede</span>
+                                                        break;
+                                                    case IlisanCommerce.Models.PaymentStatus.Processing:
+                                                        <span class="badge bg-info">İşleniyor</span>
+                                                        break;
+                                                    case IlisanCommerce.Models.PaymentStatus.Paid:
+                                                        <span class="badge bg-success">Ödendi</span>
+                                                        break;
+                                                    case IlisanCommerce.Models.PaymentStatus.Completed:
+                                                        <span class="badge bg-success">Tamamlandı</span>
+                                                        break;
+                                                    case IlisanCommerce.Models.PaymentStatus.Failed:
+                                                        <span class="badge bg-danger">Başarısız</span>
+                                                        break;
+                                                    case IlisanCommerce.Models.PaymentStatus.Refunded:
+                                                        <span class="badge bg-dark">İade Edildi</span>
+                                                        break;
+                                                }
+                                            </td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    <a href="@Url.Action("OrderDetails", new { id = order.Id })" 
+                                                       class="btn btn-sm btn-outline-primary" title="Detaylar">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <a href="@Url.Action("GenerateInvoicePdf", new { id = order.Id })" 
+                                                       class="btn btn-sm btn-outline-success" title="Fatura PDF">
+                                                        <i class="fas fa-file-invoice"></i>
+                                                    </a>
+                                                    <a href="@Url.Action("GenerateShippingLabelPdf", new { id = order.Id })" 
+                                                       class="btn btn-sm btn-outline-info" title="Kargo Etiketi">
+                                                        <i class="fas fa-shipping-fast"></i>
+                                                    </a>
+                                                    <button type="button" class="btn btn-sm btn-outline-warning" 
+                                                            onclick="showStatusUpdateModal(@order.Id, '@order.OrderNumber')" title="Durum Güncelle">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button type="button" title="Sil" class="btn btn-outline-danger btn-sm"
+                                                            onclick="deleteOrder(@order.Id)">
+                                                        <i class="fas fa-trash me-1"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Sayfalama -->
+                        @if (ViewBag.TotalPages > 1)
+                        {
+                            <nav aria-label="Sayfa navigasyonu">
+                                <ul class="pagination justify-content-center">
+                                    @if (ViewBag.CurrentPage > 1)
+                                    {
+                                        <li class="page-item">
+                                            <a class="page-link" href="@Url.Action("Orders", "Admin", new { page = ViewBag.CurrentPage - 1, status = ViewBag.Status, pageSize = ViewBag.PageSize })">Önceki</a>
+                                        </li>
+                                    }
+
+                                    @for (int i = Math.Max(1, ViewBag.CurrentPage - 2); i <= Math.Min(ViewBag.TotalPages, ViewBag.CurrentPage + 2); i++)
+                                    {
+                                        <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                            <a class="page-link" href="@Url.Action("Orders", "Admin", new { page = i, status = ViewBag.Status, pageSize = ViewBag.PageSize })">@i</a>
+                                        </li>
+                                    }
+
+                                    @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                                    {
+                                        <li class="page-item">
+                                            <a class="page-link" href="@Url.Action("Orders", "Admin", new { page = ViewBag.CurrentPage + 1, status = ViewBag.Status, pageSize = ViewBag.PageSize })">Sonraki</a>
+                                        </li>
+                                    }
+                                </ul>
+                            </nav>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">Henüz sipariş bulunmuyor</h5>
+                            <p class="text-muted">Müşteriler sipariş verdiğinde burada görünecek.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bulk Status Update Modal -->
+<div class="modal fade" id="bulkStatusModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Toplu Durum Güncelleme</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="bulkStatusForm">
+                    <div class="mb-3">
+                        <label class="form-label">Yeni Durum</label>
+                        <select name="newStatus" class="form-select" required>
+                            <option value="">Durum Seçin</option>
+                            <option value="1">Beklemede</option>
+                            <option value="2">Onaylandı</option>
+                            <option value="3">Hazırlanıyor</option>
+                            <option value="4">Kargoya Verildi</option>
+                            <option value="5">Teslim Edildi</option>
+                            <option value="6">Tamamlandı</option>
+                            <option value="7">İptal Edildi</option>
+                            <option value="8">İade Edildi</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Yorum (İsteğe bağlı)</label>
+                        <textarea name="comment" class="form-control" rows="3" placeholder="Durum değişikliği hakkında not..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" onclick="executeBulkStatusUpdate()">Güncelle</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Single Order Status Update Modal -->
+<div class="modal fade" id="statusUpdateModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Durum Güncelleme</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="statusUpdateForm">
+                    <input type="hidden" id="updateOrderId" name="orderId">
+                    <div class="mb-3">
+                        <label class="form-label">Sipariş: <span id="updateOrderNumber" class="fw-bold"></span></label>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Yeni Durum</label>
+                        <select name="newStatus" class="form-select" required>
+                            <option value="">Durum Seçin</option>
+                            <option value="1">Beklemede</option>
+                            <option value="2">Onaylandı</option>
+                            <option value="3">Hazırlanıyor</option>
+                            <option value="4">Kargoya Verildi</option>
+                            <option value="5">Teslim Edildi</option>
+                            <option value="6">Tamamlandı</option>
+                            <option value="7">İptal Edildi</option>
+                            <option value="8">İade Edildi</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Yorum (İsteğe bağlı)</label>
+                        <textarea name="comment" class="form-control" rows="3" placeholder="Durum değişikliği hakkında not..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" onclick="executeSingleStatusUpdate()">Güncelle</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.bulk-operations-toolbar {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+.btn-group .btn {
+    margin-right: 2px;
+}
+
+.order-checkbox:checked {
+    background-color: #4e73df;
+    border-color: #4e73df;
+}
+
+.badge {
+    font-size: 0.75em;
+}
+
+.table th {
+    border-top: none;
+    font-weight: 600;
+    background-color: #f8f9fa;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    initializeBulkOperations();
+});
+
+function initializeBulkOperations() {
+    const selectAllCheckbox = document.getElementById('selectAll');
+    const orderCheckboxes = document.querySelectorAll('.order-checkbox');
+    const bulkToolbar = document.querySelector('.bulk-operations-toolbar');
+    const selectedCountSpan = document.getElementById('selectedCount');
+
+    // Null kontrolleri
+    if (!selectAllCheckbox || !bulkToolbar || !selectedCountSpan) {
+        console.log('Bulk operations elements not found, skipping initialization');
+        return;
+    }
+
+    // Select all functionality
+    selectAllCheckbox.addEventListener('change', function() {
+        orderCheckboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+        });
+        updateBulkToolbar();
+    });
+
+    // Individual checkbox functionality
+    orderCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            updateSelectAllState();
+            updateBulkToolbar();
+        });
+    });
+
+    function updateSelectAllState() {
+        const checkedCount = document.querySelectorAll('.order-checkbox:checked').length;
+        const totalCount = orderCheckboxes.length;
+        
+        selectAllCheckbox.indeterminate = checkedCount > 0 && checkedCount < totalCount;
+        selectAllCheckbox.checked = checkedCount === totalCount;
+    }
+
+    function updateBulkToolbar() {
+        const selectedOrders = getSelectedOrderIds();
+        selectedCountSpan.textContent = selectedOrders.length;
+        
+        if (selectedOrders.length > 0) {
+            bulkToolbar.style.display = 'block';
+        } else {
+            bulkToolbar.style.display = 'none';
+        }
+    }
+}
+
+function getSelectedOrderIds() {
+    const checkboxes = document.querySelectorAll('.order-checkbox:checked');
+    return Array.from(checkboxes).map(cb => parseInt(cb.value));
+}
+
+function showBulkStatusModal() {
+    const selectedOrders = getSelectedOrderIds();
+    if (selectedOrders.length === 0) {
+        showToast('Lütfen en az bir sipariş seçin.', 'warning');
+        return;
+    }
+    
+    const modal = new bootstrap.Modal(document.getElementById('bulkStatusModal'));
+    modal.show();
+}
+
+function showStatusUpdateModal(orderId, orderNumber) {
+    document.getElementById('updateOrderId').value = orderId;
+    document.getElementById('updateOrderNumber').textContent = orderNumber;
+    
+    const modal = new bootstrap.Modal(document.getElementById('statusUpdateModal'));
+    modal.show();
+}
+
+function executeBulkStatusUpdate() {
+    const selectedOrders = getSelectedOrderIds();
+    const form = document.getElementById('bulkStatusForm');
+    const formData = new FormData(form);
+    
+    if (!formData.get('newStatus')) {
+        showToast('Lütfen yeni durumu seçin.', 'warning');
+        return;
+    }
+
+    // Add selected order IDs to form data
+    selectedOrders.forEach(id => {
+        formData.append('orderIds', id);
+    });
+
+    fetch('@Url.Action("BulkStatusUpdate")', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast(data.message, 'success');
+            setTimeout(() => window.location.reload(), 1500);
+        } else {
+            showToast(data.message, 'error');
+        }
+        bootstrap.Modal.getInstance(document.getElementById('bulkStatusModal')).hide();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('İşlem sırasında hata oluştu.', 'error');
+    });
+}
+
+function executeSingleStatusUpdate() {
+    const form = document.getElementById('statusUpdateForm');
+    const formData = new FormData(form);
+    
+    if (!formData.get('newStatus')) {
+        showToast('Lütfen yeni durumu seçin.', 'warning');
+        return;
+    }
+
+    const orderId = formData.get('orderId');
+    formData.append('orderIds', orderId);
+
+    fetch('@Url.Action("BulkStatusUpdate")', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast(data.message, 'success');
+            setTimeout(() => window.location.reload(), 1500);
+        } else {
+            showToast(data.message, 'error');
+        }
+        bootstrap.Modal.getInstance(document.getElementById('statusUpdateModal')).hide();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('İşlem sırasında hata oluştu.', 'error');
+    });
+}
+
+function bulkGenerateInvoices() {
+    const selectedOrders = getSelectedOrderIds();
+    if (selectedOrders.length === 0) {
+        showToast('Lütfen en az bir sipariş seçin.', 'warning');
+        return;
+    }
+
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '@Url.Action("GenerateBulkInvoices")';
+    
+    selectedOrders.forEach(id => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'orderIds';
+        input.value = id;
+        form.appendChild(input);
+    });
+
+    const tokenInput = document.createElement('input');
+    tokenInput.type = 'hidden';
+    tokenInput.name = '__RequestVerificationToken';
+    tokenInput.value = document.querySelector('input[name="__RequestVerificationToken"]').value;
+    form.appendChild(tokenInput);
+
+    document.body.appendChild(form);
+    form.submit();
+    document.body.removeChild(form);
+}
+
+function bulkGenerateShippingLabels() {
+    const selectedOrders = getSelectedOrderIds();
+    if (selectedOrders.length === 0) {
+        showToast('Lütfen en az bir sipariş seçin.', 'warning');
+        return;
+    }
+
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '@Url.Action("GenerateBulkShippingLabels")';
+    
+    selectedOrders.forEach(id => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'orderIds';
+        input.value = id;
+        form.appendChild(input);
+    });
+
+    const tokenInput = document.createElement('input');
+    tokenInput.type = 'hidden';
+    tokenInput.name = '__RequestVerificationToken';
+    tokenInput.value = document.querySelector('input[name="__RequestVerificationToken"]').value;
+    form.appendChild(tokenInput);
+
+    document.body.appendChild(form);
+    form.submit();
+    document.body.removeChild(form);
+}
+
+function bulkDeleteOrders() {
+    const selectedOrders = getSelectedOrderIds();
+    if (selectedOrders.length === 0) {
+        showToast('Lütfen en az bir sipariş seçin.', 'warning');
+        return;
+    }
+
+    if (!confirm(`${selectedOrders.length} siparişi silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.`)) {
+        return;
+    }
+
+    const formData = new FormData();
+    selectedOrders.forEach(id => {
+        formData.append('orderIds', id);
+    });
+
+    fetch('@Url.Action("BulkDeleteOrders")', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast(data.message, 'success');
+            setTimeout(() => window.location.reload(), 1500);
+        } else {
+            showToast(data.message, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('İşlem sırasında hata oluştu.', 'error');
+    });
+}
+
+function deleteOrder(orderId) {
+    const btn = event.target.closest('button');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+    
+    if (!confirm("Bu siparişi silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.")) {
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('orderIds', orderId); // Sunucu zaten liste bekliyor
+
+    fetch('@Url.Action("BulkDeleteOrders")', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+        }
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast(data.message, 'success');
+                setTimeout(() => window.location.reload(), 1500);
+            } else {
+                showToast(data.message, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('İşlem sırasında hata oluştu.', 'error');
+        });
+}
+
+// Toast notification function
+function showToast(message, type = 'info') {
+    const toastContainer = document.getElementById('toast-container') || createToastContainer();
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.textContent = message;
+    toastContainer.appendChild(toast);
+
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        if (toast.parentNode) {
+            toast.parentNode.removeChild(toast);
+        }
+    }, 5000);
+}
+
+function createToastContainer() {
+    const container = document.createElement('div');
+    container.id = 'toast-container';
+    container.className = 'toast-container';
+    container.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+    `;
+    document.body.appendChild(container);
+    return container;
+}
+</script>
+
+<style>
+.toast-container .toast {
+    background: #fff;
+    border-radius: 5px;
+    padding: 15px 20px;
+    margin-bottom: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    min-width: 300px;
+    border-left: 4px solid;
+}
+
+.toast-success { border-left-color: #28a745; color: #155724; }
+.toast-error { border-left-color: #dc3545; color: #721c24; }
+.toast-warning { border-left-color: #ffc107; color: #856404; }
+.toast-info { border-left-color: #17a2b8; color: #0c5460; }
+</style>
