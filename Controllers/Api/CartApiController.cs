@@ -112,7 +112,7 @@ namespace IlisanCommerce.Controllers.Api
                     var cartItems = await _cartService.GetCartItemsAsync(userId, sessionId);
                     var count = cartItems.Sum(item => item.Quantity);
 
-                    return Ok(new { success = true, message = "Ürün sepete eklendi.", count });
+                    return Ok(new { success = true, message = "Ürün sepete eklendi.", cartCount = count });
                 }
                 else
                 {
