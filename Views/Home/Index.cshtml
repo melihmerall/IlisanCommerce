@@ -16,14 +16,14 @@
                         <img src="@slider.ImageUrl" alt="@slider.Title" class="mv-slider-img" />
                         <div class="mv-caption-style-2">
                             <div class="container">
+                                <img src="images/icon/icon_stars.png" alt="icon" class="caption-2-img-1" />
                                 <div class="caption-2-text-1">@slider.Title</div>
                                 <div class="caption-2-text-2">@slider.Subtitle</div>
                                 @if (!string.IsNullOrEmpty(slider.ButtonText) && !string.IsNullOrEmpty(slider.ButtonUrl))
                                 {
-                                    <div class="caption-2-button" style="margin-top: 2.5rem">
+                                    <div class="caption-2-button">
                                         <a href="@slider.ButtonUrl" class="mv-btn mv-btn-style-1">
                                             <span class="btn-inner">
-                                                <i class="btn-icon fa fa-eye"></i>
                                                 <span class="btn-text">@slider.ButtonText</span>
                                             </span>
                                         </a>
@@ -37,7 +37,8 @@
             else
             {
                 <li class="mv-slider-item">
-                    <div class="mv-caption-style-2">
+                    <img src="images/slideshow/slide_1920x1080.png" alt="ILISAN" class="mv-slider-img" />
+                    <div class="mv-caption-style-2">d
                         <div class="container">
                             <img src="images/icon/icon_stars.png" alt="icon" class="caption-2-img-1" />
                             <div class="caption-2-text-1">ILISAN Savunma Sanayi</div>
@@ -204,6 +205,110 @@
     </div>
 </section>
 <!-- .home-2-featured-products-->
+
+<!--
+<div class="banner">
+    <div class="left-text">
+        <span>ÜRÜN GELDİ</span>
+    </div>
+    <div class="products-container">
+        <div class="product-item">
+            <img src="placeholder-tufek.jpg" alt="Tüfek" class="product-image">
+            <span class="product-label">TÜFEK</span>
+        </div>
+        <div class="product-item">
+            <img src="images/demo/demo_300x400.png" alt="Pegasus" class="product-image">
+            <span class="product-label">PEGASUS</span>
+        </div>
+        <div class="product-item">
+            <img src="placeholder-plce.jpg" alt="PLCE" class="product-image">
+            <span class="product-label">PLCE</span>
+        </div>
+        <div class="product-item">
+            <img src="placeholder-canta.jpg" alt="Canta" class="product-image">
+            <span class="product-label">CANTA</span>
+        </div>
+        <div class="product-item">
+            <img src="placeholder-kamuflaj.jpg" alt="Kamuflaj Çantası" class="product-image">
+            <span class="product-label">KAMUFLAJ</span>
+        </div>
+    </div>
+</div>
+-->
+
+<div id="2">
+    <div class="wrapper mt-10 md:mt-20">
+        <div class="flex">
+            <div class="relative w-full gap-4 sm:columns-2 md:columns-3 lg:gap-8">
+                <div class="mb-4 md:mb-8 lg:h-[228px]">
+                    <div class="grid grid-cols-1">
+                        <h4 class="mb-4 text-base font-medium text-white">ILISAN</h4>
+                        <div class="flex flex-wrap font-kanit text-4xl leading-none text-white xl:text-[64px]">
+                            <p><span style="color: rgb(231, 151, 36); font-size: 44px; font-weight: 700;">KOLEKSİYONLAR</span></p>
+                        </div>
+                        <p class="mt-4 text-base font-medium text-white" style="font-size: 20px; font-weight: 350">ILISAN tarafından sizin için özenle hazırlanan koleksiyonları inceleyin.</p>
+                    </div>
+                </div>
+
+                <!-- Balistik Yelekler -->
+                <a class="relative block w-full overflow-hidden mb-4 lg:mb-0 h-[452px] lg:h-[500px]" href="/kategori/balistik-yelekler">
+                    <div class="absolute inset-0 z-10 h-full w-full bg-anafarta-bg opacity-10">
+                        <img src="/images/categories/balistik-yelek.jpg" alt="Balistik Yelekler" class="w-full h-full object-cover object-center">
+                    </div>
+                    <div class="absolute inset-x-0 bottom-0 z-20 w-full px-6 py-6 md:px-14">
+                        <h4 class="font-kanit text-5xl font-extrabold !text-gray-300 leading-tight drop-shadow-lg">Balistik Yelekler</h4>
+                        <p class="!text-gray-300 text-2xl font-semibold leading-relaxed mt-4 drop-shadow-md">Üst düzey koruma sağlayan, konfor ve güvenliği bir araya getiren balistik yelek koleksiyonlarımızı keşfedin.</p>
+                    </div>
+                </a>
+
+                <!-- Taktik Tişörtler -->
+                <a class="relative block w-full overflow-hidden mb-4 lg:mb-8 h-[452px] lg:h-[260px]" href="/kategori/askeri-tekstil">
+                    <div class="absolute inset-0 z-10 h-full w-full bg-anafarta-bg opacity-10">
+                        <img src="/images/categories/tacticall-tshirt.jpg" alt="Taktik Tişörtler" class="w-full h-full object-cover object-center">
+                    </div>
+                    <div class="absolute inset-x-0 bottom-0 z-20 w-full px-6 py-6 md:px-14">
+                        <h4 class="font-kanit text-5xl font-extrabold !text-gray-300 leading-tight drop-shadow-lg">Taktik Tişörtler</h4>
+                        <p class="!text-gray-300 text-2xl font-semibold leading-relaxed mt-4 drop-shadow-md">Dayanıklı kumaş yapısı ve nefes alabilir tasarımıyla profesyoneller için geliştirilen taktik tişört modelleri.</p>
+                    </div>
+                </a>
+
+                <!-- Taktik Gömlekler -->
+                <a class="relative block w-full overflow-hidden mb-4 lg:mb-0 h-[468px]" href="/kategori/askeri-tekstil">
+                    <div class="absolute inset-0 z-10 h-full w-full bg-anafarta-bg opacity-10">
+                        <img src="/images/categories/tacticall-gomlek.jpg" alt="Taktik Gömlekler" class="w-full h-full object-cover object-center">
+                    </div>
+                    <div class="absolute inset-x-0 bottom-0 z-20 w-full px-6 py-6 md:px-14">
+                        <h4 class="font-kanit text-5xl font-extrabold !text-gray-300 leading-tight drop-shadow-lg">Taktik Gömlekler</h4>
+                        <p class="!text-gray-300 text-2xl font-semibold leading-relaxed mt-4 drop-shadow-md">Sahada maksimum hareket özgürlüğü ve dayanıklılık sunan profesyonel taktik gömlekler.</p>
+                    </div>
+                </a>
+
+                <!-- Askeri Montlar -->
+                <a class="relative block w-full overflow-hidden mb-4 lg:mb-8 h-[350px]" href="/kategori/askeri-tekstil">
+                    <div class="absolute inset-0 z-10 h-full w-full bg-anafarta-bg opacity-10">
+                        <img src="/images/categories/montlar.jpg" alt="Askeri Montlar" class="w-full h-full object-cover object-center">
+                    </div>
+                    <div class="absolute inset-x-0 bottom-0 z-20 w-full px-6 py-6 md:px-14">
+                        <h4 class="font-kanit text-5xl font-extrabold !text-gray-300 leading-tight drop-shadow-lg">Askeri Montlar</h4>
+                        <p class="!text-gray-300 text-2xl font-semibold leading-relaxed mt-4 drop-shadow-md">Zorlu hava koşullarına karşı maksimum koruma ve konfor sağlayan askeri mont koleksiyonu.</p>
+                    </div>
+                </a>
+
+                <!-- Uniformalar -->
+                <a class="relative block w-full overflow-hidden mb-4 lg:mb-0 h-[380px]" href="/kategori/askeri-tekstil">
+                    <div class="absolute inset-0 z-10 h-full w-full bg-anafarta-bg opacity-10">
+                        <img src="/images/categories/polar-ceket.jpg" alt="Polar Ceket" class="w-full h-full object-cover object-center">
+                    </div>
+                    <div class="absolute inset-x-0 bottom-0 z-20 w-full px-6 py-6 md:px-14">
+                        <h4 class="font-kanit text-5xl font-extrabold !text-gray-300 leading-tight drop-shadow-lg">Polar Ceket</h4>
+                        <p class="!text-gray-300 text-2xl font-semibold leading-relaxed mt-4 drop-shadow-md">Profesyonel birlikler için özel olarak tasarlanan dayanıklı, ergonomik ve estetik polar ceketler.</p>
+                    </div>
+                </a>
+
+            </div>
+        </div>
+    </div>
+</div>
 
 
 <section class="home-2-service mv-wrap">

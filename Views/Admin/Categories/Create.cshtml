@@ -64,9 +64,9 @@
                                         </label>
                                         <select class="form-select" id="ParentCategoryId" name="ParentCategoryId">
                                             <option value="" selected="@(Model?.ParentCategoryId == null || Model?.ParentCategoryId == 0)">Ana Kategori Olarak Oluştur</option>
-                                            @if (ViewBag.Categories != null)
+                                            @if (ViewBag.ParentCategories != null)
                                             {
-                                                @foreach (var category in (List<dynamic>)ViewBag.Categories)
+                                                @foreach (var category in ViewBag.ParentCategories)
                                                 {
                                                     <option value="@category.Id" selected="@(Model?.ParentCategoryId == category.Id)">
                                                         @category.Name
