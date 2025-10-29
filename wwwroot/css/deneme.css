@@ -1,0 +1,78 @@
+/* Container */
+.collection-container {
+    display: grid;
+    gap: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+/* Header */
+.collection-header h4 {
+    font-family: 'Kanit', sans-serif;
+    color: #ffffff;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.collection-header h2 {
+    font-family: 'Kanit', sans-serif;
+    color: #e79724;
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0.5rem 0;
+}
+
+.collection-header p {
+    font-family: 'Kanit', sans-serif;
+    color: #ffffff;
+    font-size: 1rem;
+}
+
+/* Card */
+.collection-card {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    border-radius: 8px;
+    height: 400px;
+    text-decoration: none;
+    color: white;
+}
+
+.collection-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.overlay {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(25, 25, 25, 0.4); /* bg-anafarta-bg opacity 40% */
+    z-index: 1;
+}
+
+.card-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    padding: 1rem;
+    z-index: 2;
+}
+
+.card-content h4 {
+    font-family: 'Kanit', sans-serif;
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin: 0;
+}
+
+.card-content p {
+    font-family: 'Kanit', sans-serif;
+    font-size: 1rem;
+    margin: 0.25rem 0;
+}
+
+.card-content span {
+    font-size:.75rem;
+}
